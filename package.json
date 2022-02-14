@@ -1,10 +1,11 @@
 {
-  "name": "approbation",
+  "name": "@vegaprotocol/approbation",
   "version": "0.0.1",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tape test/*.js",
+    "lint": "standard *.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/vegaprotocol/approbation/issues"
   },
-  "homepage": "https://github.com/vegaprotocol/approbation#readme"
+  "homepage": "https://github.com/vegaprotocol/approbation#readme",
+  "devDependencies": {
+    "standard": "^16.0.4",
+    "tape": "^5.5.2"
+  }
 }
