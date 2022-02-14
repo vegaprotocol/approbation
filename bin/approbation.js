@@ -13,6 +13,6 @@ switch (argv._[0]) {
     require('../src/check-filenames')
     break
   default:
-    console.log('Please choose a command')
+    console.log('Please choose a valid command')
     process.exit(1)
 }
