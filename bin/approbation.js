@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+const { checkFilenames } = require('../src/check-filenames')
+
+require('../src/check-filenames')
+
 const argv = require('minimist')(process.argv.slice(2))
 
 switch (argv._[0]) {
@@ -10,7 +14,7 @@ switch (argv._[0]) {
     require('../src/check-references')
     break
   case 'check-filenames':
-    require('../src/check-filenames')
+    checkFilenames()
     break
   default:
     console.log('Please choose a valid command')

@@ -14,14 +14,14 @@ const { validSpecificationFilename, protocolSpecificationsPath, nonProtocolSpeci
 // Configure the acc
 const maxInvalidFilenames = 0
 
-// Keeps track of seen sequence numbers so we can detect duplicates
-const seenSequenceNumbers = {}
-// Tally of filenames that pass all the checks
-let countValidFilenames = 0
-// Tally of filenames that fail any checks
-let countInvalidFilenames = 0
-
 function checkFolder (path) {
+  // Keeps track of seen sequence numbers so we can detect duplicates
+  const seenSequenceNumbers = {}
+  // Tally of filenames that pass all the checks
+  let countValidFilenames = 0
+  // Tally of filenames that fail any checks
+  let countInvalidFilenames = 0
+
   seenSequenceNumbers[path] = []
 
   fs.readdirSync(path).forEach(file => {
@@ -72,18 +72,35 @@ function checkFolder (path) {
   if (missingSequenceNumbers.length > 0) {
     console.info(`Missing sequence number: ${missingSequenceNumbers}`)
   }
+
+  return {
+    countInvalidFilenames,
+    countValidFilenames
+  }
 }
 
-checkFolder(protocolSpecificationsPath)
-checkFolder(nonProtocolSpecificationsPath)
+function checkFilenames () {
+  const p = checkFolder(protocolSpecificationsPath)
+  const np = checkFolder(nonProtocolSpecificationsPath)
 
-console.log('\r\n--------------------------------------------------')
-console.log(`Correctly named    ${countValidFilenames}`)
-console.log(`Errors             ${countInvalidFilenames}`)
-console.log('\r\n\r\n')
+  const total = {
+    countInvalidFilenames: np.countInvalidFilenames + p.countInvalidFilenames,
+    countValidFilenames: np.countValidFilenames + p.countValidFilenames
+  }
 
-if (countInvalidFilenames > maxInvalidFilenames) {
-  process.exit(1)
+  console.log('\r\n--------------------------------------------------')
+  console.log(`Correctly named    ${total.countValidFilenames}`)
+  console.log(`Errors             ${total.countInvalidFilenames}`)
+  console.log('\r\n\r\n')
+
+  if (total.countInvalidFilenames > maxInvalidFilenames) {
+    process.exit(1)
+  }
+
+  process.exit(0)
 }
 
-process.exit(0)
+module.exports = {
+  checkFolder,
+  checkFilenames
+}
