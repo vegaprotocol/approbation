@@ -26,41 +26,39 @@ function checkFolder (files) {
 
   files.forEach(file => {
     const fileName = path.basename(file)
-    if (fileName.match(/md|ipynb$/) && fileName !== 'README.md') {
-      const codeStart = fileName.match(validSpecificationFilename)
+    const codeStart = fileName.match(validSpecificationFilename)
 
-      // If the filename doesn't match, it's an error
-      if (codeStart === null) {
-        console.error(`Invalid filename: ${fileName}`)
+    // If the filename doesn't match, it's an error
+    if (codeStart === null) {
+      console.error(`Invalid filename: ${fileName}`)
+      countInvalidFilenames++
+    } else {
+      // If the sequence number is 0000, it's incorrect
+      if (codeStart[1] === '0000') {
+        console.error(`Invalid sequence number 0000: ${fileName}`)
         countInvalidFilenames++
       } else {
-        // If the sequence number is 0000, it's incorrect
-        if (codeStart[1] === '0000') {
-          console.error(`Invalid sequence number 0000: ${fileName}`)
-          countInvalidFilenames++
-        } else {
-          // If the sequence number is a duplicate, it's incorrect
-          if (seenSequenceNumbers.indexOf(codeStart[1]) !== -1) {
-            console.error(`Duplicate sequence number ${codeStart[1]}: ${fileName}`)
-            countInvalidFilenames++
-          } else {
-            seenSequenceNumbers.push(codeStart[1])
-          }
-        }
-
-        // There should be a human readable bit after the sequence/code
-        if (!codeStart[3].length > 0) {
+        // If the sequence number is a duplicate, it's incorrect
+        if (seenSequenceNumbers.indexOf(codeStart[1]) !== -1) {
           console.error(`Duplicate sequence number ${codeStart[1]}: ${fileName}`)
           countInvalidFilenames++
         } else {
-          countValidFilenames++
+          seenSequenceNumbers.push(codeStart[1])
         }
+      }
 
-        // Unnecessary check, but as we're here anyway - is the file empty?
-        const content = fs.readFileSync(`${file}`, 'ascii')
-        if (content.length === 0) {
-          console.error(`Empty file: ${fileName}`)
-        }
+      // There should be a human readable bit after the sequence/code
+      if (!codeStart[3].length > 0) {
+        console.error(`Duplicate sequence number ${codeStart[1]}: ${fileName}`)
+        countInvalidFilenames++
+      } else {
+        countValidFilenames++
+      }
+
+      // Unnecessary check, but as we're here anyway - is the file empty?
+      const content = fs.readFileSync(`${file}`, 'ascii')
+      if (content.length === 0) {
+        console.error(`Empty file: ${fileName}`)
       }
     }
   })
