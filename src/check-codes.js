@@ -24,7 +24,9 @@
  * files that don't look right as per the above. It's not elegant, but it gets the job done.
  */
 const fs = require('fs')
-const { protocolSpecificationsPath, validSpecificationPrefix, nonProtocolSpecificationsPath } = require('./lib')
+const glob = require('glob')
+const path = require('path')
+const { validSpecificationPrefix } = require('./lib')
 const { minimumAcceptableACsPerSpec } = require('./config')
 
 /**
@@ -42,20 +44,22 @@ function * chunks (arr, n = 3) {
 // Outputs acceptance criteria count if it's acceptable
 const isVerbose = false
 
-// The number of files that appear to have 0 acceptance criteria
-let countEmptyFiles = 0
-// The number of files that appear to have errors
-let countErrorFiles = 0
-// The number of files that appear to have enough detail
-let countAcceptableFiles = 0
-// Total acceptance criteria across all files
-let countAcceptanceCriteria = 0
+function checkPath (files) {
+  // The number of files that appear to have 0 acceptance criteria
+  let countEmptyFiles = 0
+  // The number of files that appear to have errors
+  let countErrorFiles = 0
+  // The number of files that appear to have enough detail
+  let countAcceptableFiles = 0
+  // Total acceptance criteria across all files
+  let countAcceptanceCriteria = 0
 
-function checkPath (path) {
-  fs.readdirSync(path).forEach(file => {
-    if (file.match(/md|ipynb$/) && file !== 'README.md') {
-      const content = fs.readFileSync(`${path}${file}`, 'ascii')
-      const codeStart = file.match(validSpecificationPrefix)
+  files.forEach(file => {
+    const fileName = path.basename(file)
+
+    if (fileName !== 'README.md') {
+      const content = fs.readFileSync(`${file}`, 'ascii')
+      const codeStart = fileName.match(validSpecificationPrefix)
 
       const regex = new RegExp(`${codeStart[0]}-([0-9]{3})`, 'g')
       const matchedContent = content.match(regex)
@@ -106,14 +110,47 @@ function checkPath (path) {
       console.groupEnd(file)
     }
   })
+
+  return {
+    countEmptyFiles,
+    countErrorFiles,
+    countAcceptableFiles,
+    countAcceptanceCriteria
+  }
 }
 
-checkPath(protocolSpecificationsPath)
-checkPath(nonProtocolSpecificationsPath)
+function checkCodes (paths) {
+  const fileList = glob.sync(paths, {})
+  let exitCode = 0
+  let res
 
-console.log('\r\n--------------------------------------------------')
-console.log(`Acceptable         ${countAcceptableFiles} (files with more than ${minimumAcceptableACsPerSpec} ACs)`)
-console.log(`Need work          ${countEmptyFiles}`)
-console.log(`Files with errors  ${countErrorFiles}`)
-console.log(`Total ACs          ${countAcceptanceCriteria}`)
-console.log('\r\n\r\n')
+  if (fileList.length > 0) {
+    res = checkPath(fileList)
+    console.log('\r\n--------------------------------------------------')
+    console.log(`Acceptable         ${res.countAcceptableFiles} (files with more than ${minimumAcceptableACsPerSpec} ACs)`)
+    console.log(`Need work          ${res.countEmptyFiles}`)
+    console.log(`Files with errors  ${res.countErrorFiles}`)
+    console.log(`Total ACs          ${res.countAcceptanceCriteria}`)
+    console.log('\r\n\r\n')
+
+    if (res.countErrorFiles > 0) {
+      console.error('Too many errors')
+      exitCode = 1
+    } else {
+      exitCode = 0
+    }
+  } else {
+    console.error('glob matched no files')
+    exitCode = 1
+  }
+
+  return {
+    exitCode,
+    res
+  }
+}
+
+module.exports = {
+  checkCodes,
+  checkPath
+}

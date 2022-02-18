@@ -6,7 +6,7 @@
  * This script is pretty ugly. Sorry.
  */
 const fs = require('fs')
-const { protocolSpecificationsPath, validSpecificationPrefix, validAcceptanceCriteriaCode, featurePath, nonProtocolSpecificationsPath } = require('./lib')
+const { protocolSpecificationsPath, validSpecificationPrefix, validAcceptanceCriteriaCode, nonProtocolSpecificationsPath } = require('./lib')
 
 // Step 1: Gather all the initial details
 const specFiles = new Map()
@@ -43,26 +43,31 @@ checkPath(nonProtocolSpecificationsPath)
 
 // Step 2: Gather all the features
 const linksInFeatures = new Map()
-fs.readdirSync(featurePath).forEach(file => {
-  if (file.match(/feature/) && file !== 'README.md') {
-    const content = fs.readFileSync(`${featurePath}${file}`, 'ascii')
+function checkTestPath (path) {
+  fs.readdirSync(path).forEach(file => {
+    if (file.match(/py|feature/) && file !== 'README.md') {
+      const content = fs.readFileSync(`${path}${file}`, 'ascii')
 
-    const codesInFeature = content.match(validAcceptanceCriteriaCode)
+      const codesInFeature = content.match(validAcceptanceCriteriaCode)
 
-    if (codesInFeature !== null) {
-      codesInFeature.forEach(acCode => {
-        if (linksInFeatures.has(acCode)) {
-          const referrers = linksInFeatures.get(acCode)
-          referrers.push(file)
+      if (codesInFeature !== null) {
+        codesInFeature.forEach(acCode => {
+          if (linksInFeatures.has(acCode)) {
+            const referrers = linksInFeatures.get(acCode)
+            referrers.push(file)
 
-          linksInFeatures.set(acCode, [...new Set(referrers)])
-        } else {
-          linksInFeatures.set(acCode, [file])
-        }
-      })
+            linksInFeatures.set(acCode, [...new Set(referrers)])
+          } else {
+            linksInFeatures.set(acCode, [file])
+          }
+        })
+      }
     }
-  }
-})
+  })
+}
+
+checkTestPath('./system-tests/')
+checkTestPath('./features/')
 
 let criteriaTotal = 0
 let criteriaReferencedTotal = 0

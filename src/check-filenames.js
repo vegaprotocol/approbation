@@ -9,81 +9,107 @@
  * files that don't look right as per the above. It's not elegant, but it gets the job done.
  */
 const fs = require('fs')
-const { validSpecificationFilename, protocolSpecificationsPath, nonProtocolSpecificationsPath } = require('./lib')
+const glob = require('glob')
+const path = require('path')
+const { validSpecificationFilename } = require('./lib')
 
 // Configure the acc
 const maxInvalidFilenames = 0
 
-// Keeps track of seen sequence numbers so we can detect duplicates
-const seenSequenceNumbers = {}
-// Tally of filenames that pass all the checks
-let countValidFilenames = 0
-// Tally of filenames that fail any checks
-let countInvalidFilenames = 0
+function checkFolder (files) {
+  // Keeps track of seen sequence numbers so we can detect duplicates
+  const seenSequenceNumbers = []
+  // Tally of filenames that pass all the checks
+  let countValidFilenames = 0
+  // Tally of filenames that fail any checks
+  let countInvalidFilenames = 0
 
-function checkFolder (path) {
-  seenSequenceNumbers[path] = []
+  files.forEach(file => {
+    const fileName = path.basename(file)
+    const codeStart = fileName.match(validSpecificationFilename)
 
-  fs.readdirSync(path).forEach(file => {
-    if (file.match(/md|ipynb$/) && file !== 'README.md') {
-      const codeStart = file.match(validSpecificationFilename)
-
-      // If the filename doesn't match, it's an error
-      if (codeStart === null) {
-        console.error(`Invalid filename: ${file}`)
+    // If the filename doesn't match, it's an error
+    if (codeStart === null) {
+      console.error(`Invalid filename: ${fileName}`)
+      countInvalidFilenames++
+    } else {
+      // If the sequence number is 0000, it's incorrect
+      if (codeStart[1] === '0000') {
+        console.error(`Invalid sequence number 0000: ${fileName}`)
         countInvalidFilenames++
       } else {
-        // If the sequence number is 0000, it's incorrect
-        if (codeStart[1] === '0000') {
-          console.error(`Invalid sequence number 0000: ${file}`)
+        // If the sequence number is a duplicate, it's incorrect
+        if (seenSequenceNumbers.indexOf(codeStart[1]) !== -1) {
+          console.error(`Duplicate sequence number ${codeStart[1]}: ${fileName}`)
           countInvalidFilenames++
         } else {
-          // If the sequence number is a duplicate, it's incorrect
-          if (seenSequenceNumbers[path].indexOf(codeStart[1]) !== -1) {
-            console.error(`Duplicate sequence number ${codeStart[1]}: ${file}`)
-            countInvalidFilenames++
-          } else {
-            seenSequenceNumbers[path].push(codeStart[1])
-          }
+          seenSequenceNumbers.push(codeStart[1])
         }
+      }
 
-        // There should be a human readable bit after the sequence/code
-        if (!codeStart[3].length > 0) {
-          console.error(`Duplicate sequence number ${codeStart[1]}: ${file}`)
-          countInvalidFilenames++
-        } else {
-          countValidFilenames++
-        }
+      // There should be a human readable bit after the sequence/code
+      if (!codeStart[3].length > 0) {
+        console.error(`Duplicate sequence number ${codeStart[1]}: ${fileName}`)
+        countInvalidFilenames++
+      } else {
+        countValidFilenames++
+      }
 
-        // Unnecessary check, but as we're here anyway - is the file empty?
-        const content = fs.readFileSync(`${path}${file}`, 'ascii')
-        if (content.length === 0) {
-          console.error(`Empty file: ${file}`)
-        }
+      // Unnecessary check, but as we're here anyway - is the file empty?
+      const content = fs.readFileSync(`${file}`, 'ascii')
+      if (content.length === 0) {
+        console.error(`Empty file: ${fileName}`)
       }
     }
   })
 
   // An acceptable error, output anyway: is there a missing sequence number?
-  const missingSequenceNumbers = seenSequenceNumbers[path].filter((n, i) =>
-    (i < seenSequenceNumbers[path].length - 1 && parseInt(seenSequenceNumbers[path][i + 1]) !== parseInt(n) + 1)
+  const missingSequenceNumbers = seenSequenceNumbers.filter((n, i) =>
+    (i < seenSequenceNumbers.length - 1 && parseInt(seenSequenceNumbers[i + 1]) !== parseInt(n) + 1)
   ).map(n => parseInt(n) + 1)
 
   if (missingSequenceNumbers.length > 0) {
     console.info(`Missing sequence number: ${missingSequenceNumbers}`)
   }
+
+  return {
+    countInvalidFilenames,
+    countValidFilenames
+  }
 }
 
-checkFolder(protocolSpecificationsPath)
-checkFolder(nonProtocolSpecificationsPath)
+function checkFilenames (paths) {
+  const fileList = glob.sync(paths, {})
+  let exitCode = 0
 
-console.log('\r\n--------------------------------------------------')
-console.log(`Correctly named    ${countValidFilenames}`)
-console.log(`Errors             ${countInvalidFilenames}`)
-console.log('\r\n\r\n')
+  if (fileList.length > 0) {
+    const p = checkFolder(fileList)
 
-if (countInvalidFilenames > maxInvalidFilenames) {
-  process.exit(1)
+    const total = {
+      countInvalidFilenames: p.countInvalidFilenames,
+      countValidFilenames: p.countValidFilenames
+    }
+
+    console.log('\r\n--------------------------------------------------')
+    console.log(`Correctly named    ${total.countValidFilenames}`)
+    console.log(`Errors             ${total.countInvalidFilenames}`)
+    console.log('\r\n\r\n')
+
+    if (total.countInvalidFilenames > maxInvalidFilenames) {
+      exitCode = 1
+    } else {
+      exitCode = 0
+    }
+  } else {
+    exitCode = 1
+  }
+
+  return {
+    exitCode
+  }
 }
 
-process.exit(0)
+module.exports = {
+  checkFolder,
+  checkFilenames
+}
