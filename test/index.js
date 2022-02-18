@@ -1,6 +1,7 @@
 const test = require('tape')
 const { checkFilenames } = require('../src/check-filenames')
 const { checkCodes } = require('../src/check-codes')
+const { checkReferences } = require('../src/check-references')
 
 test('check-filenames: exit with error if there are 2 filenames with the same sequence number', t => {
   t.plan(1)
@@ -47,4 +48,13 @@ test('check-codes: An invalid file', t => {
   const { exitCode, res } = checkCodes('./test/check-codes/a-tag-not-a-link/**/*.md')
   t.equal(exitCode, 1, 'Expected failure')
   t.equal(res.countErrorFiles, 1, 'One file has an error')
+})
+
+test('check-references: Happy path', t => {
+  t.plan(3)
+
+  const { exitCode, res } = checkReferences('./test/check-references/valid/**/*.md', './test/check-references/tests/**/*.{feature,py}')
+  t.equal(res.criteriaTotal, 1, 'One criteria exists')
+  t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
+  t.equal(res.criteriaReferencedPercent, 100, 'That is 100%')
 })
