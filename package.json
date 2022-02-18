@@ -3,6 +3,7 @@
   "version": "0.0.4",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "main": "./bin/approbation.js",
+  "engine": ">= 16",
   "bin": "./bin/approbation.js",
   "scripts": {
     "test": "tape test/*.js",
