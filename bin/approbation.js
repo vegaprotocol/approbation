@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const { checkFilenames } = require('../src/check-filenames')
+const { checkCodes } = require('../src/check-codes')
 
 require('../src/check-filenames')
 
@@ -13,10 +14,15 @@ if (command === 'check-filenames') {
   const paths = argv.specs ? argv.specs : '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   res = checkFilenames(paths)
   process.exit(res.exitCode)
+
 } else if (command === 'check-codes') {
-  require('../src/check-codes')
+  const paths = argv.specs ? argv.specs : '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  res = checkCodes(paths)
+  process.exit(res.exitCode)
+
 } else if (command === 'check-references') {
   require('../src/check-references')
+
 } else {
   console.error('Please choose a command')
   console.group('Available commands:')

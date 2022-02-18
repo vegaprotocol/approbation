@@ -9,9 +9,9 @@
  * files that don't look right as per the above. It's not elegant, but it gets the job done.
  */
 const fs = require('fs')
-const { validSpecificationFilename, protocolSpecificationsPath, nonProtocolSpecificationsPath } = require('./lib')
 const glob = require('glob')
 const path = require('path')
+const { validSpecificationFilename, protocolSpecificationsPath, nonProtocolSpecificationsPath } = require('./lib')
 
 // Configure the acc
 const maxInvalidFilenames = 0
@@ -80,22 +80,29 @@ function checkFolder (files) {
 
 function checkFilenames (paths) {
   const fileList = glob.sync(paths, {})
-  const p = checkFolder(fileList)
   let exitCode = 0
-  const total = {
-    countInvalidFilenames: p.countInvalidFilenames,
-    countValidFilenames: p.countValidFilenames
-  }
 
-  console.log('\r\n--------------------------------------------------')
-  console.log(`Correctly named    ${total.countValidFilenames}`)
-  console.log(`Errors             ${total.countInvalidFilenames}`)
-  console.log('\r\n\r\n')
+  if (fileList.length > 0) {
+    const p = checkFolder(fileList)
 
-  if (total.countInvalidFilenames > maxInvalidFilenames) {
-    exitCode = 1
+
+    const total = {
+      countInvalidFilenames: p.countInvalidFilenames,
+      countValidFilenames: p.countValidFilenames
+    }
+
+    console.log('\r\n--------------------------------------------------')
+    console.log(`Correctly named    ${total.countValidFilenames}`)
+    console.log(`Errors             ${total.countInvalidFilenames}`)
+    console.log('\r\n\r\n')
+
+    if (total.countInvalidFilenames > maxInvalidFilenames) {
+      exitCode = 1
+    } else {
+      exitCode = 0
+    }
   } else {
-    exitCode = 0
+    exitCode = 1
   }
 
   return {
