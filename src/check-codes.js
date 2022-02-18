@@ -26,7 +26,7 @@
 const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
-const { protocolSpecificationsPath, validSpecificationPrefix, nonProtocolSpecificationsPath } = require('./lib')
+const { validSpecificationPrefix } = require('./lib')
 const { minimumAcceptableACsPerSpec } = require('./config')
 
 /**
@@ -43,7 +43,6 @@ function * chunks (arr, n = 3) {
 
 // Outputs acceptance criteria count if it's acceptable
 const isVerbose = false
-
 
 function checkPath (files) {
   // The number of files that appear to have 0 acceptance criteria
@@ -116,7 +115,7 @@ function checkPath (files) {
     countEmptyFiles,
     countErrorFiles,
     countAcceptableFiles,
-    countAcceptanceCriteria 
+    countAcceptanceCriteria
   }
 }
 
@@ -124,7 +123,7 @@ function checkCodes (paths) {
   const fileList = glob.sync(paths, {})
   let exitCode = 0
   let res
-  
+
   if (fileList.length > 0) {
     res = checkPath(fileList)
     console.log('\r\n--------------------------------------------------')

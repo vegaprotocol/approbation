@@ -11,14 +11,14 @@
 const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
-const { validSpecificationFilename, protocolSpecificationsPath, nonProtocolSpecificationsPath } = require('./lib')
+const { validSpecificationFilename } = require('./lib')
 
 // Configure the acc
 const maxInvalidFilenames = 0
 
 function checkFolder (files) {
   // Keeps track of seen sequence numbers so we can detect duplicates
-  const seenSequenceNumbers = [] 
+  const seenSequenceNumbers = []
   // Tally of filenames that pass all the checks
   let countValidFilenames = 0
   // Tally of filenames that fail any checks
@@ -84,7 +84,6 @@ function checkFilenames (paths) {
 
   if (fileList.length > 0) {
     const p = checkFolder(fileList)
-
 
     const total = {
       countInvalidFilenames: p.countInvalidFilenames,

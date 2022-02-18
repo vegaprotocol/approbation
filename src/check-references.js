@@ -6,7 +6,7 @@
  * This script is pretty ugly. Sorry.
  */
 const fs = require('fs')
-const { protocolSpecificationsPath, validSpecificationPrefix, validAcceptanceCriteriaCode, featurePath, nonProtocolSpecificationsPath } = require('./lib')
+const { protocolSpecificationsPath, validSpecificationPrefix, validAcceptanceCriteriaCode, nonProtocolSpecificationsPath } = require('./lib')
 
 // Step 1: Gather all the initial details
 const specFiles = new Map()

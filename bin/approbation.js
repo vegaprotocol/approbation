@@ -14,15 +14,12 @@ if (command === 'check-filenames') {
   const paths = argv.specs ? argv.specs : '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   res = checkFilenames(paths)
   process.exit(res.exitCode)
-
 } else if (command === 'check-codes') {
   const paths = argv.specs ? argv.specs : '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   res = checkCodes(paths)
   process.exit(res.exitCode)
-
 } else if (command === 'check-references') {
   require('../src/check-references')
-
 } else {
   console.error('Please choose a command')
   console.group('Available commands:')
