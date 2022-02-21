@@ -18,28 +18,30 @@ function gatherSpecs (fileList) {
   fileList.forEach(file => {
     const fileName = path.basename(file)
 
-    if (fileName !== 'README.md') {
-      const content = fs.readFileSync(`${file}`, 'ascii')
-      const codeStart = fileName.match(validSpecificationPrefix)
-
-      // Gather the AC codes in this file
-      const regex = new RegExp(`${codeStart[0]}-([0-9]{3})`, 'g')
-      const labelledAcceptanceCriteria = content.match(regex)
-      let criteria = []
-
-      if (labelledAcceptanceCriteria !== null) {
-        // Dedupe labelled acceptance criteria
-        criteria = [...new Set(labelledAcceptanceCriteria)]
-      }
-
-      specFiles.set(fileName, {
-        name: `${path}${file}`,
-        code: codeStart[0],
-        file,
-        path,
-        criteria
-      })
+    if (fileName.toLowerCase().indexOf('readme') !== -1) {
+      return
     }
+
+    const content = fs.readFileSync(`${file}`, 'ascii')
+    const codeStart = fileName.match(validSpecificationPrefix)
+
+    // Gather the AC codes in this file
+    const regex = new RegExp(`${codeStart[0]}-([0-9]{3})`, 'g')
+    const labelledAcceptanceCriteria = content.match(regex)
+    let criteria = []
+
+    if (labelledAcceptanceCriteria !== null) {
+      // Dedupe labelled acceptance criteria
+      criteria = [...new Set(labelledAcceptanceCriteria)]
+    }
+
+    specFiles.set(fileName, {
+      name: `${path}${file}`,
+      code: codeStart[0],
+      file,
+      path,
+      criteria
+    })
   })
 
   return specFiles
@@ -51,23 +53,26 @@ function gatherTests (fileList) {
 
   fileList.forEach(file => {
     const fileName = path.basename(file)
-    if (fileName !== 'README.md') {
-      const content = fs.readFileSync(`${file}`, 'ascii')
 
-      const codesInFeature = content.match(validAcceptanceCriteriaCode)
+    if (fileName.toLowerCase().indexOf('readme') !== -1) {
+      return
+    }
 
-      if (codesInFeature !== null) {
-        codesInFeature.forEach(acCode => {
-          if (linksInFeatures.has(acCode)) {
-            const referrers = linksInFeatures.get(acCode)
-            referrers.push(file)
+    const content = fs.readFileSync(`${file}`, 'ascii')
 
-            linksInFeatures.set(acCode, [...new Set(referrers)])
-          } else {
-            linksInFeatures.set(acCode, [file])
-          }
-        })
-      }
+    const codesInFeature = content.match(validAcceptanceCriteriaCode)
+
+    if (codesInFeature !== null) {
+      codesInFeature.forEach(acCode => {
+        if (linksInFeatures.has(acCode)) {
+          const referrers = linksInFeatures.get(acCode)
+          referrers.push(file)
+
+          linksInFeatures.set(acCode, [...new Set(referrers)])
+        } else {
+          linksInFeatures.set(acCode, [file])
+        }
+      })
     }
   })
 
@@ -152,9 +157,9 @@ function checkReferences (specsGlob, testsGlob) {
     const criteriaReferencedPercent = Math.round(criteriaReferencedTotal / criteriaTotal * 100)
     const criteriaUnreferencedPercent = Math.round(criteriaUnreferencedTotal / criteriaTotal * 100)
 
-    console.log(`Total criteria:       ${criteriaTotal}`)
-    console.log(`With references:      ${criteriaReferencedTotal} (${criteriaReferencedPercent}%)`)
-    console.log(`Without references:   ${criteriaUnreferencedTotal} (${criteriaUnreferencedPercent}%)`)
+    console.log(pc.bold('Total criteria') + `:       ${criteriaTotal}`)
+    console.log(pc.green(pc.bold('With references')) + `:      ${criteriaReferencedTotal} (${criteriaReferencedPercent}%)`)
+    console.log(pc.red(pc.bold('Without references')) + `:   ${criteriaUnreferencedTotal} (${criteriaUnreferencedPercent}%)`)
     return {
       exitCode,
       res: {
@@ -168,7 +173,7 @@ function checkReferences (specsGlob, testsGlob) {
   } else {
     console.group('Globs found no files:')
     if (specList.length === 0) {
-      console.error(pc.red(`--specs matched no files (${specsGlob}})`))
+      console.error(pc.red(`--specs matched no files (${pc.dim(specsGlob)}})`))
     } else {
       console.log(pc.green(`--specs matched ${pc.bold(specList.length)} files (${pc.dim(specsGlob)})`))
     }

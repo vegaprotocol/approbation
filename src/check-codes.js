@@ -58,53 +58,55 @@ function checkPath (files) {
   files.forEach(file => {
     const fileName = path.basename(file)
 
-    if (fileName !== 'README.md') {
-      const content = fs.readFileSync(`${file}`, 'ascii')
-      const codeStart = fileName.match(validSpecificationPrefix)
+    if (fileName.toLowerCase().indexOf('readme') !== -1) {
+      return
+    }
 
-      const regex = new RegExp(`${codeStart[0]}-([0-9]{3})`, 'g')
-      const matchedContent = content.match(regex)
+    const content = fs.readFileSync(`${file}`, 'ascii')
+    const codeStart = fileName.match(validSpecificationPrefix)
 
-      if (matchedContent === null) {
-        // There were no matches for the AC prefix, so this file probably needs attention
-        countEmptyFiles++
+    const regex = new RegExp(`${codeStart[0]}-([0-9]{3})`, 'g')
+    const matchedContent = content.match(regex)
+
+    if (matchedContent === null) {
+      // There were no matches for the AC prefix, so this file probably needs attention
+      countEmptyFiles++
+      console.group(file)
+      console.error('no acceptance criteria')
+    } else {
+      // Acceptance code links are self referential, and have a name property, which makes
+      // 3 instances of each code. So a basic check for this is to split the matches in to
+      // arrays of 3
+      const chunkedMatches = [...chunks(matchedContent)]
+
+      // Then get a count of unique elements in each of those array. They should all be one
+      const totalAcceptanceCriteria = chunkedMatches.map(c => [...new Set(c)].length)
+
+      // If all of the arrays aren't 1, there's probably a mistake. Output all chunks to
+      // point to where the error is
+      const unbalancedChunks = totalAcceptanceCriteria.filter(i => i !== 1)
+
+      countAcceptanceCriteria += totalAcceptanceCriteria.length
+
+      if (unbalancedChunks.length > 0) {
+        // Something is wrong, dump out the array as a starting point for working out what
+        countErrorFiles++
         console.group(file)
-        console.error('no acceptance criteria')
+        console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
+        console.error('Found something odd:')
+        console.dir(chunkedMatches)
       } else {
-        // Acceptance code links are self referential, and have a name property, which makes
-        // 3 instances of each code. So a basic check for this is to split the matches in to
-        // arrays of 3
-        const chunkedMatches = [...chunks(matchedContent)]
-
-        // Then get a count of unique elements in each of those array. They should all be one
-        const totalAcceptanceCriteria = chunkedMatches.map(c => [...new Set(c)].length)
-
-        // If all of the arrays aren't 1, there's probably a mistake. Output all chunks to
-        // point to where the error is
-        const unbalancedChunks = totalAcceptanceCriteria.filter(i => i !== 1)
-
-        countAcceptanceCriteria += totalAcceptanceCriteria.length
-
-        if (unbalancedChunks.length > 0) {
-          // Something is wrong, dump out the array as a starting point for working out what
+        // The files are *valid*, at least. But do they have enough ACs?
+        if (totalAcceptanceCriteria.length >= minimumAcceptableACsPerSpec) {
+          countAcceptableFiles++
+          if (isVerbose) {
+            console.group(file)
+            console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
+          }
+        } else {
           countErrorFiles++
           console.group(file)
-          console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
-          console.error('Found something odd:')
-          console.dir(chunkedMatches)
-        } else {
-          // The files are *valid*, at least. But do they have enough ACs?
-          if (totalAcceptanceCriteria.length >= minimumAcceptableACsPerSpec) {
-            countAcceptableFiles++
-            if (isVerbose) {
-              console.group(file)
-              console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
-            }
-          } else {
-            countErrorFiles++
-            console.group(file)
-            console.error(`${totalAcceptanceCriteria.length} acceptance criteria`)
-          }
+          console.error(`${totalAcceptanceCriteria.length} acceptance criteria`)
         }
       }
 

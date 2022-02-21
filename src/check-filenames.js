@@ -27,6 +27,10 @@ function checkFolder (files) {
 
   files.forEach(file => {
     const fileName = path.basename(file)
+
+    if (fileName.toLowerCase().indexOf('readme') !== -1) {
+      return
+    }
     const codeStart = fileName.match(validSpecificationFilename)
 
     // If the filename doesn't match, it's an error
