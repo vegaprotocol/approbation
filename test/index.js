@@ -24,7 +24,6 @@ test('check-filenames: README is always ignored', t => {
   t.equal(exitCode, 0, 'Expected success code, as this is the happy path')
 })
 
-
 test('check-filenames: filenames can have a mix of extensions without a problem...', t => {
   t.plan(1)
 
