@@ -1,6 +1,6 @@
 {
   "name": "@vegaprotocol/approbation",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "main": "./bin/approbation.js",
   "engine": ">= 16",
@@ -8,7 +8,7 @@
   "scripts": {
     "test": "tape test/*.js",
     "lint": "standard **/*.js",
-    "prepare": "husky install"
+    "setup": "husky install"
   },
   "repository": {
     "type": "git",

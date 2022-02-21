@@ -91,9 +91,11 @@ And for `check-references`:
 ```
 
 # Development
+Run `npm run setup` to configure your environment:
+
 - Linting uses [standard](https://www.npmjs.com/package/standard)
 - Tests are run pre-push by [Husky](https://www.npmjs.com/package/husky)
-- Tags are pushed to npm
+- Package is published to `npm` on tag
 
 # [License](./LICENSE)
 The Unlicense
