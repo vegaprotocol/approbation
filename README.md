@@ -90,5 +90,10 @@ And for `check-references`:
   
 ```
 
+# Development
+- Linting uses [standard](https://www.npmjs.com/package/standard)
+- Tests are run pre-push by [Husky](https://www.npmjs.com/package/husky)
+- Tags are pushed to npm
+
 # [License](./LICENSE)
 The Unlicense
