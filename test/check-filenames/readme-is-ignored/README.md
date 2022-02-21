@@ -1,0 +1,1 @@
+README would be an invalid filename - but it is always ignored

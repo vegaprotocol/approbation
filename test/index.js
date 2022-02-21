@@ -17,6 +17,14 @@ test('check-filenames: exit with success if all file codes are valid', t => {
   t.equal(exitCode, 0, 'Expected success code, as this is the happy path')
 })
 
+test('check-filenames: README is always ignored', t => {
+  t.plan(1)
+
+  const { exitCode } = checkFilenames('./test/check-filenames/readme-is-ignored/**/*.md')
+  t.equal(exitCode, 0, 'Expected success code, as this is the happy path')
+})
+
+
 test('check-filenames: filenames can have a mix of extensions without a problem...', t => {
   t.plan(1)
 
@@ -50,6 +58,16 @@ test('check-codes: An invalid file', t => {
   t.equal(res.countErrorFiles, 1, 'One file has an error')
 })
 
+test('check-codes: Readme is always ignored', t => {
+  t.plan(4)
+
+  const { exitCode, res } = checkCodes('./test/check-codes/readme-is-ignored/**/*.md')
+  t.equal(exitCode, 0, 'Expected success')
+  t.equal(res.countAcceptableFiles, 1, 'One file is acceptable')
+  t.equal(res.countEmptyFiles, 0, 'No files are empty')
+  t.equal(res.countErrorFiles, 0, 'No files have errors')
+})
+
 test('check-references: Happy path, 100% referenced', t => {
   t.plan(4)
 
@@ -80,4 +98,14 @@ test('check-references: multiple specs, multiple tests', t => {
   t.equal(res.criteriaReferencedTotal, 2, 'Two criteria is referenced')
   t.equal(res.criteriaUnreferencedTotal, 1, 'That one criteria is not referenced')
   t.equal(res.criteriaReferencedPercent, 67, 'That is 67%')
+})
+
+test('check-references: README is ignored', t => {
+  t.plan(4)
+
+  const { exitCode, res } = checkReferences('./test/check-references/readme-is-ignored/**/*.md', './test/check-references/readme-is-ignored/**/*.{feature,py}')
+  t.equal(exitCode, 0, 'Success')
+  t.equal(res.criteriaTotal, 1, 'One criteria exists')
+  t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
+  t.equal(res.criteriaReferencedPercent, 100, 'That is 100%')
 })
