@@ -28,6 +28,7 @@ const glob = require('glob')
 const path = require('path')
 const { validSpecificationPrefix } = require('./lib')
 const { minimumAcceptableACsPerSpec } = require('./config')
+const pc = require('picocolors')
 
 /**
  * Generator to chunk array by defined size, defaulting to 3
@@ -140,7 +141,7 @@ function checkCodes (paths) {
       exitCode = 0
     }
   } else {
-    console.error('glob matched no files')
+    console.error(pc.red(`glob matched no files (${paths})`))
     exitCode = 1
   }
 

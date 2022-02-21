@@ -51,9 +51,10 @@ test('check-codes: An invalid file', t => {
 })
 
 test('check-references: Happy path', t => {
-  t.plan(3)
+  t.plan(4)
 
-  const { exitCode, res } = checkReferences('./test/check-references/valid/**/*.md', './test/check-references/tests/**/*.{feature,py}')
+  const { exitCode, res } = checkReferences('./test/check-references/valid/**/*.md', './test/check-references/valid/**/*.{feature,py}')
+  t.equal(exitCode, 0, 'Success')
   t.equal(res.criteriaTotal, 1, 'One criteria exists')
   t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
   t.equal(res.criteriaReferencedPercent, 100, 'That is 100%')

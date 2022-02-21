@@ -1,5 +1,5 @@
 # approbation
-Coverage matrix for [specifications](https://github.com/vegaprotocol/specs)
+Scripts for producing a coverage matrix for Vega [specifications](https://github.com/vegaprotocol/specs)
 
 ## Specification file names
 Each protocol specification receives a sequence number when it is merged in to master. 
@@ -61,11 +61,34 @@ set of tests, to produce a coverage number
 
 # Running these checks
 
-```
-npx @vegaprotocol/approbation check-references
+## v2.0.0 onwards
+_All_ checks take a `--specs` argument, which is a [glob](https://www.npmjs.com/package/glob) specifying the specification files to check.
+
+```bash
+npx @vegaprotocol/approbation@2.0.0 check-codes --specs='./protocol/*.md'
 ```
 
-# Development
+`check-references` also requires a `--tests` glob, specifying the tests to cross-reference with the `--specs`:
+
+```bash
+npx @vegaprotocol/approbation@2.0.0 check-references --specs='./protocol/*.md' --tests='{./feature/*.feature,./system-tests/**/*.py}'
+```
+
+This second example shows how to use globs to specify multiple paths containing tests. For more complex examples, check the 
+ [glob](https://www.npmjs.com/package/glob) documentation.
+
+### Defaults
+Default paths will be removed in v3.0.0, but exist in v2.0.0 for legacy support. If not specified, for `check-codes` & `check-filenames`:
+```
+--specs='{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+```
+
+And for `check-references`:
+```
+--specs='{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+--tests'{./qa-scenarios/**/*.{feature,py}}'
+  
+```
 
 # [License](./LICENSE)
 The Unlicense

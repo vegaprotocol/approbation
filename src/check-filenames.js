@@ -12,6 +12,7 @@ const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
 const { validSpecificationFilename } = require('./lib')
+const pc = require('picocolors')
 
 // Configure the acc
 const maxInvalidFilenames = 0
@@ -90,10 +91,10 @@ function checkFilenames (paths) {
       countValidFilenames: p.countValidFilenames
     }
 
-    console.log('\r\n--------------------------------------------------')
-    console.log(`Correctly named    ${total.countValidFilenames}`)
-    console.log(`Errors             ${total.countInvalidFilenames}`)
-    console.log('\r\n\r\n')
+    console.log()
+    console.log(pc.bold(pc.green('Correctly named')) + '    ' + pc.bold(total.countValidFilenames))
+    console.log(pc.bold(pc.red('Errors')) + '             ' + pc.bold(total.countInvalidFilenames))
+    console.log()
 
     if (total.countInvalidFilenames > maxInvalidFilenames) {
       exitCode = 1
@@ -101,6 +102,7 @@ function checkFilenames (paths) {
       exitCode = 0
     }
   } else {
+    console.error(pc.red(`glob matched no files (${paths})`))
     exitCode = 1
   }
 

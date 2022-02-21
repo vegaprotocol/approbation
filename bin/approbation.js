@@ -1,28 +1,65 @@
 #!/usr/bin/env node
 
+const packageJson = require('../package.json')
 const { checkFilenames } = require('../src/check-filenames')
 const { checkCodes } = require('../src/check-codes')
 const { checkReferences } = require('../src/check-references')
-
-require('../src/check-filenames')
+const pc = require('picocolors')
 
 const argv = require('minimist')(process.argv.slice(2))
 const command = argv._[0]
 
+function warn (lines) {
+  console.warn('')
+  lines.map(l => console.warn(pc.yellow(`! ${l}`)))
+  console.warn('')
+}
+
 let res
 
+console.log(pc.bold(`Approbation ${packageJson.version}`))
+console.log('')
+
 if (command === 'check-filenames') {
-  const paths = argv.specs ? argv.specs : '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
+  } else {
+    paths = argv.specs
+  }
+
   res = checkFilenames(paths)
   process.exit(res.exitCode)
 } else if (command === 'check-codes') {
-  const paths = argv.specs ? argv.specs : '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
+  } else {
+    paths = argv.specs
+  }
+
   res = checkCodes(paths)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
-  const specsGlob = argv.specs ? argv.specs : '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
-  const testsGlob = argv.tests ? argv.specs : '{./qa-scenarios/**/*.{feature,py}}'
+  let specsGlob = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  let testsGlob = '{./qa-scenarios/**/*.{feature,py}}'
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided, defaulting to:', `--specs="${specsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
+  } else {
+    specsGlob = argv.specs
+  }
+
+  if (!argv.tests) {
+    warn(['No --tests argument provided, defaulting to:', `--specs="${testsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
+  } else {
+    testsGlob = argv.tests
+  }
+
   res = checkReferences(specsGlob, testsGlob)
+
   process.exit(res.exitCode)
 } else {
   console.error('Please choose a command')
@@ -34,7 +71,7 @@ if (command === 'check-filenames') {
   console.log('--specs="{**/*.md}"')
   console.groupEnd('Arguments')
   console.groupEnd('check-codes')
-  
+
   console.group('check-filenames')
   console.log('Check that spec filenames are valid')
   console.group('Arguments')
@@ -49,5 +86,4 @@ if (command === 'check-filenames') {
   console.log('--tests="tests/**/*.{py,feature}"')
   console.groupEnd('Arguments')
   console.groupEnd('check-references')
-
 }
