@@ -50,11 +50,34 @@ test('check-codes: An invalid file', t => {
   t.equal(res.countErrorFiles, 1, 'One file has an error')
 })
 
-test('check-references: Happy path', t => {
-  t.plan(3)
+test('check-references: Happy path, 100% referenced', t => {
+  t.plan(4)
 
-  const { exitCode, res } = checkReferences('./test/check-references/valid/**/*.md', './test/check-references/tests/**/*.{feature,py}')
+  const { exitCode, res } = checkReferences('./test/check-references/complete-coverage/**/*.md', './test/check-references/complete-coverage/**/*.{feature,py}')
+  t.equal(exitCode, 0, 'Success')
   t.equal(res.criteriaTotal, 1, 'One criteria exists')
   t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
   t.equal(res.criteriaReferencedPercent, 100, 'That is 100%')
+})
+
+test('check-references: 50% referenced, both from one spec', t => {
+  t.plan(5)
+
+  const { exitCode, res } = checkReferences('./test/check-references/fifty-percent/**/*.md', './test/check-references/fifty-percent/**/*.{feature,py}')
+  t.equal(exitCode, 0, 'Success')
+  t.equal(res.criteriaTotal, 2, 'One criteria exists')
+  t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
+  t.equal(res.criteriaUnreferencedTotal, 1, 'That one criteria is not referenced')
+  t.equal(res.criteriaReferencedPercent, 50, 'That is 50%')
+})
+
+test('check-references: multiple specs, multiple tests', t => {
+  t.plan(5)
+
+  const { exitCode, res } = checkReferences('./test/check-references/complex/specs/*.{md,ipynb}', './test/check-references/complex/**/*.{feature,py}')
+  t.equal(exitCode, 0, 'Success')
+  t.equal(res.criteriaTotal, 3, 'Three criteria exist')
+  t.equal(res.criteriaReferencedTotal, 2, 'Two criteria is referenced')
+  t.equal(res.criteriaUnreferencedTotal, 1, 'That one criteria is not referenced')
+  t.equal(res.criteriaReferencedPercent, 67, 'That is 67%')
 })

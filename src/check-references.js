@@ -8,12 +8,12 @@
 const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
-const { protocolSpecificationsPath, validSpecificationPrefix, validAcceptanceCriteriaCode, nonProtocolSpecificationsPath } = require('./lib')
+const pc = require('picocolors')
+const { validSpecificationPrefix, validAcceptanceCriteriaCode } = require('./lib')
 
 function gatherSpecs (fileList) {
   // Step 1: Gather all the initial details
   const specFiles = new Map()
-
 
   fileList.forEach(file => {
     const fileName = path.basename(file)
@@ -45,7 +45,6 @@ function gatherSpecs (fileList) {
   return specFiles
 }
 
-
 // Step 2: Gather all the features
 function gatherTests (fileList) {
   const linksInFeatures = new Map()
@@ -75,15 +74,14 @@ function gatherTests (fileList) {
   return linksInFeatures
 }
 
-
-function processReferences(specs, tests) {
+function processReferences (specs, tests) {
   let criteriaTotal = 0
   let criteriaReferencedTotal = 0
   let criteriaUnreferencedTotal = 0
   // Step 3: Output the data
   specs.forEach((value, key) => {
     console.group(key)
-    console.log(`File:          ${value.path}${value.file}`)
+    console.log(`File:          ${value.file}`)
     console.log(`Criteria:      ${value.criteria.length}`)
     criteriaTotal += value.criteria.length
 
@@ -130,12 +128,25 @@ function processReferences(specs, tests) {
 }
 
 function checkReferences (specsGlob, testsGlob) {
-  const fileList = glob.sync(specsGlob, {})
-  let exitCode = 0
+  const specList = glob.sync(specsGlob, {})
+  const testList = glob.sync(testsGlob, {})
+  let specs, tests
+  const exitCode = 0
 
-  if (fileList.length > 0) {
-    const specs = gatherSpecs(fileList)
-    const tests = gatherTests(fileList)
+  if (specList.length > 0 && testList.length > 0) {
+    try {
+      specs = gatherSpecs(specList)
+      tests = gatherTests(testList)
+    } catch (e) {
+      console.group(pc.red('Error listing files'))
+      console.error(pc.red(e))
+      console.groupEnd()
+
+      return {
+        exitCode: 1,
+        res: {}
+      }
+    }
 
     const { criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal } = processReferences(specs, tests)
     const criteriaReferencedPercent = Math.round(criteriaReferencedTotal / criteriaTotal * 100)
@@ -153,16 +164,28 @@ function checkReferences (specsGlob, testsGlob) {
         criteriaReferencedPercent,
         criteriaUnreferencedPercent
       }
-    }  
-
+    }
   } else {
+    console.group('Globs found no files:')
+    if (specList.length === 0) {
+      console.error(pc.red(`--specs matched no files (${specsGlob}})`))
+    } else {
+      console.log(pc.green(`--specs matched ${pc.bold(specList.length)} files (${pc.dim(specsGlob)})`))
+    }
+
+    if (testList === 0) {
+      console.error(pc.red(`--tets matched no files (${testsGlob}})`))
+    } else {
+      console.error(pc.red(`--tests matched ${pc.bold(testList.length)} files (${pc.dim(testsGlob)})`))
+    }
+    console.groupEnd('Globs found no files:')
+
     return {
       exitCode: 1,
       res: {}
     }
   }
 }
-
 
 module.exports = {
   checkReferences
