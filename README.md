@@ -65,13 +65,13 @@ set of tests, to produce a coverage number
 _All_ checks take a `--specs` argument, which is a [glob](https://www.npmjs.com/package/glob) specifying the specification files to check.
 
 ```bash
-npx @vegaprotocol/approbation@2.0.0 check-codes --specs='./protocol/*.md'
+npx @vegaprotocol/approbation@latest check-codes --specs='./protocol/*.md'
 ```
 
 `check-references` also requires a `--tests` glob, specifying the tests to cross-reference with the `--specs`:
 
 ```bash
-npx @vegaprotocol/approbation@2.0.0 check-references --specs='./protocol/*.md' --tests='{./feature/*.feature,./system-tests/**/*.py}'
+npx @vegaprotocol/approbation@latest check-references --specs='./protocol/*.md' --tests='{./feature/*.feature,./system-tests/**/*.py}'
 ```
 
 This second example shows how to use globs to specify multiple paths containing tests. For more complex examples, check the 
