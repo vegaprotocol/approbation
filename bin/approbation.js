@@ -21,6 +21,7 @@ console.log(pc.bold(`Approbation ${packageJson.version}`))
 console.log('')
 
 if (command === 'check-filenames') {
+  let retired = []
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
 
   if (!argv.specs) {
@@ -29,7 +30,15 @@ if (command === 'check-filenames') {
     paths = argv.specs
   }
 
-  res = checkFilenames(paths)
+  if (argv.retired) {
+    if (Array.isArray(argv.retired) && argv.retired.length > 0) {
+      retired = argv.retired
+    } else {
+      warn(['--retired provided, but did not look like an array of retired spec codes. Ignored.'])
+    }
+  }
+
+  res = checkFilenames(paths, { retired })
   process.exit(res.exitCode)
 } else if (command === 'check-codes') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
@@ -65,25 +74,28 @@ if (command === 'check-filenames') {
   console.error('Please choose a command')
   console.group('Available commands:')
 
-  console.group('check-codes')
+  console.group(pc.bold('check-codes'))
   console.log('Looks for possible errors in the coding of acceptance criteria')
-  console.group('Arguments')
+  console.group('Required arguments')
   console.log('--specs="{**/*.md}"')
-  console.groupEnd('Arguments')
-  console.groupEnd('check-codes')
+  console.groupEnd()
+  console.groupEnd()
 
-  console.group('check-filenames')
-  console.log('Check that spec filenames are valid')
-  console.group('Arguments')
+  console.group(pc.bold('check-filenames'))
+  console.log('Check that spec filenames are valid. Optional "retired" parameter can silence errors for deleted specs.')
+  console.group('Required arguments:')
   console.log('--specs="{**/*.md}"')
-  console.groupEnd('Arguments')
-  console.groupEnd('check-filenames')
+  console.groupEnd()
+  console.group(pc.dim('Optional arguments:'))
+  console.log(pc.dim('--retired=13'))
+  console.groupEnd()
+  console.groupEnd()
 
-  console.group('check-references')
+  console.group(pc.bold('check-references'))
   console.log('Coverage statistics for acceptance criteria')
-  console.group('Arguments')
+  console.group('Required arguments:')
   console.log('--specs="{specs/**/*.md}"')
   console.log('--tests="tests/**/*.{py,feature}"')
-  console.groupEnd('Arguments')
-  console.groupEnd('check-references')
+  console.groupEnd()
+  console.groupEnd()
 }

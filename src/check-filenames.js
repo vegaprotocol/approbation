@@ -17,7 +17,7 @@ const pc = require('picocolors')
 // Configure the acc
 const maxInvalidFilenames = 0
 
-function checkFolder (files) {
+function checkFolder (files, options) {
   // Keeps track of seen sequence numbers so we can detect duplicates
   const seenSequenceNumbers = []
   // Tally of filenames that pass all the checks
@@ -74,7 +74,11 @@ function checkFolder (files) {
   ).map(n => parseInt(n) + 1)
 
   if (missingSequenceNumbers.length > 0) {
-    console.info(`Missing sequence number: ${missingSequenceNumbers}`)
+    const nonRetiredMissingNumbers = missingSequenceNumbers.filter(x => !options.retired.includes(x))
+
+    if (nonRetiredMissingNumbers.length > 0) {
+      console.info(`Missing sequence number: ${nonRetiredMissingNumbers}`)
+    }
   }
 
   return {
@@ -83,12 +87,12 @@ function checkFolder (files) {
   }
 }
 
-function checkFilenames (paths) {
+function checkFilenames (paths, options) {
   const fileList = glob.sync(paths, {})
   let exitCode = 0
 
   if (fileList.length > 0) {
-    const p = checkFolder(fileList)
+    const p = checkFolder(fileList, options)
 
     const total = {
       countInvalidFilenames: p.countInvalidFilenames,
