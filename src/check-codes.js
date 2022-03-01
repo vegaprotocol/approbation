@@ -42,6 +42,29 @@ function * chunks (arr, n = 3) {
   }
 }
 
+/**
+ * Find the unique codes in a set
+ * Source: https://stackoverflow.com/questions/840781/get-all-non-unique-values-i-e-duplicate-more-than-one-occurrence-in-an-array
+ * Could be replaced with lodash, but it's not worth the extra dep 
+ * 
+ * @return String[] Duplicate codes
+ */
+function findDuplicates(codes) {
+  const uniq = codes.flat().map(code => {
+    return {
+      count: 1,
+      code: code
+    }
+  })
+  .reduce((a, b) => {
+    a[b.code] = (a[b.code] || 0) + b.count
+    return a
+  }, {})
+
+  return Object.keys(uniq).filter((a) => uniq[a] > 1)
+}
+
+
 // Outputs acceptance criteria count if it's acceptable
 const isVerbose = false
 
@@ -80,11 +103,21 @@ function checkPath (files) {
       const chunkedMatches = [...chunks(matchedContent)]
 
       // Then get a count of unique elements in each of those array. They should all be one
-      const totalAcceptanceCriteria = chunkedMatches.map(c => [...new Set(c)].length)
+      const totalAcceptanceCriteria = chunkedMatches.map(c => [...new Set(c)])
+
+      const dupes = findDuplicates(totalAcceptanceCriteria)
+      if (dupes.length > 0) {
+        // There are multiple uses of the same code, warn
+        countErrorFiles++
+        console.group(file)
+        console.error('Found multiple uses of the same code:')
+        console.dir(dupes)
+  
+      }
 
       // If all of the arrays aren't 1, there's probably a mistake. Output all chunks to
       // point to where the error is
-      const unbalancedChunks = totalAcceptanceCriteria.filter(i => i !== 1)
+      const unbalancedChunks = totalAcceptanceCriteria.filter(i => i.length !== 1)
 
       countAcceptanceCriteria += totalAcceptanceCriteria.length
 
@@ -95,19 +128,19 @@ function checkPath (files) {
         console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
         console.error('Found something odd:')
         console.dir(chunkedMatches)
-      } else {
-        // The files are *valid*, at least. But do they have enough ACs?
-        if (totalAcceptanceCriteria.length >= minimumAcceptableACsPerSpec) {
-          countAcceptableFiles++
-          if (isVerbose) {
-            console.group(file)
-            console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
-          }
-        } else {
-          countErrorFiles++
+      }
+
+      // The files are *valid*, at least. But do they have enough ACs?
+      if (totalAcceptanceCriteria.length >= minimumAcceptableACsPerSpec) {
+        countAcceptableFiles++
+        if (isVerbose) {
           console.group(file)
-          console.error(`${totalAcceptanceCriteria.length} acceptance criteria`)
+          console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
         }
+      } else {
+        countErrorFiles++
+        console.group(file)
+        console.error(`${totalAcceptanceCriteria.length} acceptance criteria`)
       }
 
       console.groupEnd(file)
