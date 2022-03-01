@@ -57,6 +57,14 @@ test('check-codes: An invalid file', t => {
   t.equal(res.countErrorFiles, 1, 'One file has an error')
 })
 
+test('check-codes: Detect duplicate codes as an error', t => {
+  t.plan(2)
+
+  const { exitCode, res } = checkCodes('./test/check-codes/duplicate-code/**/*.md')
+  t.equal(exitCode, 1, 'Expected failure')
+  t.equal(res.countErrorFiles, 1, 'One file has an error')
+})
+
 test('check-codes: Readme is always ignored', t => {
   t.plan(4)
 
