@@ -45,25 +45,24 @@ function * chunks (arr, n = 3) {
 /**
  * Find the unique codes in a set
  * Source: https://stackoverflow.com/questions/840781/get-all-non-unique-values-i-e-duplicate-more-than-one-occurrence-in-an-array
- * Could be replaced with lodash, but it's not worth the extra dep 
- * 
+ * Could be replaced with lodash, but it's not worth the extra dep
+ *
  * @return String[] Duplicate codes
  */
-function findDuplicates(codes) {
+function findDuplicates (codes) {
   const uniq = codes.flat().map(code => {
     return {
       count: 1,
       code: code
     }
   })
-  .reduce((a, b) => {
-    a[b.code] = (a[b.code] || 0) + b.count
-    return a
-  }, {})
+    .reduce((a, b) => {
+      a[b.code] = (a[b.code] || 0) + b.count
+      return a
+    }, {})
 
   return Object.keys(uniq).filter((a) => uniq[a] > 1)
 }
-
 
 // Outputs acceptance criteria count if it's acceptable
 const isVerbose = false
@@ -112,7 +111,6 @@ function checkPath (files) {
         console.group(file)
         console.error('Found multiple uses of the same code:')
         console.dir(dupes)
-  
       }
 
       // If all of the arrays aren't 1, there's probably a mistake. Output all chunks to
