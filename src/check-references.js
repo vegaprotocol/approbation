@@ -85,7 +85,7 @@ function processReferences (specs, tests) {
   let criteriaUnreferencedTotal = 0
   // Step 3: Output the data
   specs.forEach((value, key) => {
-    console.group(key)
+    console.group(pc.bold(key))
     console.log(`File:          ${value.file}`)
     console.log(`Criteria:      ${value.criteria.length}`)
     criteriaTotal += value.criteria.length

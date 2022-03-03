@@ -1,6 +1,6 @@
 {
   "name": "@vegaprotocol/approbation",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "main": "./bin/approbation.js",
   "engine": ">= 16",
@@ -26,8 +26,9 @@
     "tape": "5.5.2"
   },
   "dependencies": {
-    "picocolors": "^1.0.0",
+    "git-branch": "^2.0.1",
     "glob": "^7.2.0",
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.5",
+    "picocolors": "^1.0.0"
   }
 }
