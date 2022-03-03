@@ -5,7 +5,7 @@ const { checkFilenames } = require('../src/check-filenames')
 const { checkCodes } = require('../src/check-codes')
 const { checkReferences } = require('../src/check-references')
 const pc = require('picocolors')
-
+const { outputBranches } = require('../src/lib/get-project-branches')
 const argv = require('minimist')(process.argv.slice(2))
 const command = argv._[0]
 
@@ -18,7 +18,13 @@ function warn (lines) {
 let res
 
 console.log(pc.bold(`Approbation ${packageJson.version}`))
+
 console.log('')
+
+if (argv && argv['show-branches']) {
+  outputBranches()
+  console.log()
+}
 
 if (command === 'check-filenames') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'

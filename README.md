@@ -90,6 +90,9 @@ And for `check-references`:
   
 ```
 
+### show-branches
+Adding `--show-branches` will show the git branch name for each project that is searched for specs/tests. Useful for CI output.
+
 # Development
 Run `npm run setup` to configure your environment:
 
