@@ -9,7 +9,7 @@ const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
 const pc = require('picocolors')
-const { validSpecificationPrefix, validAcceptanceCriteriaCode } = require('./lib')
+const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
 
 function gatherSpecs (fileList) {
   // Step 1: Gather all the initial details
@@ -132,9 +132,11 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob) {
-  const specList = glob.sync(specsGlob, {})
-  const testList = glob.sync(testsGlob, {})
+function checkReferences (specsGlob, testsGlob, ignoreGlob) {
+  const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
+  const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
+  const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
+
   let specs, tests
   const exitCode = 0
 

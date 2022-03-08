@@ -11,7 +11,7 @@
 const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
-const { validSpecificationFilename } = require('./lib')
+const { validSpecificationFilename, ignoreFiles } = require('./lib')
 const pc = require('picocolors')
 
 // Configure the acc
@@ -83,8 +83,10 @@ function checkFolder (files) {
   }
 }
 
-function checkFilenames (paths) {
-  const fileList = glob.sync(paths, {})
+function checkFilenames (paths, ignoreGlob) {
+  const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
+  const fileList = ignoreFiles(glob.sync(paths, {}), ignoreList)
+
   let exitCode = 0
 
   if (fileList.length > 0) {

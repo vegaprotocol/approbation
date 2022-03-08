@@ -26,7 +26,7 @@
 const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
-const { validSpecificationPrefix } = require('./lib')
+const { validSpecificationPrefix, ignoreFiles } = require('./lib')
 const { minimumAcceptableACsPerSpec } = require('./config')
 const pc = require('picocolors')
 
@@ -153,8 +153,9 @@ function checkPath (files) {
   }
 }
 
-function checkCodes (paths) {
-  const fileList = glob.sync(paths, {})
+function checkCodes (paths, ignoreGlob) {
+  const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
+  const fileList = ignoreFiles(glob.sync(paths, {}), ignoreList)
   let exitCode = 0
   let res
 

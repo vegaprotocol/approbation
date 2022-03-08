@@ -28,6 +28,7 @@ if (argv && argv['show-branches']) {
 
 if (command === 'check-filenames') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  const ignoreGlob = argv.ignore
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -35,10 +36,11 @@ if (command === 'check-filenames') {
     paths = argv.specs
   }
 
-  res = checkFilenames(paths)
+  res = checkFilenames(paths, ignoreGlob)
   process.exit(res.exitCode)
 } else if (command === 'check-codes') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  const ignoreGlob = argv.ignore
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -46,11 +48,12 @@ if (command === 'check-filenames') {
     paths = argv.specs
   }
 
-  res = checkCodes(paths)
+  res = checkCodes(paths, ignoreGlob)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
   let specsGlob = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   let testsGlob = '{./qa-scenarios/**/*.{feature,py}}'
+  const ignoreGlob = argv.ignore
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${specsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -64,7 +67,7 @@ if (command === 'check-filenames') {
     testsGlob = argv.tests
   }
 
-  res = checkReferences(specsGlob, testsGlob)
+  res = checkReferences(specsGlob, testsGlob, ignoreGlob)
 
   process.exit(res.exitCode)
 } else {
@@ -75,6 +78,7 @@ if (command === 'check-filenames') {
   console.log('Looks for possible errors in the coding of acceptance criteria')
   console.group('Arguments')
   console.log('--specs="{**/*.md}"')
+  console.log('--ignore="{**/*.md}"')
   console.groupEnd('Arguments')
   console.groupEnd('check-codes')
 
@@ -82,6 +86,7 @@ if (command === 'check-filenames') {
   console.log('Check that spec filenames are valid')
   console.group('Arguments')
   console.log('--specs="{**/*.md}"')
+  console.log('--ignore="{**/*.md}"')
   console.groupEnd('Arguments')
   console.groupEnd('check-filenames')
 
@@ -90,6 +95,7 @@ if (command === 'check-filenames') {
   console.group('Arguments')
   console.log('--specs="{specs/**/*.md}"')
   console.log('--tests="tests/**/*.{py,feature}"')
+  console.log('--ignore="tests/**/*.{py,feature}"')
   console.groupEnd('Arguments')
   console.groupEnd('check-references')
 }
