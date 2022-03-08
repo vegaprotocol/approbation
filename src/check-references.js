@@ -136,7 +136,7 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, ignoreGlob) {
+function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false) {
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
   const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
   const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
@@ -163,7 +163,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob) {
     const criteriaReferencedPercent = Math.round(criteriaReferencedTotal / criteriaTotal * 100)
     const criteriaUnreferencedPercent = Math.round(criteriaUnreferencedTotal / criteriaTotal * 100)
 
-    if (unknownCriteriaInTests.size > 0) {
+    if (showMystery && unknownCriteriaInTests.size > 0) {
       const g = pc.bold(`${pc.red('Mystery criteria')} referenced in tests, not found in specs:`)
       console.group(g)
       console.dir(unknownCriteriaInTests)
@@ -174,7 +174,10 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob) {
     console.log(pc.bold('Total criteria') + `:       ${criteriaTotal}`)
     console.log(pc.green(pc.bold('With references')) + `:      ${criteriaReferencedTotal} (${criteriaReferencedPercent}%)`)
     console.log(pc.red(pc.bold('Without references')) + `:   ${criteriaUnreferencedTotal} (${criteriaUnreferencedPercent}%)`)
-    console.log(pc.red(pc.bold('Mystery criteria')) + `:     ${unknownCriteriaInTests.size}`)
+
+    if (showMystery) {
+      console.log(pc.red(pc.bold('Mystery criteria')) + `:     ${unknownCriteriaInTests.size}`)
+    }
 
     return {
       exitCode,
