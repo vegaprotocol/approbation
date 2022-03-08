@@ -28,6 +28,7 @@ if (argv && argv['show-branches']) {
 
 if (command === 'check-filenames') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  const ignoreGlob = argv.ignore
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -35,10 +36,11 @@ if (command === 'check-filenames') {
     paths = argv.specs
   }
 
-  res = checkFilenames(paths)
+  res = checkFilenames(paths, ignoreGlob)
   process.exit(res.exitCode)
 } else if (command === 'check-codes') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  const ignoreGlob = argv.ignore
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -46,11 +48,12 @@ if (command === 'check-filenames') {
     paths = argv.specs
   }
 
-  res = checkCodes(paths)
+  res = checkCodes(paths, ignoreGlob)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
   let specsGlob = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   let testsGlob = '{./qa-scenarios/**/*.{feature,py}}'
+  const ignoreGlob = argv.ignore
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${specsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -64,7 +67,7 @@ if (command === 'check-filenames') {
     testsGlob = argv.tests
   }
 
-  res = checkReferences(specsGlob, testsGlob)
+  res = checkReferences(specsGlob, testsGlob, ignoreGlob)
 
   process.exit(res.exitCode)
 } else {
