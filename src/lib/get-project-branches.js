@@ -1,6 +1,6 @@
 const fs = require('fs')
 const pc = require('picocolors')
-const branch = require('git-branch');
+const git = require('git-rev-sync');
 
 /**
  * Returns all subfolders of the current path
@@ -34,11 +34,15 @@ function colourCodeBranch(branch) {
 function outputBranches() {
   const projects = getDirectories('./')
 
-
   console.group(pc.bold('Project branches'))
   projects.map(p => {
-    const b = branch.sync(p)
-  	console.log(`${pc.bold(p)}: ${colourCodeBranch(b)}`)
+    try {
+      const branch = git.branch(p)
+      const commit = git.short(p) 
+    	console.log(`${pc.bold(p)}: ${colourCodeBranch(branch)} @ ${commit}`)
+    } catch (e) {
+      console.error(`Could not check git branch for ${p}`)
+    }
   }) 
   console.groupEnd()
 }
