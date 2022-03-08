@@ -15,6 +15,14 @@ function warn (lines) {
   console.warn('')
 }
 
+function showArg (arg, description) {
+  if (description) {
+    console.log(`${pc.bold(arg)}: ${description}`)
+  } else {
+    console.log(`${pc.bold(arg)}`)
+  }
+}
+
 let res
 
 console.log(pc.bold(`Approbation ${packageJson.version}`))
@@ -54,6 +62,7 @@ if (command === 'check-filenames') {
   let specsGlob = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   let testsGlob = '{./qa-scenarios/**/*.{feature,py}}'
   const ignoreGlob = argv.ignore
+  const showMystery = argv['show-mystery'] === true
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${specsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -67,35 +76,45 @@ if (command === 'check-filenames') {
     testsGlob = argv.tests
   }
 
-  res = checkReferences(specsGlob, testsGlob, ignoreGlob)
+  res = checkReferences(specsGlob, testsGlob, ignoreGlob, showMystery)
 
   process.exit(res.exitCode)
 } else {
-  console.error('Please choose a command')
-  console.group('Available commands:')
+  console.error(pc.red(pc.bold('Please choose a command')))
+  console.log()
+  console.group(pc.bold('Available commands:'))
 
-  console.group('check-codes')
+  console.group(pc.bold('check-codes'))
   console.log('Looks for possible errors in the coding of acceptance criteria')
+  console.log()
   console.group('Arguments')
-  console.log('--specs="{**/*.md}"')
-  console.log('--ignore="{**/*.md}"')
+  showArg(`--specs="${pc.yellow('{specs/**/*.md}')}"`, 'glob of specs to pull AC codes from ')
+  showArg(`--ignore="${pc.yellow('tests/**/*.{py,feature}')}"`, 'glob of files not to check for codes')
+  showArg('--show-branches', 'Show git branches for subfolders of the current folder')
   console.groupEnd('Arguments')
   console.groupEnd('check-codes')
 
-  console.group('check-filenames')
+  console.log()
+  console.group(pc.bold('check-filenames'))
   console.log('Check that spec filenames are valid')
+  console.log()
   console.group('Arguments')
-  console.log('--specs="{**/*.md}"')
-  console.log('--ignore="{**/*.md}"')
+  showArg(`--specs="${pc.yellow('{specs/**/*.md}')}"`, 'glob of specs to pull AC codes from ')
+  showArg(`--ignore="${pc.yellow('tests/**/*.{py,feature')}"`, 'glob of filenames to ignore')
+  showArg('--show-branches', 'Show git branches for subfolders of the current folder')
   console.groupEnd('Arguments')
   console.groupEnd('check-filenames')
 
-  console.group('check-references')
+  console.log()
+  console.group(pc.bold('check-references'))
   console.log('Coverage statistics for acceptance criteria')
+  console.log()
   console.group('Arguments')
-  console.log('--specs="{specs/**/*.md}"')
-  console.log('--tests="tests/**/*.{py,feature}"')
-  console.log('--ignore="tests/**/*.{py,feature}"')
+  showArg(`--specs="${pc.yellow('{specs/**/*.md}')}"`, 'glob of specs to pull AC codes from ')
+  showArg(`--tests="${pc.yellow('tests/**/*.{py,feature}')}"`, 'glob of tests to match to the spec AC codes')
+  showArg(`--ignore="${pc.yellow('{tests/**/*.{py,feature}')}"`, 'glob of files to ignore for both tests and specs')
+  showArg('--show-mystery', 'If set, display criteria in tests that are not in any specs matched by --specs')
+  showArg('--show-branches', 'Show git branches for subfolders of the current folder')
   console.groupEnd('Arguments')
   console.groupEnd('check-references')
 }

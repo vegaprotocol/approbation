@@ -1,6 +1,6 @@
 {
   "name": "@vegaprotocol/approbation",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "main": "./bin/approbation.js",
   "engine": ">= 16",
