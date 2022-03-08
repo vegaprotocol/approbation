@@ -135,7 +135,7 @@ function processReferences (specs, tests) {
 function checkReferences (specsGlob, testsGlob, ignoreGlob) {
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
   const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
-  const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList)
+  const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
 
   let specs, tests
   const exitCode = 0

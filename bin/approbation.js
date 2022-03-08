@@ -78,6 +78,7 @@ if (command === 'check-filenames') {
   console.log('Looks for possible errors in the coding of acceptance criteria')
   console.group('Arguments')
   console.log('--specs="{**/*.md}"')
+  console.log('--ignore="{**/*.md}"')
   console.groupEnd('Arguments')
   console.groupEnd('check-codes')
 
@@ -85,6 +86,7 @@ if (command === 'check-filenames') {
   console.log('Check that spec filenames are valid')
   console.group('Arguments')
   console.log('--specs="{**/*.md}"')
+  console.log('--ignore="{**/*.md}"')
   console.groupEnd('Arguments')
   console.groupEnd('check-filenames')
 
@@ -93,6 +95,7 @@ if (command === 'check-filenames') {
   console.group('Arguments')
   console.log('--specs="{specs/**/*.md}"')
   console.log('--tests="tests/**/*.{py,feature}"')
+  console.log('--ignore="tests/**/*.{py,feature}"')
   console.groupEnd('Arguments')
   console.groupEnd('check-references')
 }

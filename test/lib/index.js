@@ -1,4 +1,4 @@
-
+/* Quick hacky silence output for tests */
 const log = console.log
 const warn = console.warn
 const error = console.error

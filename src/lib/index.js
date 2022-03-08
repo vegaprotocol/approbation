@@ -1,5 +1,18 @@
-function ignoreFiles(includeList, ignoreList) {
-  return includeList.filter(file => ignoreList.indexOf(file) === -1)
+const pc = require('picocolors')
+
+function ignoreFiles(includeList, ignoreList, category = 'spec') {
+  if (ignoreList.length === 0 || !ignoreList) {
+    return includeList
+  }
+
+  const finalList = includeList.filter(file => ignoreList.indexOf(file) === -1)
+
+  const diff = includeList.length - finalList.length
+  const ignoreLog = `Ignore matched ${pc.bold(diff)} ${category} files`
+
+  console.log(pc.yellow(ignoreLog))
+
+  return finalList
 }
 
 module.exports = {

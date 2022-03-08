@@ -50,3 +50,19 @@ test('check-codes: Readme is always ignored', t => {
   t.equal(res.countEmptyFiles, 0, 'No files are empty')
   t.equal(res.countErrorFiles, 0, 'No files have errors')
 })
+
+test('check-codes: ignore glob ignores ignored files', t => {
+  const path = './test/check-codes/ignore/**/'
+  t.plan(4)
+
+  quiet()
+  const allFiles = checkCodes(`${path}*.md`)
+  const ignore = checkCodes(`${path}*.md`, `${path}0028*.md`)
+  loud()
+
+  t.equal(ignore.exitCode, 0, 'Ignore: Expected success')
+  t.equal(ignore.res.countErrorFiles, 0, 'Ignore: The file with an error is ignored')
+
+  t.equal(allFiles.exitCode, 1, 'All files: Expected failure')
+  t.equal(allFiles.res.countErrorFiles, 1, 'All files: The file with an error is ignored')
+})

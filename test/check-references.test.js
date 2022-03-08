@@ -55,3 +55,51 @@ test('check-references: README is ignored', t => {
   t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
   t.equal(res.criteriaReferencedPercent, 100, 'That is 100%')
 })
+
+test('check-references: Ignore ignores specs...', t => {
+  const path = './test/check-references/ignore-specs/**/'
+  t.plan(4)
+
+  quiet()
+  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`)
+  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, `${path}0002*.md`)
+  loud()
+
+  t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
+  t.equal(allFiles.res.criteriaReferencedPercent, 50, 'All files: coverage is 50%')
+
+  t.equal(ignore.res.criteriaTotal, 1, 'Ignore: One criteria exists')
+  t.equal(ignore.res.criteriaReferencedPercent, 100, 'Ignore: coverage is 100%')
+})
+
+test('check-references: ...ignore also applies to tests...', t => {
+  const path = './test/check-references/ignore-tests/**/'
+  t.plan(4)
+
+  quiet()
+  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`)
+  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, `${path}another-test.feature`)
+  loud()
+
+  t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
+  t.equal(allFiles.res.criteriaReferencedPercent, 100, 'All files: coverage is 100%')
+
+  t.equal(ignore.res.criteriaTotal, 2, 'Ignore: Two criteria exist')
+  t.equal(ignore.res.criteriaReferencedPercent, 50, 'Ignore: coverage is 50%')
+})
+
+test('check-references: ...which is to say both simultaneously', t => {
+  const path = './test/check-references/ignore-both/**/'
+  t.plan(4)
+
+  quiet()
+  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`)
+  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, `${path}{another-test*,0001*}`)
+  loud()
+
+  t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
+  t.equal(allFiles.res.criteriaReferencedPercent, 100, 'All files: coverage is 100%')
+
+  t.equal(ignore.res.criteriaTotal, 1, 'Ignore: One criteria exists')
+  t.equal(ignore.res.criteriaReferencedPercent, 100, 'Ignore: coverage is 100%')
+})

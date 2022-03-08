@@ -51,3 +51,15 @@ test('check-filenames: ... but any matched file must be coded', t => {
 
   t.equal(exitCode, 1, 'Expected failure due to uncoded svg')
 })
+
+test('check-filenames: Ignore glob ignores ignored files', t => {
+  const path = './text/check-filenames/duplicate-sequence/**/'
+  t.plan(1)
+
+  quiet()
+  const { exitCode } = checkFilenames(`${path}*.{md,ipynb,txt,svg}`, `${path}0001-INTE*.md`)
+
+  loud()
+
+  t.equal(exitCode, 1, 'Expected failure due to uncoded svg')
+})
