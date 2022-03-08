@@ -101,6 +101,9 @@ function processReferences (specs, tests) {
           criteriaWithRefs.push(c)
           criteriaReferencedTotal++
         }
+
+        // Delete used references, so that tests at the end contains only AC codes not found in specs
+        tests.delete(c)
       })
 
       if (refOutput.length > 0) {
@@ -128,7 +131,8 @@ function processReferences (specs, tests) {
   return {
     criteriaTotal,
     criteriaReferencedTotal,
-    criteriaUnreferencedTotal
+    criteriaUnreferencedTotal,
+    unknownCriteriaInTests: tests
   }
 }
 
@@ -155,13 +159,23 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob) {
       }
     }
 
-    const { criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal } = processReferences(specs, tests)
+    const { criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
     const criteriaReferencedPercent = Math.round(criteriaReferencedTotal / criteriaTotal * 100)
     const criteriaUnreferencedPercent = Math.round(criteriaUnreferencedTotal / criteriaTotal * 100)
+
+    if (unknownCriteriaInTests.size > 0) {
+      const g = pc.bold(`${pc.red('Mystery criteria')} referenced in tests, not found in specs:`)
+      console.group(g)
+      console.dir(unknownCriteriaInTests)
+      console.groupEnd(g)
+      console.log()
+    }
 
     console.log(pc.bold('Total criteria') + `:       ${criteriaTotal}`)
     console.log(pc.green(pc.bold('With references')) + `:      ${criteriaReferencedTotal} (${criteriaReferencedPercent}%)`)
     console.log(pc.red(pc.bold('Without references')) + `:   ${criteriaUnreferencedTotal} (${criteriaUnreferencedPercent}%)`)
+    console.log(pc.red(pc.bold('Mystery criteria')) + `:     ${unknownCriteriaInTests.size}`)
+
     return {
       exitCode,
       res: {
@@ -169,7 +183,8 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob) {
         criteriaReferencedTotal,
         criteriaUnreferencedTotal,
         criteriaReferencedPercent,
-        criteriaUnreferencedPercent
+        criteriaUnreferencedPercent,
+        unknownCriteriaInTests
       }
     }
   } else {

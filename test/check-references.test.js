@@ -103,3 +103,20 @@ test('check-references: ...which is to say both simultaneously', t => {
   t.equal(ignore.res.criteriaTotal, 1, 'Ignore: One criteria exists')
   t.equal(ignore.res.criteriaReferencedPercent, 100, 'Ignore: coverage is 100%')
 })
+
+test('check-references: detect references in tests that are not in specs', t => {
+  const path = './test/check-references/mystery-criteria/**/'
+  t.plan(4)
+
+  quiet()
+  const { res } = checkReferences(`${path}*.md`, `${path}*.feature`)
+  loud()
+
+  t.equal(res.criteriaTotal, 2, 'Two valid criteria exist in specs')
+
+  const mc = res.unknownCriteriaInTests
+  t.equal(mc.size, 1, 'There should be 1 mystery criteria')
+
+  t.equal(mc.keys().next().value, '0007-MYST-001', 'It should list the unkown code')
+  t.equal(mc.values().next().value[0], './test/check-references/mystery-criteria/tests/test.feature', 'It should point to the file with the unknown code')
+})
