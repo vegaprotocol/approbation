@@ -10,6 +10,7 @@ const glob = require('glob')
 const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
+const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseUncoveredForCategory, specCategories } = require('./lib/category')
 
 function gatherSpecs (fileList) {
   // Step 1: Gather all the initial details
@@ -35,12 +36,15 @@ function gatherSpecs (fileList) {
       criteria = [...new Set(labelledAcceptanceCriteria)]
     }
 
+    const category = getCategoryForSpec(codeStart[0])
+
     specFiles.set(fileName, {
       name: `${path}${file}`,
       code: codeStart[0],
       file,
       path,
-      criteria
+      criteria,
+      category
     })
   })
 
@@ -89,6 +93,7 @@ function processReferences (specs, tests) {
     console.log(`File:          ${value.file}`)
     console.log(`Criteria:      ${value.criteria.length}`)
     criteriaTotal += value.criteria.length
+    increaseCodesForCategory(value.category, value.criteria.length)
 
     // Tally Criteria
     if (value.criteria && value.criteria.length > 0) {
@@ -96,10 +101,14 @@ function processReferences (specs, tests) {
       let refOutput = ''
       value.criteria.forEach(c => {
         const linksForAC = tests.get(c)
+
         if (linksForAC) {
           refOutput += `${c}:  ${linksForAC.length} (${linksForAC.toString()})\r\n`
           criteriaWithRefs.push(c)
           criteriaReferencedTotal++
+          increaseCoveredForCategory(value.category, 1)
+        } else {
+          increaseCoveredForCategory(value.category, 0)
         }
 
         // Delete used references, so that tests at the end contains only AC codes not found in specs
@@ -121,6 +130,8 @@ function processReferences (specs, tests) {
             criteriaUnreferencedTotal++
           }
         })
+
+        increaseUncoveredForCategory(value.category, unreferencedCriteria.length)
         console.log(`Unreferenced ACs: ${unreferencedCriteria.join(', ')}`)
       }
     }
@@ -178,6 +189,17 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false)
     if (showMystery) {
       console.log(pc.red(pc.bold('Mystery criteria')) + `:     ${unknownCriteriaInTests.size}`)
     }
+
+    console.log('----')
+    console.log()
+    Object.keys(specCategories).forEach(key => {
+      const c = specCategories[key]
+      console.group(key)
+      console.log('Total ACs: ' + c['codes'])
+      console.log('Covered ACs: ' + c['covered'])
+      console.log('Uncovered ACs: ' + c['uncovered'])
+      console.groupEnd(key)
+    })
 
     return {
       exitCode,
