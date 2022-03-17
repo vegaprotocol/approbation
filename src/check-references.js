@@ -117,11 +117,16 @@ function processReferences (specs, tests) {
           criteriaReferencedTotal++
           increaseCoveredForCategory(value.category, 1)
 
+          // Hacky hack: Limit these to 1 or 0 rather than a true tally.
+          let criteriaAlreadyLoggedSystest = false
+          let criteriaAlreadyLoggedFeature = false
           linksForAC.forEach(l => {
-            if (l.match('system-tests')) {
+            if (!criteriaAlreadyLoggedSystest && l.match('system-tests')) {
               increaseSystemTestCoveredForCategory(value.category, 1)
-            } else if (l.match('.feature')) {
+              criteriaAlreadyLoggedSystest = true
+            } else if (!criteriaAlreadyLoggedFeature && l.match('.feature')) {
               increaseFeatureCoveredForCategory(value.category, 1)
+              criteriaAlreadyLoggedFeature = true
             }
           })
         } else {
