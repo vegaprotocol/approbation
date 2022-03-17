@@ -10,7 +10,12 @@ const glob = require('glob')
 const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
-const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseUncoveredForCategory, specCategories } = require('./lib/category')
+const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, specCategories } = require('./lib/category')
+const { printTable } = require('console-table-printer')
+
+// Ugly globals
+let verbose = false
+let showFiles = false
 
 function gatherSpecs (fileList) {
   // Step 1: Gather all the initial details
@@ -87,26 +92,38 @@ function processReferences (specs, tests) {
   let criteriaTotal = 0
   let criteriaReferencedTotal = 0
   let criteriaUnreferencedTotal = 0
+  const acceptableMinimum = 1
   // Step 3: Output the data
   specs.forEach((value, key) => {
-    console.group(pc.bold(key))
-    console.log(`File:          ${value.file}`)
-    console.log(`Criteria:      ${value.criteria.length}`)
+    const unreferencedCriteria = []
+    const category = value.category && value.category !== 'Unknown' ? ` #${pc.yellow(value.category)}` : ''
+    increaseSpecCountForCategory(value.category)
+
+    const acceptableMinimum = 1
+
     criteriaTotal += value.criteria.length
     increaseCodesForCategory(value.category, value.criteria.length)
+    let refOutput = ''
+    const criteriaWithRefs = []
 
     // Tally Criteria
     if (value.criteria && value.criteria.length > 0) {
-      const criteriaWithRefs = []
-      let refOutput = ''
       value.criteria.forEach(c => {
         const linksForAC = tests.get(c)
 
         if (linksForAC) {
-          refOutput += `${c}:  ${linksForAC.length} (${linksForAC.toString()})\r\n`
+          refOutput += `${pc.green(c)}:  ${linksForAC.length} (${linksForAC.toString()})\r\n`
           criteriaWithRefs.push(c)
           criteriaReferencedTotal++
           increaseCoveredForCategory(value.category, 1)
+
+          linksForAC.forEach(l => {
+            if (l.match('system-tests')) {
+              increaseSystemTestCoveredForCategory(value.category, 1)
+            } else if (l.match('.feature')) {
+              increaseFeatureCoveredForCategory(value.category, 1)
+            }
+          })
         } else {
           increaseCoveredForCategory(value.category, 0)
         }
@@ -115,15 +132,7 @@ function processReferences (specs, tests) {
         tests.delete(c)
       })
 
-      if (refOutput.length > 0) {
-        console.group('Feature references')
-        console.log(refOutput)
-        console.groupEnd('Feature references')
-      }
-
       if (criteriaWithRefs.length !== value.criteria.length) {
-        const unreferencedCriteria = []
-
         value.criteria.forEach(v => {
           if (!criteriaWithRefs.includes(v)) {
             unreferencedCriteria.push(v)
@@ -132,11 +141,33 @@ function processReferences (specs, tests) {
         })
 
         increaseUncoveredForCategory(value.category, unreferencedCriteria.length)
-        console.log(`Unreferenced ACs: ${unreferencedCriteria.join(', ')}`)
+      }
+
+      if (value.criteria.length > acceptableMinimum) {
+        increaseAcceptableSpecsForCategory(value.category)
       }
     }
-    console.groupEnd(key)
-    console.log(' ')
+
+    if (showFiles) {
+      // Console output
+      const count = value.criteria.length > acceptableMinimum ? pc.green(value.criteria.length) : pc.red(value.criteria.length)
+      const referenced = criteriaWithRefs.length > acceptableMinimum ? pc.green(criteriaWithRefs.length) : pc.red(criteriaWithRefs.length)
+
+      const tally = ` has ${count} ACs of which ${referenced} are tested`
+
+      console.log(`${pc.bold(key)}${tally}${category}`)
+      if (verbose) {
+        console.group()
+        console.log(`File:          ${value.file}`)
+        console.log(`Unreferenced ACs: ${unreferencedCriteria.join(', ')}`)
+        if (refOutput.length > 0) {
+          console.group(pc.green(pc.bold('Test references')))
+          console.log(refOutput)
+          console.groupEnd()
+        }
+        console.groupEnd()
+      }
+    }
   })
 
   return {
@@ -147,7 +178,10 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false) {
+function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false) {
+  verbose = isVerbose
+  showFiles = shouldShowFiles
+
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
   const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
   const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
@@ -182,24 +216,57 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false)
       console.log()
     }
 
-    console.log(pc.bold('Total criteria') + `:       ${criteriaTotal}`)
-    console.log(pc.green(pc.bold('With references')) + `:      ${criteriaReferencedTotal} (${criteriaReferencedPercent}%)`)
-    console.log(pc.red(pc.bold('Without references')) + `:   ${criteriaUnreferencedTotal} (${criteriaUnreferencedPercent}%)`)
-
+    if (!showCategoryStats) {
+      console.log(pc.bold('Total criteria') + `:       ${criteriaTotal}`)
+      console.log(pc.green(pc.bold('With references')) + `:      ${criteriaReferencedTotal} (${criteriaReferencedPercent}%)`)
+      console.log(pc.red(pc.bold('Without references')) + `:   ${criteriaUnreferencedTotal} (${criteriaUnreferencedPercent}%)`)
+    }
     if (showMystery) {
       console.log(pc.red(pc.bold('Mystery criteria')) + `:     ${unknownCriteriaInTests.size}`)
     }
 
-    console.log('----')
-    console.log()
-    Object.keys(specCategories).forEach(key => {
-      const c = specCategories[key]
-      console.group(key)
-      console.log('Total ACs: ' + c['codes'])
-      console.log('Covered ACs: ' + c['covered'])
-      console.log('Uncovered ACs: ' + c['uncovered'])
-      console.groupEnd(key)
-    })
+    if (showCategoryStats) {
+      console.log()
+      let specFilesTotal = 0
+      let labelledFeatureTotal = 0
+      let labelledSystestTotal = 0
+      let acceptableSpecsTotal = 0
+      const categories = Object.keys(specCategories).map(key => {
+        const c = specCategories[key]
+        const coverage = (Math.round(c.covered / c.codes * 100))
+        specFilesTotal += c.specCount | 0
+        labelledFeatureTotal += c.featureCovered | 0
+        labelledSystestTotal += c.systemTestCovered | 0
+        acceptableSpecsTotal += c.acceptableSpecCount | 0
+
+
+        return {
+          Category: pc.yellow(key),
+          'Spec files': c.specCount || pc.gray('-'),
+          'Acceptable': c.acceptableSpecCount ? c.acceptableSpecCount === c.specCount ? pc.green(c.acceptableSpecCount) : pc.red(c.acceptableSpecCount) : pc.gray('-'),
+          'AC codes': c.codes || pc.gray('-'),
+          'ACs covered': c.covered || pc.gray('-'),
+          'ACs/Features': c.featureCovered || pc.gray('-'),
+          'ACs/Systest': c.systemTestCovered || pc.gray('-'),
+          'ACs uncovered': c.uncovered || pc.gray('-'),
+          'AC coverage': isNaN(coverage) ? '-' : `${coverage}%`
+        }
+      })
+
+      categories.push({
+        Category: pc.bold(pc.yellow('Total')),
+        'Spec files': pc.yellow(specFilesTotal),
+        'Acceptable': pc.yellow(acceptableSpecsTotal),
+        'AC codes': pc.yellow(criteriaTotal),
+        'ACs covered': pc.yellow(criteriaReferencedTotal),
+        'ACs/Features': pc.yellow(labelledFeatureTotal),
+        'ACs/Systest': pc.yellow(labelledSystestTotal),
+        'ACs uncovered': pc.yellow(criteriaUnreferencedTotal),
+        'AC coverage': pc.yellow(`${criteriaReferencedPercent}%`)
+      })
+
+      printTable(categories)
+    }
 
     return {
       exitCode,

@@ -27,10 +27,10 @@ const specCategories = {
      'specs': ['0045-DSRC', '0046-DSRM', '0047-DSRF', '0048-DSRI']
    },
    'Bridges': {
-     'specs': ['0049-TVAL', '0050-EPOC', '0030-ETHM', '0031-ETHB', '0069-VCBS', '0066-VALW', '0065-FTCO', '0064-VALP', '0063-VALK']
+     'specs': ['0049-TVAL', '0050-EPOC', '0030-ETHM', '0031-ETHB']
    },
-   'Staking': {
-     'specs': ['0059-STKG', '0056-REWA', '0058-REWS', '0055-TREA', '0041-TSTK']
+   'Staking & Validators': {
+     'specs': ['0059-STKG', '0056-REWA', '0058-REWS', '0055-TREA', '0041-TSTK', '0069-VCBS', '0066-VALW', '0065-FTCO', '0064-VALP', '0063-VALK']
    },
    'Architecture': {
      'specs': ['0036-BRIE', '0009-NP-SNAP']
@@ -53,7 +53,6 @@ function getCategoryForSpec(code) {
 }
 
 function setOrIncreaseProperty(category, property, value) {
-  console.log(category, property, value)
 
   if (specCategories[category][property]) {
     specCategories[category][property] += value
@@ -70,10 +69,25 @@ function increaseCoveredForCategory(category, count) {
   setOrIncreaseProperty(category, 'covered', count)
 }
 
+function increaseFeatureCoveredForCategory(category, count) {
+  setOrIncreaseProperty(category, 'featureCovered', count)
+}
+
+function increaseSystemTestCoveredForCategory(category, count) {
+  setOrIncreaseProperty(category, 'systemTestCovered', count)
+}
+
 function increaseUncoveredForCategory(category, count) {
   setOrIncreaseProperty(category, 'uncovered', count)
 }
 
+function increaseSpecCountForCategory(category) {
+  setOrIncreaseProperty(category, 'specCount', 1)
+}
+
+function increaseAcceptableSpecsForCategory(category) {
+  setOrIncreaseProperty(category, 'acceptableSpecCount', 1)
+}
 
 module.exports = {
   specCategories,
@@ -81,4 +95,8 @@ module.exports = {
   increaseCodesForCategory,
   increaseCoveredForCategory,
   increaseUncoveredForCategory,
+  increaseSpecCountForCategory,
+  increaseSystemTestCoveredForCategory,
+  increaseFeatureCoveredForCategory,
+  increaseAcceptableSpecsForCategory
 }
