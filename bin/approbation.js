@@ -49,6 +49,7 @@ if (command === 'check-filenames') {
 } else if (command === 'check-codes') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   const ignoreGlob = argv.ignore
+  const isVerbose = argv.verbose === true
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -56,13 +57,16 @@ if (command === 'check-filenames') {
     paths = argv.specs
   }
 
-  res = checkCodes(paths, ignoreGlob)
+  res = checkCodes(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
   let specsGlob = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   let testsGlob = '{./qa-scenarios/**/*.{feature,py}}'
   const ignoreGlob = argv.ignore
   const showMystery = argv['show-mystery'] === true
+  const showCategoryStats = argv['category-stats'] === true
+  const isVerbose = argv.verbose === true
+  const showFiles = argv['show-files'] === true
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${specsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -76,7 +80,7 @@ if (command === 'check-filenames') {
     testsGlob = argv.tests
   }
 
-  res = checkReferences(specsGlob, testsGlob, ignoreGlob, showMystery)
+  res = checkReferences(specsGlob, testsGlob, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles)
 
   process.exit(res.exitCode)
 } else {
@@ -90,6 +94,7 @@ if (command === 'check-filenames') {
   console.group('Arguments')
   showArg(`--specs="${pc.yellow('{specs/**/*.md}')}"`, 'glob of specs to pull AC codes from ')
   showArg(`--ignore="${pc.yellow('tests/**/*.{py,feature}')}"`, 'glob of files not to check for codes')
+  showArg('--verbose', 'Show more detail for referenced/unreferenced codes')
   showArg('--show-branches', 'Show git branches for subfolders of the current folder')
   console.groupEnd('Arguments')
   console.groupEnd('check-codes')
@@ -114,7 +119,10 @@ if (command === 'check-filenames') {
   showArg(`--tests="${pc.yellow('tests/**/*.{py,feature}')}"`, 'glob of tests to match to the spec AC codes')
   showArg(`--ignore="${pc.yellow('{tests/**/*.{py,feature}')}"`, 'glob of files to ignore for both tests and specs')
   showArg('--show-mystery', 'If set, display criteria in tests that are not in any specs matched by --specs')
+  showArg('--category-stats', 'Show more detail for referenced/unreferenced codes')
   showArg('--show-branches', 'Show git branches for subfolders of the current folder')
+  showArg('--show-files', 'Show basic stats per file')
+  showArg('--verbose', 'Show more detail for each file')
   console.groupEnd('Arguments')
   console.groupEnd('check-references')
 }

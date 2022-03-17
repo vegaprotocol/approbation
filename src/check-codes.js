@@ -65,7 +65,7 @@ function findDuplicates (codes) {
 }
 
 // Outputs acceptance criteria count if it's acceptable
-const isVerbose = false
+let verbose = false
 
 function checkPath (files) {
   // The number of files that appear to have 0 acceptance criteria
@@ -131,7 +131,7 @@ function checkPath (files) {
       // The files are *valid*, at least. But do they have enough ACs?
       if (totalAcceptanceCriteria.length >= minimumAcceptableACsPerSpec) {
         countAcceptableFiles++
-        if (isVerbose) {
+        if (verbose) {
           console.group(file)
           console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
         }
@@ -153,7 +153,8 @@ function checkPath (files) {
   }
 }
 
-function checkCodes (paths, ignoreGlob) {
+function checkCodes (paths, ignoreGlob, isVerbose = false) {
+  verbose = isVerbose
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
   const fileList = ignoreFiles(glob.sync(paths, {}), ignoreList)
   let exitCode = 0
