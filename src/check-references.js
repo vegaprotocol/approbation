@@ -288,7 +288,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
     }
 
     if (testList === 0) {
-      console.error(pc.red(`--tets matched no files (${testsGlob}})`))
+      console.error(pc.red(`--tests matched no files (${testsGlob}})`))
     } else {
       console.error(pc.red(`--tests matched ${pc.bold(testList.length)} files (${pc.dim(testsGlob)})`))
     }
