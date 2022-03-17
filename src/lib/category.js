@@ -1,3 +1,4 @@
+// This should be committed as a JSON file to the specs repo - but for now, this will do
 const specCategories = {
    'Fundamentals': {
      'specs': ['0017-PART', '0022-AUTH', '0051-PROD', '0016-PFUT', '0053-PERP', '0040-ASSF', '0013-ACCT', '0028-GOVE', '0054-NETP', '0068-MATC', '0067-KEYS', '0057-TRAN', '0052-FPOS']
