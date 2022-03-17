@@ -244,12 +244,12 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
           Category: pc.yellow(key),
           'Spec files': c.specCount || pc.gray('-'),
           'Acceptable': c.acceptableSpecCount ? c.acceptableSpecCount === c.specCount ? pc.green(c.acceptableSpecCount) : pc.red(c.acceptableSpecCount) : pc.gray('-'),
-          'AC codes': c.codes || pc.gray('-'),
-          'ACs covered': c.covered || pc.gray('-'),
-          'ACs/Features': c.featureCovered || pc.gray('-'),
-          'ACs/Systest': c.systemTestCovered || pc.gray('-'),
-          'ACs uncovered': c.uncovered || pc.gray('-'),
-          'AC coverage': isNaN(coverage) ? '-' : `${coverage}%`
+          'Total ACs': c.codes || pc.gray('-'),
+          'ACs w/FeatTest': c.featureCovered || pc.gray('-'),
+          'ACs w/SysTest': c.systemTestCovered || pc.gray('-'),
+          'ACs Covered': c.covered || pc.gray('-'),
+          'ACs Not Covered': c.uncovered || pc.gray('-'),
+          'AC Coverage %': isNaN(coverage) ? '-' : `${coverage}%`
         }
       })
 
@@ -257,12 +257,12 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
         Category: pc.bold(pc.yellow('Total')),
         'Spec files': pc.yellow(specFilesTotal),
         'Acceptable': pc.yellow(acceptableSpecsTotal),
-        'AC codes': pc.yellow(criteriaTotal),
-        'ACs covered': pc.yellow(criteriaReferencedTotal),
-        'ACs/Features': pc.yellow(labelledFeatureTotal),
-        'ACs/Systest': pc.yellow(labelledSystestTotal),
-        'ACs uncovered': pc.yellow(criteriaUnreferencedTotal),
-        'AC coverage': pc.yellow(`${criteriaReferencedPercent}%`)
+        'Total ACs': pc.yellow(criteriaTotal),
+        'ACs Covered': pc.yellow(criteriaReferencedTotal),
+        'ACs w/FeatTest': pc.yellow(labelledFeatureTotal),
+        'ACs w/SysTest': pc.yellow(labelledSystestTotal),
+        'ACs Not Covered': pc.yellow(criteriaUnreferencedTotal),
+        'AC Coverage %': pc.yellow(`${criteriaReferencedPercent}%`)
       })
 
       printTable(categories)
