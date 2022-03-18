@@ -117,3 +117,7 @@ Run `npm run setup` to configure your environment:
 
 # [License](./LICENSE)
 The Unlicense
+
+<p align="right">
+ <img src="https://user-images.githubusercontent.com/6678/159024710-42ae880f-b994-44af-b91d-b3fca3f49685.png" width="80" height="80" />
+</p>
