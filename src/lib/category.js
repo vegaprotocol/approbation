@@ -6,8 +6,8 @@ const specCategories = {
    'Markets': {
      'specs': ['0035-LIQM', '0032-PRIM', '0043-MKTL', '0026-AUCT', '0006-POSI', '0008-TRAD', '0001-MKTF', '0009-MRKP', '0012-POSR', '0021-MDAT', '0039-MKTD', '0070-MKTD']
    },
-   'Settlement': {
-     'specs': ['0002-STTL', '0003-MTMK']
+   'Settlement & Oracles': {
+     'specs': ['0002-STTL', '0003-MTMK', '0045-DSRC', '0046-DSRM', '0047-DSRF', '0048-DSRI']
    },
    'Protections': {
      'specs': ['0062-SPAM', '0060-WEND', '0003-NP-LIMI', '0005-NP-LIMN']
@@ -23,9 +23,6 @@ const specCategories = {
    },
    'Margin': {
      'specs': ['0029-FEES', '0005-COLL', '0010-MARG', '0011-MARA', '0015-INSR', '0019-MCAL', '0018-RSKM', '0023-CALI']
-   },
-   'Oracles': {
-     'specs': ['0045-DSRC', '0046-DSRM', '0047-DSRF', '0048-DSRI']
    },
    'Bridges': {
      'specs': ['0049-TVAL', '0050-EPOC', '0030-ETHM', '0031-ETHB']
