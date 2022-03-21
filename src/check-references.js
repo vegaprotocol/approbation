@@ -11,7 +11,8 @@ const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
 const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, specCategories } = require('./lib/category')
-const { printTable } = require('console-table-printer')
+const { Table } = require('console-table-printer')
+const { renderScreenshot } = require('terminal-screenshot')
 
 // Ugly globals
 let verbose = false
@@ -183,7 +184,7 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false) {
+async function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false) {
   verbose = isVerbose
   showFiles = shouldShowFiles
 
@@ -270,7 +271,22 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
         'AC Coverage %': pc.yellow(`${criteriaReferencedPercent}%`)
       })
 
-      printTable(categories)
+      const t = new Table();
+      t.addRows(categories)
+
+      const tableOutput = t.render()
+
+      // Output it to the console
+      console.log(tableOutput)
+
+      if (!fs.existsSyn('./results')) {
+        fs.mkdirSync('./results')
+      }
+
+      // Also write it out as an image
+      fs.writeFileSync('results/output.txt', tableOutput);
+
+      await generateImage(tableOutput)
     }
 
     return {
@@ -306,6 +322,15 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
   }
 }
 
+async function generateImage(data){
+  const output = await renderImage({
+    data
+  })
+
+  fs.writeFileSync('results/output.png', output);
+}
+
 module.exports = {
   checkReferences
 }
+
