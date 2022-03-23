@@ -67,6 +67,8 @@ if (command === 'check-filenames') {
   const showCategoryStats = argv['category-stats'] === true
   const isVerbose = argv.verbose === true
   const showFiles = argv['show-files'] === true
+  const shouldOutputCSV = argv['output-csv'] === true
+  const shouldOutputJenkins = argv['output-jenkins'] === true
 
   if (!argv.specs) {
     warn(['No --specs argument provided, defaulting to:', `--specs="${specsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
@@ -80,7 +82,8 @@ if (command === 'check-filenames') {
     testsGlob = argv.tests
   }
 
-  res = checkReferences(specsGlob, testsGlob, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles)
+  // TODO: Turn in to an object
+  res = checkReferences(specsGlob, testsGlob, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins)
 
   process.exit(res.exitCode)
 } else {
@@ -123,6 +126,8 @@ if (command === 'check-filenames') {
   showArg('--show-branches', 'Show git branches for subfolders of the current folder')
   showArg('--show-files', 'Show basic stats per file')
   showArg('--verbose', 'Show more detail for each file')
+  showArg('--output-csv', 'Show more detail for each file')
+  showArg('--output-jenkins', 'Output a quick summary for CI')
   console.groupEnd('Arguments')
   console.groupEnd('check-references')
 }

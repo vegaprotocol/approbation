@@ -11,7 +11,7 @@ const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
 const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, specCategories } = require('./lib/category')
-const { printTable } = require('console-table-printer')
+const { Table } = require('console-table-printer')
 
 // Ugly globals
 let verbose = false
@@ -183,7 +183,7 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false) {
+function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false) {
   verbose = isVerbose
   showFiles = shouldShowFiles
 
@@ -231,11 +231,12 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
     }
 
     if (showCategoryStats) {
-      console.log()
+      const shouldOutputImage = false
       let specFilesTotal = 0
       let labelledFeatureTotal = 0
       let labelledSystestTotal = 0
       let acceptableSpecsTotal = 0
+
       const categories = Object.keys(specCategories).map(key => {
         const c = specCategories[key]
         const coverage = (Math.round(c.covered / c.codes * 100))
@@ -246,31 +247,63 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
 
 
         return {
-          Category: pc.yellow(key),
-          'Spec files': c.specCount || pc.gray('-'),
-          'Acceptable': c.acceptableSpecCount ? c.acceptableSpecCount === c.specCount ? pc.green(c.acceptableSpecCount) : pc.red(c.acceptableSpecCount) : pc.gray('-'),
-          'Total ACs': c.codes || pc.gray('-'),
-          'ACs w/FeatTest': c.featureCovered || pc.gray('-'),
-          'ACs w/SysTest': c.systemTestCovered || pc.gray('-'),
-          'ACs Covered': c.covered || pc.gray('-'),
-          'ACs Not Covered': c.uncovered || pc.gray('-'),
+          'Category': key,
+          'Spec files': c.specCount || '-',
+          'Acceptable': c.acceptableSpecCount ? c.acceptableSpecCount : '-',
+          'Total ACs': c.codes || '-',
+          'ACs w/FeatTest': c.featureCovered || '-',
+          'ACs w/SysTest': c.systemTestCovered || '-',
+          'ACs Covered': c.covered || '-',
+          'ACs Not Covered': c.uncovered || '-',
           'AC Coverage %': isNaN(coverage) ? '-' : `${coverage}%`
         }
       })
 
       categories.push({
-        Category: pc.bold(pc.yellow('Total')),
-        'Spec files': pc.yellow(specFilesTotal),
-        'Acceptable': pc.yellow(acceptableSpecsTotal),
-        'Total ACs': pc.yellow(criteriaTotal),
-        'ACs Covered': pc.yellow(criteriaReferencedTotal),
-        'ACs w/FeatTest': pc.yellow(labelledFeatureTotal),
-        'ACs w/SysTest': pc.yellow(labelledSystestTotal),
-        'ACs Not Covered': pc.yellow(criteriaUnreferencedTotal),
-        'AC Coverage %': pc.yellow(`${criteriaReferencedPercent}%`)
+        'Category': 'Total',
+        'Spec files': specFilesTotal,
+        'Acceptable': acceptableSpecsTotal,
+        'Total ACs': criteriaTotal,
+        'ACs Covered': criteriaReferencedTotal,
+        'ACs w/FeatTest': labelledFeatureTotal,
+        'ACs w/SysTest': labelledSystestTotal,
+        'ACs Not Covered': criteriaUnreferencedTotal,
+        'AC Coverage %': `${criteriaReferencedPercent}%`
       })
 
-      printTable(categories)
+      const t = new Table();
+      t.addRows(categories)
+
+      const tableOutput = t.render()
+
+      // Output it to the console
+      console.log(tableOutput)
+
+      if (shouldOutputJenkins || shouldOutputCSV || shouldOutputImage) {
+        if (!fs.existsSync('./results')) {
+          fs.mkdirSync('./results')
+        }
+
+        if (shouldOutputCSV) {
+          let csvOutput = Object.keys(categories[0]).join(',')
+          categories.forEach(c => {
+            csvOutput += `\r\n${Object.values(c).join(',')}`
+          })
+          fs.writeFileSync('results/output.csv', csvOutput);
+        }
+
+        if (shouldOutputImage) {
+          console.log(pc.red('Generating image not yet supported'))
+        }
+
+        if (shouldOutputJenkins) {
+          const skipCategories = ['Category', 'Spec files', 'Acceptable']
+          const jenkinsLine = Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `**${key}**: ${value}`: '').join('  ').trim()
+          fs.writeFileSync('results/jenkins.txt', jenkinsLine);
+        }
+
+        console.groupEnd()
+      }
     }
 
     return {
@@ -309,3 +342,6 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
 module.exports = {
   checkReferences
 }
+
+
+
