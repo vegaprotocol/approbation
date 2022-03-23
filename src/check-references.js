@@ -279,14 +279,15 @@ async function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = 
       // Output it to the console
       console.log(tableOutput)
 
-      if (!fs.existsSyn('./results')) {
+      if (!fs.existsSync('./results')) {
         fs.mkdirSync('./results')
       }
 
       // Also write it out as an image
       fs.writeFileSync('results/output.txt', tableOutput);
 
-      await generateImage(tableOutput)
+      const staticImage = await generateImage(tableOutput)
+      fs.writeFileSync('results/output.png', staticImage);
     }
 
     return {
