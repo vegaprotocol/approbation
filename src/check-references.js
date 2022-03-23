@@ -92,7 +92,6 @@ function processReferences (specs, tests) {
   let criteriaTotal = 0
   let criteriaReferencedTotal = 0
   let criteriaUnreferencedTotal = 0
-  const acceptableMinimum = 1
   // Step 3: Output the data
   specs.forEach((value, key) => {
     const unreferencedCriteria = []
@@ -245,11 +244,10 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
         labelledSystestTotal += c.systemTestCovered | 0
         acceptableSpecsTotal += c.acceptableSpecCount | 0
 
-
         return {
-          'Category': key,
+          Category: key,
           'Spec files': c.specCount || '-',
-          'Acceptable': c.acceptableSpecCount ? c.acceptableSpecCount : '-',
+          Acceptable: c.acceptableSpecCount ? c.acceptableSpecCount : '-',
           'Total ACs': c.codes || '-',
           'ACs w/FeatTest': c.featureCovered || '-',
           'ACs w/SysTest': c.systemTestCovered || '-',
@@ -260,9 +258,9 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
       })
 
       categories.push({
-        'Category': 'Total',
+        Category: 'Total',
         'Spec files': specFilesTotal,
-        'Acceptable': acceptableSpecsTotal,
+        Acceptable: acceptableSpecsTotal,
         'Total ACs': criteriaTotal,
         'ACs Covered': criteriaReferencedTotal,
         'ACs w/FeatTest': labelledFeatureTotal,
@@ -271,7 +269,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
         'AC Coverage %': `${criteriaReferencedPercent}%`
       })
 
-      const t = new Table();
+      const t = new Table()
       t.addRows(categories)
 
       const tableOutput = t.render()
@@ -289,7 +287,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
           categories.forEach(c => {
             csvOutput += `\r\n${Object.values(c).join(',')}`
           })
-          fs.writeFileSync('results/output.csv', csvOutput);
+          fs.writeFileSync('results/output.csv', csvOutput)
         }
 
         if (shouldOutputImage) {
@@ -298,8 +296,8 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
 
         if (shouldOutputJenkins) {
           const skipCategories = ['Category', 'Spec files', 'Acceptable']
-          const jenkinsLine = Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `**${key}**: ${value}`: '').join('  ').trim()
-          fs.writeFileSync('results/jenkins.txt', jenkinsLine);
+          const jenkinsLine = Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()
+          fs.writeFileSync('results/jenkins.txt', jenkinsLine)
         }
 
         console.groupEnd()
@@ -342,6 +340,3 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
 module.exports = {
   checkReferences
 }
-
-
-
