@@ -246,27 +246,27 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
 
         return {
           Category: key,
-          'Spec files': c.specCount || '-',
+          Specs: c.specCount || '-',
           Acceptable: c.acceptableSpecCount ? c.acceptableSpecCount : '-',
-          'Total ACs': c.codes || '-',
-          'ACs w/FeatTest': c.featureCovered || '-',
-          'ACs w/SysTest': c.systemTestCovered || '-',
-          'ACs Covered': c.covered || '-',
-          'ACs Not Covered': c.uncovered || '-',
-          'AC Coverage %': isNaN(coverage) ? '-' : `${coverage}%`
+          Criteria: c.codes || '-',
+          Covered: c.covered || '-',
+          'by/FeatTest': c.featureCovered || '-',
+          'by/SysTest': c.systemTestCovered || '-',
+          Uncovered: c.uncovered || '-',
+          Coverage: isNaN(coverage) ? '-' : `${coverage}%`
         }
       })
 
       categories.push({
         Category: 'Total',
-        'Spec files': specFilesTotal,
+        Specs: specFilesTotal,
         Acceptable: acceptableSpecsTotal,
-        'Total ACs': criteriaTotal,
-        'ACs Covered': criteriaReferencedTotal,
-        'ACs w/FeatTest': labelledFeatureTotal,
-        'ACs w/SysTest': labelledSystestTotal,
-        'ACs Not Covered': criteriaUnreferencedTotal,
-        'AC Coverage %': `${criteriaReferencedPercent}%`
+        Criteria: criteriaTotal,
+        Covered: criteriaReferencedTotal,
+        'by/FeatTest': labelledFeatureTotal,
+        'by/SysTest': labelledSystestTotal,
+        Uncovered: criteriaUnreferencedTotal,
+        Coverage: `${criteriaReferencedPercent}%`
       })
 
       const t = new Table()
@@ -295,7 +295,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
         }
 
         if (shouldOutputJenkins) {
-          const skipCategories = ['Category', 'Spec files', 'Acceptable']
+          const skipCategories = ['Category', 'Specs', 'Acceptable']
           const jenkinsLine = Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()
           fs.writeFileSync('results/jenkins.txt', jenkinsLine)
         }
