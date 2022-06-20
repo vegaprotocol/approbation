@@ -238,7 +238,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
 
       const categories = Object.keys(specCategories).map(key => {
         const c = specCategories[key]
-        const coverage = (Math.round(c.covered / c.codes * 100))
+        const coverage = (c.covered / c.codes * 100).toFixed(1)
         specFilesTotal += c.specCount | 0
         labelledFeatureTotal += c.featureCovered | 0
         labelledSystestTotal += c.systemTestCovered | 0
