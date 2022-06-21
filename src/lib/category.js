@@ -10,7 +10,7 @@ const specCategories = {
      'specs': ['0002-STTL', '0003-MTMK', '0045-DSRC', '0046-DSRM', '0047-DSRF', '0048-DSRI']
    },
    'Protections': {
-     'specs': ['0062-SPAM', '0060-WEND', '0003-NP-LIMI', '0005-NP-LIMN']
+     'specs': ['0071-SPPW', '0062-SPAM', '0060-WEND', '0003-NP-LIMI', '0005-NP-LIMN']
    },
    'Liquidity': {
      'specs': ['0044-LIQM', '0042-LIQF', '0034-PROB']
@@ -28,13 +28,13 @@ const specCategories = {
      'specs': ['0049-TVAL', '0050-EPOC', '0030-ETHM', '0031-ETHB']
    },
    'Staking & Validators': {
-     'specs': ['0059-STKG', '0056-REWA', '0061-REWP', '0058-REWS', '0055-TREA', '0041-TSTK', '0069-VCBS', '0066-VALW', '0065-FTCO', '0064-VALP', '0063-VALK']
+     'specs': ['0071-STAK', '0059-STKG', '0056-REWA', '0061-REWP', '0058-REWS', '0055-TREA', '0041-TSTK', '0069-VCBS', '0066-VALW', '0065-FTCO', '0064-VALP', '0063-VALK']
    },
    'Architecture': {
      'specs': ['0036-BRIE', '0009-NP-SNAP']
    },
    'Data': {
-     'specs': ['0020-APIS', '0007-POSN']
+     'specs': ['0011-NP-DANO', '0020-APIS', '0007-POSN']
    },
    'Unknown': {
      'specs': []
