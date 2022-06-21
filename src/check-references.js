@@ -209,8 +209,8 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
     }
 
     const { criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
-    const criteriaReferencedPercent = Math.round(criteriaReferencedTotal / criteriaTotal * 100)
-    const criteriaUnreferencedPercent = Math.round(criteriaUnreferencedTotal / criteriaTotal * 100)
+    const criteriaReferencedPercent = (criteriaReferencedTotal / criteriaTotal * 100).toFixed(1)
+    const criteriaUnreferencedPercent = (criteriaUnreferencedTotal / criteriaTotal * 100).toFixed(1)
 
     if (showMystery && unknownCriteriaInTests.size > 0) {
       const g = pc.bold(`${pc.red('Mystery criteria')} referenced in tests, not found in specs:`)
@@ -253,7 +253,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
           'by/FeatTest': c.featureCovered || '-',
           'by/SysTest': c.systemTestCovered || '-',
           Uncovered: c.uncovered || '-',
-          Coverage: isNaN(coverage) ? '-' : `${coverage}%`
+          Coverage: `${coverage}%`
         }
       })
 
