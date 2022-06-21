@@ -12,7 +12,7 @@ test('check-references: Happy path, 100% referenced', t => {
   t.equal(exitCode, 0, 'Success')
   t.equal(res.criteriaTotal, 1, 'One criteria exists')
   t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
-  t.equal(res.criteriaReferencedPercent, 100, 'That is 100%')
+  t.equal(res.criteriaReferencedPercent, '100.0', 'That is 100%')
 })
 
 test('check-references: 50% referenced, both from one spec', t => {
@@ -26,7 +26,7 @@ test('check-references: 50% referenced, both from one spec', t => {
   t.equal(res.criteriaTotal, 2, 'One criteria exists')
   t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
   t.equal(res.criteriaUnreferencedTotal, 1, 'That one criteria is not referenced')
-  t.equal(res.criteriaReferencedPercent, 50, 'That is 50%')
+  t.equal(res.criteriaReferencedPercent, '50.0', 'That is 50%')
 })
 
 test('check-references: multiple specs, multiple tests', t => {
@@ -40,7 +40,7 @@ test('check-references: multiple specs, multiple tests', t => {
   t.equal(res.criteriaTotal, 3, 'Three criteria exist')
   t.equal(res.criteriaReferencedTotal, 2, 'Two criteria is referenced')
   t.equal(res.criteriaUnreferencedTotal, 1, 'That one criteria is not referenced')
-  t.equal(res.criteriaReferencedPercent, 67, 'That is 67%')
+  t.equal(res.criteriaReferencedPercent, '66.7', 'That is 66.7%')
 })
 
 test('check-references: README is ignored', t => {
@@ -53,7 +53,7 @@ test('check-references: README is ignored', t => {
   t.equal(exitCode, 0, 'Success')
   t.equal(res.criteriaTotal, 1, 'One criteria exists')
   t.equal(res.criteriaReferencedTotal, 1, 'That one criteria is referenced')
-  t.equal(res.criteriaReferencedPercent, 100, 'That is 100%')
+  t.equal(res.criteriaReferencedPercent, '100.0', 'That is 100%')
 })
 
 test('check-references: Ignore ignores specs...', t => {
@@ -66,10 +66,10 @@ test('check-references: Ignore ignores specs...', t => {
   loud()
 
   t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
-  t.equal(allFiles.res.criteriaReferencedPercent, 50, 'All files: coverage is 50%')
+  t.equal(allFiles.res.criteriaReferencedPercent, '50.0', 'All files: coverage is 50%')
 
   t.equal(ignore.res.criteriaTotal, 1, 'Ignore: One criteria exists')
-  t.equal(ignore.res.criteriaReferencedPercent, 100, 'Ignore: coverage is 100%')
+  t.equal(ignore.res.criteriaReferencedPercent, '100.0', 'Ignore: coverage is 100%')
 })
 
 test('check-references: ...ignore also applies to tests...', t => {
@@ -82,10 +82,10 @@ test('check-references: ...ignore also applies to tests...', t => {
   loud()
 
   t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
-  t.equal(allFiles.res.criteriaReferencedPercent, 100, 'All files: coverage is 100%')
+  t.equal(allFiles.res.criteriaReferencedPercent, '100.0', 'All files: coverage is 100%')
 
   t.equal(ignore.res.criteriaTotal, 2, 'Ignore: Two criteria exist')
-  t.equal(ignore.res.criteriaReferencedPercent, 50, 'Ignore: coverage is 50%')
+  t.equal(ignore.res.criteriaReferencedPercent, '50.0', 'Ignore: coverage is 50%')
 })
 
 test('check-references: ...which is to say both simultaneously', t => {
@@ -98,10 +98,10 @@ test('check-references: ...which is to say both simultaneously', t => {
   loud()
 
   t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
-  t.equal(allFiles.res.criteriaReferencedPercent, 100, 'All files: coverage is 100%')
+  t.equal(allFiles.res.criteriaReferencedPercent, '100.0', 'All files: coverage is 100%')
 
   t.equal(ignore.res.criteriaTotal, 1, 'Ignore: One criteria exists')
-  t.equal(ignore.res.criteriaReferencedPercent, 100, 'Ignore: coverage is 100%')
+  t.equal(ignore.res.criteriaReferencedPercent, '100.0', 'Ignore: coverage is 100%')
 })
 
 test('check-references: detect references in tests that are not in specs', t => {
