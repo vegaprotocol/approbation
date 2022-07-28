@@ -36,6 +36,9 @@ const specCategories = {
    'Data': {
      'specs': ['0011-NP-DANO', '0020-APIS', '0007-POSN']
    },
+   'UI': {
+     'specs': ['1000-ASSO', '1001-VEST', '1002-STAK', '1003-INCO', '1004-VOTE', '1005-PROP', '1006-NETW', '1007-WALL', '3000-DEPO', '3001-WITH', '5000-MARK', '6000-COLL', '6001-SORD', '6002-MORD', '6003-POSI', '6004-FILL']
+   },
    'Unknown': {
      'specs': []
    }

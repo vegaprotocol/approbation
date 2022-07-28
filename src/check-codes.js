@@ -95,6 +95,7 @@ function checkPath (files) {
       countEmptyFiles++
       console.group(file)
       console.error('no acceptance criteria')
+      console.groupEnd(file)
     } else {
       // Acceptance code links are self referential, and have a name property, which makes
       // 3 instances of each code. So a basic check for this is to split the matches in to
@@ -111,6 +112,7 @@ function checkPath (files) {
         console.group(file)
         console.error('Found multiple uses of the same code:')
         console.dir(dupes)
+        console.groupEnd(file)
       }
 
       // If all of the arrays aren't 1, there's probably a mistake. Output all chunks to
@@ -134,14 +136,14 @@ function checkPath (files) {
         if (verbose) {
           console.group(file)
           console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
+          console.groupEnd(file)
         }
       } else {
         countErrorFiles++
         console.group(file)
         console.error(`${totalAcceptanceCriteria.length} acceptance criteria`)
+        console.groupEnd(file)
       }
-
-      console.groupEnd(file)
     }
   })
 
