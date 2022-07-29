@@ -1,6 +1,6 @@
 {
   "name": "@vegaprotocol/approbation",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "main": "./bin/approbation.js",
   "engine": ">= 16",
@@ -22,15 +22,15 @@
   },
   "homepage": "https://github.com/vegaprotocol/approbation#readme",
   "devDependencies": {
-    "husky": "7.0.4",
-    "standard": "16.0.4",
-    "tap-arc": "0.1.2",
-    "tape": "5.5.2"
+    "husky": "8.0.1",
+    "standard": "17.0.0",
+    "tap-arc": "0.3.5",
+    "tape": "5.5.3"
   },
   "dependencies": {
     "console-table-printer": "^2.10.0",
     "git-rev-sync": "3.0.2",
-    "glob": "^7.2.0",
+    "glob": "^8.0.3",
     "minimist": "^1.2.5",
     "picocolors": "^1.0.0"
   }

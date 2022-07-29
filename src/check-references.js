@@ -12,6 +12,8 @@ const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
 const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, specCategories } = require('./lib/category')
 const { Table } = require('console-table-printer')
+const { specPriorities } = require('./lib/priority')
+const sortBy = require('lodash.sortby')
 
 // Ugly globals
 let verbose = false
@@ -163,6 +165,7 @@ function processReferences (specs, tests) {
     value.count = value.criteria.length
     value.referenced = criteriaWithRefs.length
     value.uncovered = value.count - value.referenced
+    value.priority = specPriorities[value.code] || 10
 
     if (showFiles) {
       const tally = ` has ${count} ACs of which ${referenced} are tested`
@@ -243,6 +246,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
         const coverage = (s.referenced / s.count * 100).toFixed(1)
         return {
           File: key,
+          Priority: s.priority,
           Category: s.category,
           Criteria: s.count,
           Covered: s.referenced,
@@ -252,9 +256,8 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
           Coverage: `${coverage | '0.0'}%`
         }
       })
-
       const st = new Table()
-      st.addRows(specsTableRows)
+      st.addRows(sortBy(specsTableRows, ['Priority', 'Coverage']))
       console.log(st.render())
     }
 
