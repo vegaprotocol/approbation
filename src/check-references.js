@@ -240,8 +240,10 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
       console.log(pc.red(pc.bold('Mystery criteria')) + `:     ${unknownCriteriaInTests.size}`)
     }
 
+    let specsTableRows
+
     if (shouldShowFileStats) {
-      const specsTableRows = Array.from(specs.keys()).map(key => {
+      specsTableRows = Array.from(specs.keys()).map(key => {
         const s = specs.get(key)
         const coverage = (s.referenced / s.count * 100).toFixed(1)
         return {
@@ -316,7 +318,15 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
           categories.forEach(c => {
             csvOutput += `\r\n${Object.values(c).join(',')}`
           })
-          fs.writeFileSync('results/output.csv', csvOutput)
+          fs.writeFileSync('results/approbation-categories.csv', csvOutput)
+
+          if (shouldShowFileStats) {
+            let csvOutputFiles = Object.keys(specsTableRows[0]).join(',')
+            specsTableRows.forEach(c => {
+              csvOutputFiles += `\r\n${Object.values(c).join(',')}`
+            })
+            fs.writeFileSync('results/approbation-files.csv', csvOutputFiles)
+          }
         }
 
         if (shouldOutputImage) {
