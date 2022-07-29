@@ -1,6 +1,6 @@
 {
   "name": "@vegaprotocol/approbation",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "main": "./bin/approbation.js",
   "engine": ">= 16",
@@ -31,6 +31,7 @@
     "console-table-printer": "^2.10.0",
     "git-rev-sync": "3.0.2",
     "glob": "^8.0.3",
+    "lodash.sortby": "^4.7.0",
     "minimist": "^1.2.5",
     "picocolors": "^1.0.0"
   }
