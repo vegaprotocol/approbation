@@ -94,6 +94,9 @@ function processReferences (specs, tests) {
   let criteriaUnreferencedTotal = 0
   // Step 3: Output the data
   specs.forEach((value, key) => {
+    value.referencedByFeature = 0
+    value.referencedBySystemTest = 0
+
     const unreferencedCriteria = []
     const category = value.category && value.category !== 'Unknown' ? ` #${pc.yellow(value.category)}` : ''
     increaseSpecCountForCategory(value.category)
@@ -122,9 +125,11 @@ function processReferences (specs, tests) {
           linksForAC.forEach(l => {
             if (!criteriaAlreadyLoggedSystest && l.match('system-tests')) {
               increaseSystemTestCoveredForCategory(value.category, 1)
+              value.referencedBySystemTest++
               criteriaAlreadyLoggedSystest = true
             } else if (!criteriaAlreadyLoggedFeature && l.match('.feature')) {
               increaseFeatureCoveredForCategory(value.category, 1)
+              value.referencedByFeature++
               criteriaAlreadyLoggedFeature = true
             }
           })
@@ -152,11 +157,14 @@ function processReferences (specs, tests) {
       }
     }
 
-    if (showFiles) {
-      // Console output
-      const count = value.criteria.length > acceptableMinimum ? pc.green(value.criteria.length) : pc.red(value.criteria.length)
-      const referenced = criteriaWithRefs.length > acceptableMinimum ? pc.green(criteriaWithRefs.length) : pc.red(criteriaWithRefs.length)
+    const count = value.criteria.length > acceptableMinimum ? pc.green(value.criteria.length) : pc.red(value.criteria.length)
+    const referenced = criteriaWithRefs.length > acceptableMinimum ? pc.green(criteriaWithRefs.length) : pc.red(criteriaWithRefs.length)
 
+    value.count = value.criteria.length
+    value.referenced = criteriaWithRefs.length
+    value.uncovered = value.count - value.referenced
+
+    if (showFiles) {
       const tally = ` has ${count} ACs of which ${referenced} are tested`
 
       console.log(`${pc.bold(key)}${tally}${category}`)
@@ -182,7 +190,7 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false) {
+function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false) {
   verbose = isVerbose
   showFiles = shouldShowFiles
 
@@ -229,6 +237,27 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
       console.log(pc.red(pc.bold('Mystery criteria')) + `:     ${unknownCriteriaInTests.size}`)
     }
 
+    if (shouldShowFileStats) {
+      const specsTableRows = Array.from(specs.keys()).map(key => {
+        const s = specs.get(key)
+        const coverage = (s.referenced / s.count * 100).toFixed(1)
+        return {
+          File: key,
+          Category: s.category,
+          Criteria: s.count,
+          Covered: s.referenced,
+          'by/FeatTest': s.referencedByFeature,
+          'by/SysTest': s.referencedBySystemTest,
+          Uncovered: s.uncovered,
+          Coverage: `${coverage | '0.0'}%`
+        }
+      })
+
+      const st = new Table()
+      st.addRows(specsTableRows)
+      console.log(st.render())
+    }
+
     if (showCategoryStats) {
       const shouldOutputImage = false
       let specFilesTotal = 0
@@ -271,10 +300,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
 
       const t = new Table()
       t.addRows(categories)
-
       const tableOutput = t.render()
-
-      // Output it to the console
       console.log(tableOutput)
 
       if (shouldOutputJenkins || shouldOutputCSV || shouldOutputImage) {
