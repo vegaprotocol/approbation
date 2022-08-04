@@ -13,7 +13,7 @@ const specCategories = {
      'specs': ['0073-LIMN', '0072-SPPW', '0062-SPAM', '0060-WEND', '0003-NP-LIMI']
    },
    'Liquidity': {
-     'specs': ['0044-LIQM', '0042-LIQF', '0034-PROB']
+     'specs': ['0044-LIME', '0042-LIQF', '0034-PROB']
    },
    'Governance': {
      'specs': ['0028-GOVE', '0027-ASSP', '0059-STKG', '0058-REWS', '0056-REWA', '0055-TREA']
