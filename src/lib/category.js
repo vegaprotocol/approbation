@@ -10,7 +10,7 @@ const specCategories = {
      'specs': ['0002-STTL', '0003-MTMK', '0045-DSRC', '0046-DSRM', '0047-DSRF', '0048-DSRI']
    },
    'Protections': {
-     'specs': ['0073-LIMN', '0072-SPPW', '0062-SPAM', '0060-WEND', '0003-NP-LIMI']
+     'specs': ['0073-LIMN', '0072-SPPW', '0062-SPAM', '0060-WEND', '0003-NP-LIMI', '0072-SPPW']
    },
    'Liquidity': {
      'specs': ['0044-LIME', '0042-LIQF', '0034-PROB']
@@ -19,7 +19,7 @@ const specCategories = {
      'specs': ['0028-GOVE', '0027-ASSP', '0059-STKG', '0058-REWS', '0056-REWA', '0055-TREA']
    },
    'Orders': {
-     'specs': ['0014-ORDT', '0004-AMND', '0024-OSTA', '0025-OCRE', '0037-OPEG', '0033-OCAN', '0038-OLIQ']
+     'specs': ['0014-ORDT', '0004-AMND', '0024-OSTA', '0025-OCRE', '0037-OPEG', '0033-OCAN', '0038-OLIQ', '0074-BTCH']
    },
    'Margin': {
      'specs': ['0029-FEES', '0005-COLL', '0010-MARG', '0011-MARA', '0015-INSR', '0019-MCAL', '0018-RSKM', '0023-CALI']
@@ -31,7 +31,7 @@ const specCategories = {
      'specs': ['0071-STAK', '0059-STKG', '0056-REWA', '0061-REWP', '0058-REWS', '0055-TREA', '0041-TSTK', '0069-VCBS', '0066-VALW', '0065-FTCO', '0064-VALP', '0063-VALK']
    },
    'Architecture': {
-     'specs': ['0036-BRIE', '0009-NP-SNAP']
+     'specs': ['0036-BRIE', '0009-NP-SNAP', '0075-PLUP']
    },
    'Data': {
      'specs': ['0011-NP-DANO', '0020-APIS', '0007-POSN']
