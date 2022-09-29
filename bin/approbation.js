@@ -60,8 +60,8 @@ if (command === 'check-filenames') {
   res = checkCodes(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
-  let specsGlob = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
-  let testsGlob = '{./qa-scenarios/**/*.{feature,py}}'
+  let specsGlob = '{./specs/user-interface/*.md}'
+  let testsGlob = '{./frontend-monorepo/apps/*-e2e/**/*.cy.js}'
   const ignoreGlob = argv.ignore
   const showMystery = argv['show-mystery'] === true
   const showCategoryStats = argv['category-stats'] === true

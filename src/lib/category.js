@@ -1,47 +1,35 @@
 // This should be committed as a JSON file to the specs repo - but for now, this will do
 const specCategories = {
-   'Fundamentals': {
-     'specs': ['0017-PART', '0022-AUTH', '0051-PROD', '0016-PFUT', '0053-PERP', '0040-ASSF', '0013-ACCT', '0028-GOVE', '0054-NETP', '0068-MATC', '0067-KEYS', '0057-TRAN', '0052-FPOS']
-   },
-   'Markets': {
-     'specs': ['0035-LIQM', '0032-PRIM', '0043-MKTL', '0026-AUCT', '0006-POSI', '0008-TRAD', '0001-MKTF', '0009-MRKP', '0012-POSR', '0021-MDAT', '0039-MKTD', '0070-MKTD']
-   },
-   'Settlement & Oracles': {
-     'specs': ['0002-STTL', '0003-MTMK', '0045-DSRC', '0046-DSRM', '0047-DSRF', '0048-DSRI']
-   },
-   'Protections': {
-     'specs': ['0073-LIMN', '0072-SPPW', '0062-SPAM', '0060-WEND', '0003-NP-LIMI', '0072-SPPW']
-   },
-   'Liquidity': {
-     'specs': ['0044-LIME', '0042-LIQF', '0034-PROB']
-   },
-   'Governance': {
-     'specs': ['0028-GOVE', '0027-ASSP', '0059-STKG', '0058-REWS', '0056-REWA', '0055-TREA']
-   },
-   'Orders': {
-     'specs': ['0014-ORDT', '0004-AMND', '0024-OSTA', '0025-OCRE', '0037-OPEG', '0033-OCAN', '0038-OLIQ', '0074-BTCH']
-   },
-   'Margin': {
-     'specs': ['0029-FEES', '0005-COLL', '0010-MARG', '0011-MARA', '0015-INSR', '0019-MCAL', '0018-RSKM', '0023-CALI']
-   },
-   'Bridges': {
-     'specs': ['0049-TVAL', '0050-EPOC', '0030-ETHM', '0031-ETHB']
-   },
-   'Staking & Validators': {
-     'specs': ['0071-STAK', '0059-STKG', '0056-REWA', '0061-REWP', '0058-REWS', '0055-TREA', '0041-TSTK', '0069-VCBS', '0066-VALW', '0065-FTCO', '0064-VALP', '0063-VALK']
-   },
-   'Architecture': {
-     'specs': ['0036-BRIE', '0009-NP-SNAP', '0075-PLUP']
-   },
-   'Data': {
-     'specs': ['0011-NP-DANO', '0020-APIS', '0007-POSN']
-   },
-   'UI': {
-     'specs': ['1000-ASSO', '1001-VEST', '1002-STAK', '1003-INCO', '1004-VOTE', '1005-PROP', '1006-NETW', '1007-WALL', '3000-DEPO', '3001-WITH', '5000-MARK', '6000-COLL', '6001-SORD', '6002-MORD', '6003-POSI', '6004-FILL']
-   },
-   'Unknown': {
-     'specs': []
-   }
+  "Wallets, signing transactions and network selection": {
+      "specs": ["0001-WALL", "0002-WCON", "0003-WTXN", "0004-EWAL", "0005-ETXN", "0006-NETW"]
+  },
+  "Bridges, Transfers and Vesting": {
+      "specs": ["1001-DEPO", "1002-WITH", "1003-TRAN", "1004-ASSO", "1005-VEST"]
+  },
+  "Staking": {
+      "specs": ["2001-STKE", "2002-SINC"]
+  },
+  "Governance": {
+      "specs": ["3001-VOTE", "3002-PROP", "3003-PMAN", "3004-PMAC", "3005-PASN", "3006-PASC", "3007-PNEC", "3008-PFRO"]
+  },
+  "Treasury": {
+      "specs": ["4001-TRES"]
+  },
+  "Liquidity provision": {
+      "specs": ["5001-LIQF", "5002-LIQP", "5003-LIQI"]
+  },
+  "Markets and analysis": {
+      "specs": ["6001-MARK", "6002-MARD", "6003-ORDB", "6004-PHIS", "6005-THIS"]
+  },
+  "Collateral, Orders, Positions and Fills": {
+      "specs": ["7001-COLL", "7002-SORD", "7003-MORD", "7004-POSI", "7005-FILL", "7006-FEES"]
+  },
+  "Block exploring": {
+      "specs": ["8001-BLOX"]
+  },
+  'Unknown': {
+    'specs': []
+  }
 }
 
 function getCategoryForSpec(code) {
