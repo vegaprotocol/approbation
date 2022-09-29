@@ -36,7 +36,7 @@ const pc = require('picocolors')
  * @param {*} arr
  * @param {number} n
  */
-function * chunks (arr, n = 3) {
+function* chunks (arr, n = 3) {
   for (let i = 0; i < arr.length; i += n) {
     yield arr.slice(i, i + n)
   }
@@ -86,6 +86,12 @@ function checkPath (files) {
 
     const content = fs.readFileSync(`${file}`, 'ascii')
     const codeStart = fileName.match(validSpecificationPrefix)
+
+    // Wkip files that do not match the expected file name pattern
+    if (!codeStart || !codeStart[0] || codeStart[0].length <= 4) {
+      console.error(`Skipping: ${fileName} (does not match '${validSpecificationPrefix}')`)
+      return
+    }
 
     const regex = new RegExp(`${codeStart[0]}-([0-9]{3})`, 'g')
     const matchedContent = content.match(regex)
