@@ -66,3 +66,15 @@ test('check-codes: ignore glob ignores ignored files', t => {
   t.equal(allFiles.exitCode, 1, 'All files: Expected failure')
   t.equal(allFiles.res.countErrorFiles, 1, 'All files: The file with an error is ignored')
 })
+
+test('check-codes: Do not crash when a filename included in the glob is not in the right format', t => {
+  t.plan(5)
+
+  const { exitCode, res } = checkCodes('./test/check-codes/invalid-filename-matches-glob/**/*.md')
+
+  t.equal(exitCode, 0, 'Expected success')
+  t.equal(res.countAcceptableFiles, 1, 'There is 1 acceptable files')
+  t.equal(res.countEmptyFiles, 0, 'None are is empty')
+  t.equal(res.countErrorFiles, 0, 'None have an error')
+  t.equal(res.countAcceptanceCriteria, 1, 'There are three distinct ACs')
+})
