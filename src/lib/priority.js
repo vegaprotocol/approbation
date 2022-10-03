@@ -4,8 +4,11 @@ const specPriorities = {
   '0022-AUTH': 1,
   '0066-VALW': 1,
   '0069-VCBS': 1,
-  '0009-NP-SNAP': 1,
+  '0077-SNAP': 1,
   '0073-LIMN': 1,
+  '0074-BTCH': 1,
+  '0075-PLUP': 1,
+  '0076-DANO': 1,
   // ==============
   '0006-POSI': 2,
   '0008-TRAD': 2,
@@ -26,8 +29,6 @@ const specPriorities = {
   '0064-VALP': 2,
   '0067-KEYS': 2,
   '0072-SPPW': 2,
-  '0074-BTCH': 2,
-  '0075-PLUP': 2,
   // ==============
   '0017-PART': 3,
   '0025-OCRE': 3,
