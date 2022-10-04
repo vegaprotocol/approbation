@@ -6,7 +6,7 @@ test('check-references: Happy path, 100% referenced', t => {
   t.plan(4)
 
   quiet()
-  const { exitCode, res } = checkReferences('./test/check-references/complete-coverage/**/*.md', './test/check-references/complete-coverage/**/*.{feature,py}')
+  const { exitCode, res } = checkReferences('./test/check-references/complete-coverage/**/*.md', './test/check-references/complete-coverage/**/*.{feature,py}', './test/test-data/categories.json')
   loud()
 
   t.equal(exitCode, 0, 'Success')
@@ -19,7 +19,7 @@ test('check-references: 50% referenced, both from one spec', t => {
   t.plan(5)
 
   quiet()
-  const { exitCode, res } = checkReferences('./test/check-references/fifty-percent/**/*.md', './test/check-references/fifty-percent/**/*.{feature,py}')
+  const { exitCode, res } = checkReferences('./test/check-references/fifty-percent/**/*.md', './test/check-references/fifty-percent/**/*.{feature,py}', './test/test-data/categories.json')
   loud()
 
   t.equal(exitCode, 0, 'Success')
@@ -33,7 +33,7 @@ test('check-references: multiple specs, multiple tests', t => {
   t.plan(5)
 
   quiet()
-  const { exitCode, res } = checkReferences('./test/check-references/complex/specs/*.{md,ipynb}', './test/check-references/complex/**/*.{feature,py}')
+  const { exitCode, res } = checkReferences('./test/check-references/complex/specs/*.{md,ipynb}', './test/check-references/complex/**/*.{feature,py}', './test/test-data/categories.json')
   loud()
 
   t.equal(exitCode, 0, 'Success')
@@ -47,7 +47,7 @@ test('check-references: README is ignored', t => {
   t.plan(4)
 
   quiet()
-  const { exitCode, res } = checkReferences('./test/check-references/readme-is-ignored/**/*.md', './test/check-references/readme-is-ignored/**/*.{feature,py}')
+  const { exitCode, res } = checkReferences('./test/check-references/readme-is-ignored/**/*.md', './test/check-references/readme-is-ignored/**/*.{feature,py}', './test/test-data/categories.json')
   loud()
 
   t.equal(exitCode, 0, 'Success')
@@ -61,8 +61,8 @@ test('check-references: Ignore ignores specs...', t => {
   t.plan(4)
 
   quiet()
-  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`)
-  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, `${path}0002*.md`)
+  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, './test/test-data/categories.json')
+  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, './test/test-data/categories.json', `${path}0002*.md`)
   loud()
 
   t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
@@ -77,8 +77,8 @@ test('check-references: ...ignore also applies to tests...', t => {
   t.plan(4)
 
   quiet()
-  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`)
-  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, `${path}another-test.feature`)
+  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, './test/test-data/categories.json')
+  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, './test/test-data/categories.json', `${path}another-test.feature`)
   loud()
 
   t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
@@ -93,8 +93,8 @@ test('check-references: ...which is to say both simultaneously', t => {
   t.plan(4)
 
   quiet()
-  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`)
-  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, `${path}{another-test*,0001*}`)
+  const allFiles = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, './test/test-data/categories.json')
+  const ignore = checkReferences(`${path}*.md`, `${path}*.{feature,py}`, './test/test-data/categories.json', `${path}{another-test*,0001*}`)
   loud()
 
   t.equal(allFiles.res.criteriaTotal, 2, 'All files: two criteria exist')
@@ -109,7 +109,7 @@ test('check-references: detect references in tests that are not in specs', t => 
   t.plan(4)
 
   quiet()
-  const { res } = checkReferences(`${path}*.md`, `${path}*.feature`)
+  const { res } = checkReferences(`${path}*.md`, `${path}*.feature`, './test/test-data/categories.json')
   loud()
 
   t.equal(res.criteriaTotal, 2, 'Two valid criteria exist in specs')
