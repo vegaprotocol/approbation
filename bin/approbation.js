@@ -60,8 +60,9 @@ if (command === 'check-filenames') {
   res = checkCodes(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
-  let specsGlob = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
-  let testsGlob = '{./qa-scenarios/**/*.{feature,py}}'
+  let specsGlob = argv['specs']
+  let testsGlob = argv['tests']
+  const categories = argv['categories']
   const ignoreGlob = argv.ignore
   const showMystery = argv['show-mystery'] === true
   const showCategoryStats = argv['category-stats'] === true
@@ -72,19 +73,22 @@ if (command === 'check-filenames') {
   const shouldShowFileStats = argv['show-file-stats'] === true
 
   if (!argv.specs) {
-    warn(['No --specs argument provided, defaulting to:', `--specs="${specsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
-  } else {
-    specsGlob = argv.specs
+    warn(['No --specs argument provided, exiting'])
+    process.exit(1)
   }
 
   if (!argv.tests) {
-    warn(['No --tests argument provided, defaulting to:', `--specs="${testsGlob}"`, '(This behaviour will be deprecated in 3.0.0)'])
-  } else {
-    testsGlob = argv.tests
+    warn(['No --tests argument provided, exiting'])
+    process.exit(1)
+  }
+
+  if (!categories) {
+    warn(['No --categories argument provided, exiting'])
+    process.exit(1)
   }
 
   // TODO: Turn in to an object
-  res = checkReferences(specsGlob, testsGlob, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats)
+  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats)
 
   process.exit(res.exitCode)
 } else {
@@ -121,6 +125,7 @@ if (command === 'check-filenames') {
   console.group('Arguments')
   showArg(`--specs="${pc.yellow('{specs/**/*.md}')}"`, 'glob of specs to pull AC codes from ')
   showArg(`--tests="${pc.yellow('tests/**/*.{py,feature}')}"`, 'glob of tests to match to the spec AC codes')
+  showArg(`--categories="${pc.yellow('./specs/protocol/categories.json')}"`, 'Single JSON file that contains the categories for this test run')
   showArg(`--ignore="${pc.yellow('{tests/**/*.{py,feature}')}"`, 'glob of files to ignore for both tests and specs')
   showArg('--show-mystery', 'If set, display criteria in tests that are not in any specs matched by --specs')
   showArg('--category-stats', 'Show more detail for referenced/unreferenced codes')

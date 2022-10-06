@@ -10,7 +10,7 @@ const glob = require('glob')
 const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
-const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, specCategories } = require('./lib/category')
+const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, setCategories, specCategories } = require('./lib/category')
 const { Table } = require('console-table-printer')
 const { specPriorities } = require('./lib/priority')
 const sortBy = require('lodash.sortby')
@@ -193,7 +193,7 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false) {
+function checkReferences (specsGlob, testsGlob, categories, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false) {
   verbose = isVerbose
   showFiles = shouldShowFiles
 
@@ -201,11 +201,13 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
   const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
   const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
 
-  let specs, tests
+  let specs, tests, specCategories
   const exitCode = 0
 
   if (specList.length > 0 && testList.length > 0) {
     try {
+      specCategories = JSON.parse(fs.readFileSync(categories))
+      setCategories(specCategories)
       specs = gatherSpecs(specList)
       tests = gatherTests(testList)
     } catch (e) {
@@ -287,7 +289,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
           'by/FeatTest': c.featureCovered || '-',
           'by/SysTest': c.systemTestCovered || '-',
           Uncovered: c.uncovered || '-',
-          Coverage: `${coverage}%`
+          Coverage: isNaN(coverage) ? '-' : `${coverage}%`
         }
       })
 
@@ -300,7 +302,7 @@ function checkReferences (specsGlob, testsGlob, ignoreGlob, showMystery = false,
         'by/FeatTest': labelledFeatureTotal,
         'by/SysTest': labelledSystestTotal,
         Uncovered: criteriaUnreferencedTotal,
-        Coverage: `${criteriaReferencedPercent}%`
+        Coverage: isNaN(criteriaReferencedPercent) ? '-' : `${criteriaReferencedPercent}%`
       })
 
       const t = new Table()
