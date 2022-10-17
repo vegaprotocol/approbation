@@ -120,3 +120,23 @@ test('check-references: detect references in tests that are not in specs', t => 
   t.equal(mc.keys().next().value, '0007-MYST-001', 'It should list the unkown code')
   t.equal(mc.values().next().value[0], './test/check-references/mystery-criteria/tests/test.feature', 'It should point to the file with the unknown code')
 })
+
+test('check-references: Specs can be in multiple categories at once', t => {
+  const path = './test/check-references/multiple-categories/**/'
+  t.plan(6)
+
+  quiet()
+  const { res } = checkReferences(`${path}*.md`, `${path}*.feature`, './test/check-references/multiple-categories/categories/categories.json', '', false, false, true)
+  loud()
+
+  const c = res.categories
+
+  t.equal(c[0].Category, 'JustTheOneSpec', 'Just The One Spec category exists')
+  t.equal(c[0].Specs, 1, 'Just The One Spec category has just the one spec')
+
+  t.equal(c[1].Category, 'AnotherCategoryWithJustOneSpec', 'Another Category With Just One Spec category exists')
+  t.equal(c[1].Specs, 1, 'Another Category with Just One Spec category has just the one spec')
+
+  t.equal(c[2].Category, 'CATEisAlsoInHere', 'Cate Is Also In Here category exists')
+  t.equal(c[2].Specs, 2, 'CATE Is Also In Here category has two specs')
+})

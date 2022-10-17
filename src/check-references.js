@@ -193,20 +193,21 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, categories, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false) {
+function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false) {
   verbose = isVerbose
   showFiles = shouldShowFiles
 
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
   const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
   const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
+  let categories
 
   let specs, tests, specCategories
   const exitCode = 0
 
   if (specList.length > 0 && testList.length > 0) {
     try {
-      specCategories = JSON.parse(fs.readFileSync(categories))
+      specCategories = JSON.parse(fs.readFileSync(categoriesPath))
       setCategories(specCategories)
       specs = gatherSpecs(specList)
       tests = gatherTests(testList)
@@ -264,7 +265,6 @@ function checkReferences (specsGlob, testsGlob, categories, ignoreGlob, showMyst
       st.addRows(sortBy(specsTableRows, ['Priority', 'Coverage']))
       console.log(st.render())
     }
-
     if (showCategoryStats) {
       const shouldOutputImage = false
       let specFilesTotal = 0
@@ -272,7 +272,7 @@ function checkReferences (specsGlob, testsGlob, categories, ignoreGlob, showMyst
       let labelledSystestTotal = 0
       let acceptableSpecsTotal = 0
 
-      const categories = Object.keys(specCategories).map(key => {
+      categories = Object.keys(specCategories).map(key => {
         const c = specCategories[key]
         const coverage = (c.covered / c.codes * 100).toFixed(1)
         specFilesTotal += c.specCount | 0
@@ -353,7 +353,8 @@ function checkReferences (specsGlob, testsGlob, categories, ignoreGlob, showMyst
         criteriaUnreferencedTotal,
         criteriaReferencedPercent,
         criteriaUnreferencedPercent,
-        unknownCriteriaInTests
+        unknownCriteriaInTests,
+        categories
       }
     }
   } else {
