@@ -125,9 +125,9 @@ test('check-references: Specs can be in multiple categories at once', t => {
   const path = './test/check-references/multiple-categories/**/'
   t.plan(20)
 
-//  quiet()
+  quiet()
   const { res } = checkReferences(`${path}*.md`, `${path}*.feature`, './test/check-references/multiple-categories/categories/categories.json', '', false, false, true)
-//  loud()
+  loud()
 
   const c = res.categories
 
