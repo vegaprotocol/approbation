@@ -123,20 +123,37 @@ test('check-references: detect references in tests that are not in specs', t => 
 
 test('check-references: Specs can be in multiple categories at once', t => {
   const path = './test/check-references/multiple-categories/**/'
-  t.plan(6)
+  t.plan(20)
 
-  quiet()
+//  quiet()
   const { res } = checkReferences(`${path}*.md`, `${path}*.feature`, './test/check-references/multiple-categories/categories/categories.json', '', false, false, true)
-  loud()
+//  loud()
 
   const c = res.categories
 
   t.equal(c[0].Category, 'JustTheOneSpec', 'Just The One Spec category exists')
   t.equal(c[0].Specs, 1, 'Just The One Spec category has just the one spec')
+  t.equal(c[0].Criteria, 1, 'The spec in this category has one criteria')
 
   t.equal(c[1].Category, 'AnotherCategoryWithJustOneSpec', 'Another Category With Just One Spec category exists')
   t.equal(c[1].Specs, 1, 'Another Category with Just One Spec category has just the one spec')
+  t.equal(c[1].Criteria, 3, 'The spec in this category has three criteria')
 
   t.equal(c[2].Category, 'CATEisAlsoInHere', 'Cate Is Also In Here category exists')
-  t.equal(c[2].Specs, 2, 'CATE Is Also In Here category has two specs')
+  t.equal(c[2].Specs, 1, 'CATE Is Also In Here category has one spec, which has been in a previous category')
+  t.equal(c[2].Criteria, 3, 'The spec in this category has three criteria (same as the last one)')
+  
+  t.equal(c[3].Category, 'AllSpecs', 'AllSpecs contains two specifications')
+  t.equal(c[3].Specs, 2, 'AllSpecs contains both specifications')
+  t.equal(c[3].Criteria, 4, 'The specs in this category have four criteria (total)')
+
+  t.equal(c[4].Category, 'Unknown', 'No specs with no category')
+  t.equal(c[4].Specs, '-', 'No specs with no category')
+  t.equal(c[4].Criteria, '-', 'No criteria in no specs with no category')
+
+  t.equal(c[5].Category, 'Total', 'Total should be 2, not the sum of all categories')
+  t.equal(c[5].Specs, 2, 'There are 2 specs, same as AllSpecs')
+  t.equal(c[5].Criteria, 4, 'There are 4 criteria, same as AllSpecs')
+  t.equal(c[5].Covered, 4, 'There are 4 covered criteria, same as AllSpecs')
+  t.equal(c[5]['by/FeatTest'], 4, 'There are 4 criteria covered by feature tests, same as AllSpecs')
 })

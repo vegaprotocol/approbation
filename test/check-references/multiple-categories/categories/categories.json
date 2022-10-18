@@ -7,5 +7,8 @@
     },
     "CATEisAlsoInHere": {
       "specs": ["0002-CATE"]
+    },
+    "AllSpecs": {
+      "specs": ["0001-VALI", "0002-CATE"]
     }
 }

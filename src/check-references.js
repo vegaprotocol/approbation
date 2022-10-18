@@ -10,7 +10,7 @@ const glob = require('glob')
 const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
-const { getCategoryForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, setCategories, specCategories } = require('./lib/category')
+const { getCategoriesForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, setCategories, specCategories } = require('./lib/category')
 const { Table } = require('console-table-printer')
 const { specPriorities } = require('./lib/priority')
 const sortBy = require('lodash.sortby')
@@ -43,7 +43,7 @@ function gatherSpecs (fileList) {
       criteria = [...new Set(labelledAcceptanceCriteria)]
     }
 
-    const category = getCategoryForSpec(codeStart[0])
+    const categories = getCategoriesForSpec(codeStart[0])
 
     specFiles.set(fileName, {
       name: `${path}${file}`,
@@ -51,7 +51,7 @@ function gatherSpecs (fileList) {
       file,
       path,
       criteria,
-      category
+      categories
     })
   })
 
@@ -100,13 +100,17 @@ function processReferences (specs, tests) {
     value.referencedBySystemTest = 0
 
     const unreferencedCriteria = []
-    const category = value.category && value.category !== 'Unknown' ? ` #${pc.yellow(value.category)}` : ''
-    increaseSpecCountForCategory(value.category)
+    // Used as a title later on
+    const category = value.categories && value.categories !== ['Unknown'] ? `#${pc.yellow(value.categories.join(', #'))}` : ''
+    // Used as a shortcut for all the loops
+    const categories = value.categories
+    categories.forEach(c => increaseSpecCountForCategory(c))
 
     const acceptableMinimum = 1
 
     criteriaTotal += value.criteria.length
-    increaseCodesForCategory(value.category, value.criteria.length)
+    categories.forEach(c => increaseCodesForCategory(c, value.criteria.length))
+
     let refOutput = ''
     const criteriaWithRefs = []
 
@@ -119,24 +123,24 @@ function processReferences (specs, tests) {
           refOutput += `${pc.green(c)}:  ${linksForAC.length} (${linksForAC.toString()})\r\n`
           criteriaWithRefs.push(c)
           criteriaReferencedTotal++
-          increaseCoveredForCategory(value.category, 1)
+          categories.forEach(c => increaseCoveredForCategory(c, 1))
 
           // Hacky hack: Limit these to 1 or 0 rather than a true tally.
           let criteriaAlreadyLoggedSystest = false
           let criteriaAlreadyLoggedFeature = false
           linksForAC.forEach(l => {
             if (!criteriaAlreadyLoggedSystest && l.match('system-tests')) {
-              increaseSystemTestCoveredForCategory(value.category, 1)
+              categories.forEach(c => increaseSystemTestCoveredForCategory(c, 1))
               value.referencedBySystemTest++
               criteriaAlreadyLoggedSystest = true
             } else if (!criteriaAlreadyLoggedFeature && l.match('.feature')) {
-              increaseFeatureCoveredForCategory(value.category, 1)
+              categories.forEach(c => increaseFeatureCoveredForCategory(c, 1))
               value.referencedByFeature++
               criteriaAlreadyLoggedFeature = true
             }
           })
         } else {
-          increaseCoveredForCategory(value.category, 0)
+          categories.forEach(c => increaseCoveredForCategory(c, 0))
         }
 
         // Delete used references, so that tests at the end contains only AC codes not found in specs
@@ -151,11 +155,11 @@ function processReferences (specs, tests) {
           }
         })
 
-        increaseUncoveredForCategory(value.category, unreferencedCriteria.length)
+        categories.forEach(c => increaseUncoveredForCategory(c, unreferencedCriteria.length))
       }
 
       if (value.criteria.length > acceptableMinimum) {
-        increaseAcceptableSpecsForCategory(value.category)
+        categories.forEach(c=> increaseAcceptableSpecsForCategory(c))
       }
     }
 
@@ -291,18 +295,6 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
           Uncovered: c.uncovered || '-',
           Coverage: isNaN(coverage) ? '-' : `${coverage}%`
         }
-      })
-
-      categories.push({
-        Category: 'Total',
-        Specs: specFilesTotal,
-        Acceptable: acceptableSpecsTotal,
-        Criteria: criteriaTotal,
-        Covered: criteriaReferencedTotal,
-        'by/FeatTest': labelledFeatureTotal,
-        'by/SysTest': labelledSystestTotal,
-        Uncovered: criteriaUnreferencedTotal,
-        Coverage: isNaN(criteriaReferencedPercent) ? '-' : `${criteriaReferencedPercent}%`
       })
 
       const t = new Table()
