@@ -101,7 +101,7 @@ function processReferences (specs, tests) {
 
     const unreferencedCriteria = []
     // Used as a title later on
-    const category = value.categories && value.categories !== ['Unknown'] ? `#${pc.yellow(value.categories.join(', #'))}` : ''
+    const category = value.categories && value.categories !== ['Unknown'] ? ' ' +value.categories.filter(c => c !== 'Total').map(c => { return pc.bgYellow(pc.black(`#${c}`))}).join(', ') : ''
     // Used as a shortcut for all the loops
     const categories = value.categories
     categories.forEach(c => increaseSpecCountForCategory(c))
