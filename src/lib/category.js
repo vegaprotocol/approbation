@@ -14,9 +14,10 @@ function setCategories(categories) {
   if (!specCategories['Unknown']) {
     specCategories['Unknown'] = { specs: [], specCount: 0 }
   }
+  specCategories['Total'] = { specs: [], specCount: 0 }
 }
 
-function getCategoryForSpec(code) {
+function getCategoriesForSpec(code) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
   }
@@ -26,7 +27,7 @@ function getCategoryForSpec(code) {
   })
 
   // There shouldn't be more than one. But if there is, take the first one.
-  return (categories.length > 0) ? categories[0] : 'Unknown'
+  return (categories.length > 0) ? [...categories, 'Total'] : [ 'Unknown', 'Total' ]
 }
 
 function setOrIncreaseProperty(category, property, value) {
@@ -92,7 +93,7 @@ function increaseAcceptableSpecsForCategory(category) {
 
 module.exports = {
   specCategories,
-  getCategoryForSpec,
+  getCategoriesForSpec,
   increaseCodesForCategory,
   increaseCoveredForCategory,
   increaseUncoveredForCategory,
