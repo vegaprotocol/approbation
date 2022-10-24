@@ -53,7 +53,7 @@ npx @vegaprotocol/approbation@latest check-codes --specs="./specs/protocol/**/*.
 | `--tests`         | glob     | tests to check for AC codes          | `tests/**/*.{py,feature}`    |
 | `--specs`         | glob     | specs to pull AC codes from          | `{specs/**/*.md}`    |
 | `--ignore`        | glob     | glob of files not to check for codes | `specs/0001-spec.md` |
-| `--categories`  | string  | JSON file that contains category mappings for specs          | -=`specs/categories.json`    |
+| `--categories`  | string  | JSON file that contains category mappings for specs          | `specs/categories.json`    |
 | `--show-branches` | boolean  | Show git branches for subfolders of the current folder | -  | 
 | `--show-mystery`  | boolean  | display criteria in tests that are not in any specs matched by `--specs`          | -    |
 | `--show-files`  | boolean  | display basic stats per file         | -    |
