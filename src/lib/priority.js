@@ -29,6 +29,7 @@ const specPriorities = {
   '0064-VALP': 2,
   '0067-KEYS': 2,
   '0072-SPPW': 2,
+  '0078-NWLI': 2,
   // ==============
   '0017-PART': 3,
   '0025-OCRE': 3,
