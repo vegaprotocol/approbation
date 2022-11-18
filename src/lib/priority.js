@@ -30,7 +30,7 @@ const specPriorities = {
   '0067-KEYS': 2,
   '0072-SPPW': 2,
   '0078-NWLI': 2,
-  '0079-TGAS': 2,
+  '0079-TGAP': 2,
   // ==============
   '0017-PART': 3,
   '0025-OCRE': 3,
