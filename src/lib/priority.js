@@ -31,6 +31,7 @@ const specPriorities = {
   '0072-SPPW': 2,
   '0078-NWLI': 2,
   '0079-TGAP': 2,
+  '0063-VALK': 2,
   // ==============
   '0017-PART': 3,
   '0025-OCRE': 3,
@@ -58,7 +59,6 @@ const specPriorities = {
   '0007-POSN': 8,
   '0036-BRIE': 8,
   '0054-NETP': 8,
-  '0063-VALK': 8,
   // ==============
   '0013-ACCT': 9,
   '0015-INSR': 9,
