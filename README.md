@@ -4,7 +4,7 @@
 Scripts for producing a coverage matrix for Vega [specifications](https://github.com/vegaprotocol/specs)
 
 ```bash
-npx @vegaprotocol/approbation@latest
+npx github:vegaprotocol/approbation
 ```
 
 # Available commands
@@ -23,7 +23,7 @@ All of the globs below are relatively simple - check out [globs primer](https://
 
 ### check-codes example
 ```bash
-npx @vegaprotocol/approbation@latest check-filenames --specs="./specs-internal/protocol/**/*.{md,ipynb}" --show-branches 
+npx github:vegaprotocol/approbation@latest check-filenames --specs="./specs-internal/protocol/**/*.{md,ipynb}" --show-branches 
 ```
 
 
@@ -39,7 +39,7 @@ npx @vegaprotocol/approbation@latest check-filenames --specs="./specs-internal/p
 
 ### check-filenames example
 ```bash
-npx @vegaprotocol/approbation@latest check-codes --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*,0002-*,0004-*}" --show-branches 
+npx github:vegaprotocol/approbation@latest check-codes --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*,0002-*,0004-*}" --show-branches 
 ```
 
 
@@ -64,7 +64,7 @@ npx @vegaprotocol/approbation@latest check-codes --specs="./specs/protocol/**/*.
 
 ### check-references example
 ```bash
-npx @vegaprotocol/approbation@latest check-references --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*}" --categories="specs/protocol/categories.json" --show-branches --show-mystery
+npx github:vegaprotocol/approbation@latest check-references --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*}" --categories="specs/protocol/categories.json" --show-branches --show-mystery
 ```
 
 
@@ -120,6 +120,11 @@ Run `npm run setup` to configure your environment:
 - Linting uses [standard](https://www.npmjs.com/package/standard)
 - Tests are run pre-push by [Husky](https://www.npmjs.com/package/husky)
 - Package is published to `npm` on tag
+
+# Use in CI
+```shell
+npx --silent --yes github:vegaprotocol/approbation
+```
 
 # [License](./LICENSE)
 The Unlicense
