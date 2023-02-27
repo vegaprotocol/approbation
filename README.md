@@ -1,5 +1,4 @@
 # approbation
-![npm  version](https://img.shields.io/npm/v/@vegaprotocol/approbation?style=flat-square) ![Test status](https://img.shields.io/github/workflow/status/vegaprotocol/approbation/Tape?style=flat-square) ![Maintenant status: yes](https://img.shields.io/maintenance/yes/2022?style=flat-square) ![Dependency status](https://img.shields.io/librariesio/release/npm/@vegaprotocol/approbation?style=flat-square)
 
 Scripts for producing a coverage matrix for Vega [specifications](https://github.com/vegaprotocol/specs)
 
