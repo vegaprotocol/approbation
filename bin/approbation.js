@@ -4,18 +4,19 @@ const packageJson = require('../package.json')
 const { checkFilenames } = require('../src/check-filenames')
 const { checkCodes } = require('../src/check-codes')
 const { checkReferences } = require('../src/check-references')
+const { checkCoverage } = require('../src/check-coverage')
 const pc = require('picocolors')
 const { outputBranches } = require('../src/lib/get-project-branches')
 const argv = require('minimist')(process.argv.slice(2))
 const command = argv._[0]
 
-function warn (lines) {
+function warn(lines) {
   console.warn('')
   lines.map(l => console.warn(pc.yellow(`! ${l}`)))
   console.warn('')
 }
 
-function showArg (arg, description) {
+function showArg(arg, description) {
   if (description) {
     console.log(`${pc.bold(arg)}: ${description}`)
   } else {
@@ -46,6 +47,13 @@ if (command === 'check-filenames') {
 
   res = checkFilenames(paths, ignoreGlob)
   process.exit(res.exitCode)
+} else if (command === 'check-coverage') {
+  const ignoreGlob = argv.ignore
+  const isVerbose = argv.verbose === true
+  const paths = argv.specs
+
+  res = checkCoverage(paths, ignoreGlob, isVerbose)
+  process.exit(res.exitCode);
 } else if (command === 'check-codes') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   const ignoreGlob = argv.ignore
