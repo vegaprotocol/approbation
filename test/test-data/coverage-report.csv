@@ -68,9 +68,9 @@ test_propose_new_erc20_token,tests/assets/erc20_asset_test.py,0027-ASSP-001/0027
 test_propose_new_erc20_token_twice,tests/assets/erc20_asset_test.py,,Passed
 test_propose_new_erc20_after_first_rejected,tests/assets/erc20_asset_test.py,,Passed
 test_trade_with_erc20_asset_in_market,tests/assets/erc20_asset_test.py,,Passed
-test_quantum_is_a_required_parameter[-is required],tests/assets/erc20_asset_test.py,0027-ASSP-004/0040-ASSF-008,Passed
-test_quantum_is_a_required_parameter[0-must be positive],tests/assets/erc20_asset_test.py,0027-ASSP-004/0040-ASSF-008,Passed
-test_quantum_is_a_required_parameter[-1-must be positive],tests/assets/erc20_asset_test.py,0027-ASSP-004/0040-ASSF-008,Passed
+test_quantum_is_a_required_parameter[-is required],tests/assets/erc20_asset_test.py,0027-ASSP-004/0040-ASSF-008/0027-ASSP-019,Passed
+test_quantum_is_a_required_parameter[0-must be positive],tests/assets/erc20_asset_test.py,0027-ASSP-004/0040-ASSF-008/0027-ASSP-019,Passed
+test_quantum_is_a_required_parameter[-1-must be positive],tests/assets/erc20_asset_test.py,0027-ASSP-004/0040-ASSF-008/0027-ASSP-019,Passed
 test_invalid_list_asset_signature_bundle,tests/assets/erc20_asset_test.py,0031-ETHB-017,Passed
 test_list_already_listed_asset,tests/assets/erc20_asset_test.py,,Passed
 test_invalid_withdraw_signature_bundle,tests/assets/erc20_asset_test.py,0031-ETHB-014,Passed
@@ -139,7 +139,8 @@ test_datanode_history_segments_are_deterministic,tests/datanode/datanode_test.py
 test_nodes_can_subscribe_for_event_bus,tests/datanode/datanode_test.py,0076-DANO-017,Passed
 test_core_nodes_can_only_subscribe_for_event_bus,tests/datanode/datanode_test.py,0076-DANO-016,Passed
 test_datanode_disconnection,tests/datanode/datanode_test.py,0076-DANO-023/0076-DANO-015/0076-DANO-019/0076-DANO-021,Passed
-test_datanode_start_stop_restart_from_network_history,tests/datanode/datanode_test.py,0076-DANO-024/0076-DANO-025,Passed
+test_datanode_start_stop_restart_from_network_history,tests/datanode/datanode_test.py,0076-DANO-024/0076-DANO-025,Failed
+test_datanode_rate_limiting,tests/datanode/datanode_test.py,0076-DANO-029/0076-DANO-030/0076-DANO-032/0076-DANO-033/0076-DANO-034/0076-DANO-035/0076-DANO-036/0076-DANO-037/0076-DANO-038,Failed
 test_ERC20_DepositWithdrawal_RoundTrip,tests/deposits_withdrawals/erc20_deposit_test.py,0031-ETHB-013/0031-ETHB-008,Passed
 test_fee_collection,tests/fees/fees_test.py,0029-FEES-001/0029-FEES-002/0029-FEES-003/0029-FEES-011/0029-FEES-013/0013-ACCT-019/0013-ACCT-011,Passed
 test_fees_auction_insufficient_balance,tests/fees/fees_test.py,0029-FEES-008,Passed

@@ -94,6 +94,8 @@ function processReferences (specs, tests) {
   let criteriaTotal = 0
   let criteriaReferencedTotal = 0
   let criteriaUnreferencedTotal = 0
+  const allAcCodes = []
+
   // Step 3: Output the data
   specs.forEach((value, key) => {
     value.referencedByFeature = 0
@@ -118,6 +120,7 @@ function processReferences (specs, tests) {
     if (value.criteria && value.criteria.length > 0) {
       value.criteria.forEach(c => {
         const linksForAC = tests.get(c)
+        allAcCodes.push(c)
 
         if (linksForAC) {
           refOutput += `${pc.green(c)}:  ${linksForAC.length} (${linksForAC.toString()})\r\n`
@@ -190,6 +193,7 @@ function processReferences (specs, tests) {
   })
 
   return {
+    allAcCodes,
     criteriaTotal,
     criteriaReferencedTotal,
     criteriaUnreferencedTotal,
@@ -226,7 +230,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       }
     }
 
-    const { criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
+    const { allAcCodes, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
     const criteriaReferencedPercent = (criteriaReferencedTotal / criteriaTotal * 100).toFixed(1)
     const criteriaUnreferencedPercent = (criteriaUnreferencedTotal / criteriaTotal * 100).toFixed(1)
 
@@ -334,6 +338,25 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
         }
 
         console.groupEnd()
+      }
+    }
+
+    if (shouldOutputCSV) {
+      if (!fs.existsSync('./results')) {
+        fs.mkdirSync('./results')
+      }
+
+      if (shouldOutputCSV) {
+        let specCsvOutput = ''
+        allAcCodes.forEach(c => {
+          specCsvOutput += `\r\n${c},specs`
+        })
+        if (unknownCriteriaInTests.size > 0) {
+          for (const [key, value] of unknownCriteriaInTests) {
+            specCsvOutput += `\r\n${key},test`
+          }
+        }
+        fs.writeFileSync('results/approbation-codes.csv', specCsvOutput)
       }
     }
 
