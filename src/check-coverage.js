@@ -59,9 +59,9 @@ function gatherAllCodes() {
 }
 
 function generateImageFiles(allCodes, testResults) {
-  let source = 'unknown'
 
   allCodes.forEach(ac => {
+    let source = 'untested'
     if (testResults.has(ac)) {
       const resultForCode = testResults.get(ac)
       if (resultForCode === 'pass') {
