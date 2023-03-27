@@ -1,0 +1,20 @@
+<table border="1">
+    <thead>
+        <tr>
+            <th>Acceptance Criteria</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#allCodes}}
+        <tr id="{{.}}">
+            <td class="code">
+                <a href="#{{.}}">{{.}}</a>
+            </td>
+            <td class="status">
+                <img src="./status/{{status/}}{{.}}.svg" width="25" height="25" />
+            </td>
+        </tr>
+        {{/allCodes}}
+    </tbody>
+</table>

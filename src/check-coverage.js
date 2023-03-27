@@ -1,10 +1,8 @@
 const fs = require('fs')
-const glob = require('glob')
-const path = require('path')
-const { validSpecificationPrefix, ignoreFiles } = require('./lib')
-const { minimumAcceptableACsPerSpec } = require('./config')
+const Mustache = require('mustache')
 const pc = require('picocolors')
 const { parse } = require('csv-parse/sync');
+const { rimrafSync } = require('rimraf')
 
 // Outputs acceptance criteria count if it's acceptable
 let verbose = false
@@ -60,41 +58,66 @@ function gatherAllCodes() {
   return rows.map(r => r['Code'])
 }
 
-function generateFiles(allCodes, testResults) {
+function generateImageFiles(allCodes, testResults) {
+  let source = 'unknown'
+
   allCodes.forEach(ac => {
     if (testResults.has(ac)) {
       const resultForCode = testResults.get(ac)
       if (resultForCode === 'pass') {
-        console.log(`${ac}: pass`)
+        source = 'pass'
       } else if (resultForCode === 'fail') {
-        console.log(`${ac}: fail`)
+        source = 'fail'
       } else if (resultForCode === 'mix') {
-        console.log(`${ac}: mix`)
+        source = 'mixed'
       }
-    } else {
-      console.log(`${ac}: unknown`)
     }
+    fs.copyFileSync(`./assets/icons/${source}.svg`, `./build/status/${ac}.svg`)
   })
+
+}
+
+function generateHTML(allCodes, testResults){
+  const template = fs.readFileSync('./templates/template.mustache', { encoding: 'utf-8' }).toString()
+  const partials = {
+    stylesheet: fs.readFileSync('./templates/partials/stylesheet.mustache', { encoding: 'utf-8' }).toString(),
+    footer: fs.readFileSync('./templates/partials/footer.mustache', { encoding: 'utf-8' }).toString(),
+    codes: fs.readFileSync('./templates/partials/codes.mustache', { encoding: 'utf-8' }).toString(),
+  }
+
+  const html = Mustache.render(template, { allCodes, testResults }, partials)
+  const res = fs.writeFileSync('./build/index.html', html)
+  return res
 }
 
 function checkCoverage(paths, ignoreGlob, isVerbose = false) {
   verbose = isVerbose
-  const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
-  const fileList = ignoreFiles(glob.sync(paths, {}), ignoreList)
+  isVerbose && console.log(`Cleaning previous build`)
+
+  rimrafSync('./build/index.html')
+  rimrafSync('./build/status/*')
+  
   let exitCode = 0
   let res = {
     testResults: undefined,
     allCodes: undefined
   }
 
-  if (fileList.length > 0) {
-    res.testResults = gatherCoverage()
-    res.allCodes = gatherAllCodes()
-    generateFiles(res.allCodes, res.testResults.resultsByAc)
-  } else {
-    console.error(pc.red(`glob matched no files (${paths})`))
-    exitCode = 1
-  }
+  isVerbose && console.log(`Opening coverage log:`)
+  res.testResults = gatherCoverage()
+  isVerbose && console.log(pc.green(`- Got ${res.testResults.resultsByAc.size} results`))
+
+  isVerbose && console.log(`Opening code list:`)
+  res.allCodes = gatherAllCodes()
+  isVerbose && console.log(pc.green(`- Got ${res.allCodes.length} codes`))
+
+  isVerbose && console.log(pc.yellow(`Generating status images...`))
+  generateImageFiles(res.allCodes, res.testResults.resultsByAc)
+
+  isVerbose && console.log(pc.yellow(`Generating HTML...`))
+  generateHTML(res.allCodes, res.testResults.resultsByAc)
+
+  console.log(pc.green(pc.bold(`\r\nDone`)))
 
   return {
     exitCode,
