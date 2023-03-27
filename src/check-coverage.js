@@ -48,18 +48,15 @@ function gatherCoverage() {
 }
 
 function gatherAllCodes() {
-  const res = new Map()
   const fileContents = fs.readFileSync('./test/test-data/approbation-codes.csv')
-  const rows = parse(fileContents, {
-    columns: ['Code', 'Source'],
+  return parse(fileContents, {
+    columns: ['Code', 'Source', 'Systests'],
     skip_empty_lines: true
   })
 
-  return rows.map(r => r['Code'])
 }
 
 function generateImageFiles(allCodes, testResults) {
-
   allCodes.forEach(ac => {
     let source = 'untested'
     if (testResults.has(ac)) {
@@ -110,6 +107,10 @@ function checkCoverage(paths, ignoreGlob, isVerbose = false) {
   isVerbose && console.log(`Opening code list:`)
   res.allCodes = gatherAllCodes()
   isVerbose && console.log(pc.green(`- Got ${res.allCodes.length} codes`))
+  res.allCodes.forEach(e => {
+    const r = res.testResults.resultsByAc.get(e.Code)
+    e.Passing = r ? r.Passing : 'unknown'
+  })
 
   isVerbose && console.log(pc.yellow(`Generating status images...`))
   generateImageFiles(res.allCodes, res.testResults.resultsByAc)

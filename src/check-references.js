@@ -95,6 +95,7 @@ function processReferences (specs, tests) {
   let criteriaReferencedTotal = 0
   let criteriaUnreferencedTotal = 0
   const allAcCodes = []
+  const criteriaWithSystests = []
 
   // Step 3: Output the data
   specs.forEach((value, key) => {
@@ -133,6 +134,8 @@ function processReferences (specs, tests) {
           let criteriaAlreadyLoggedFeature = false
           linksForAC.forEach(l => {
             if (!criteriaAlreadyLoggedSystest && l.match('system-tests')) {
+              // Used for check-coverage
+              criteriaWithSystests.push(c)
               categories.forEach(c => increaseSystemTestCoveredForCategory(c, 1))
               value.referencedBySystemTest++
               criteriaAlreadyLoggedSystest = true
@@ -195,6 +198,7 @@ function processReferences (specs, tests) {
   return {
     allAcCodes,
     criteriaTotal,
+    criteriaWithSystests,
     criteriaReferencedTotal,
     criteriaUnreferencedTotal,
     unknownCriteriaInTests: tests
@@ -230,7 +234,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       }
     }
 
-    const { allAcCodes, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
+    const { allAcCodes, criteriaWithSystests, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
     const criteriaReferencedPercent = (criteriaReferencedTotal / criteriaTotal * 100).toFixed(1)
     const criteriaUnreferencedPercent = (criteriaUnreferencedTotal / criteriaTotal * 100).toFixed(1)
 
@@ -349,11 +353,12 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       if (shouldOutputCSV) {
         let specCsvOutput = ''
         allAcCodes.forEach(c => {
-          specCsvOutput += `\r\n${c},specs`
+          const shouldHaveSystests = criteriaWithSystests.includes(c) ? 'true' : 'false'
+          specCsvOutput += `\r\n${c},specs,${shouldHaveSystests}`
         })
         if (unknownCriteriaInTests.size > 0) {
           for (const [key, value] of unknownCriteriaInTests) {
-            specCsvOutput += `\r\n${key},test`
+            specCsvOutput += `\r\n${key},test,false`
           }
         }
         fs.writeFileSync('results/approbation-codes.csv', specCsvOutput)
