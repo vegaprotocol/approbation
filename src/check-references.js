@@ -75,6 +75,7 @@ function gatherTests (fileList) {
 
     if (codesInFeature !== null) {
       codesInFeature.forEach(acCode => {
+        console.dir(acCode)
         if (linksInFeatures.has(acCode)) {
           const referrers = linksInFeatures.get(acCode)
           referrers.push(file)
@@ -94,7 +95,6 @@ function processReferences (specs, tests) {
   let criteriaTotal = 0
   let criteriaReferencedTotal = 0
   let criteriaUnreferencedTotal = 0
-  const allAcCodes = []
   const criteriaWithSystests = []
   const fileForAc = new Map()
 
@@ -122,7 +122,6 @@ function processReferences (specs, tests) {
     if (value.criteria && value.criteria.length > 0) {
       value.criteria.forEach(c => {
         const linksForAC = tests.get(c)
-        allAcCodes.push(c)
 
         fileForAc.set(c, value.file)
 
@@ -200,7 +199,6 @@ function processReferences (specs, tests) {
 
   return {
     fileForAc,
-    allAcCodes,
     criteriaTotal,
     criteriaWithSystests,
     criteriaReferencedTotal,
@@ -238,7 +236,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       }
     }
 
-    const { fileForAc, allAcCodes, criteriaWithSystests, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
+    const { fileForAc, criteriaWithSystests, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
     const criteriaReferencedPercent = (criteriaReferencedTotal / criteriaTotal * 100).toFixed(1)
     const criteriaUnreferencedPercent = (criteriaUnreferencedTotal / criteriaTotal * 100).toFixed(1)
 
@@ -347,11 +345,15 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       }
 
       let specCsvOutput = ''
-      allAcCodes.forEach(c => {
+      
+      let allAcCodes = []
+      specs.forEach(s => allAcCodes.push(s.criteria))
+      allAcCodes.flat().forEach(c => {
         const f = fileForAc.get(c)
         const shouldHaveSystests = criteriaWithSystests.includes(c) ? 'true' : 'false'
         specCsvOutput += `\r\n${c},specs,${shouldHaveSystests},${f}`
       })
+      
       if (unknownCriteriaInTests.size > 0) {
         for (const [key, value] of unknownCriteriaInTests) {
           specCsvOutput += `\r\n${key},test,false,${value.length === 1 ? value : value[0] + ' & more'}`
