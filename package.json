@@ -31,6 +31,7 @@
   "dependencies": {
     "console-table-printer": "^2.10.0",
     "csv-parse": "^5.3.6",
+    "find-root": "^1.1.0",
     "git-rev-sync": "3.0.2",
     "glob": "^8.0.3",
     "lodash.sortby": "^4.7.0",

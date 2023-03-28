@@ -10,13 +10,13 @@ const { outputBranches } = require('../src/lib/get-project-branches')
 const argv = require('minimist')(process.argv.slice(2))
 const command = argv._[0]
 
-function warn(lines) {
+function warn (lines) {
   console.warn('')
   lines.map(l => console.warn(pc.yellow(`! ${l}`)))
   console.warn('')
 }
 
-function showArg(arg, description) {
+function showArg (arg, description) {
   if (description) {
     console.log(`${pc.bold(arg)}: ${description}`)
   } else {
@@ -53,7 +53,7 @@ if (command === 'check-filenames') {
   const paths = argv.specs
 
   res = checkCoverage(paths, ignoreGlob, isVerbose)
-  process.exit(res.exitCode);
+  process.exit(res.exitCode)
 } else if (command === 'check-codes') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   const ignoreGlob = argv.ignore
@@ -68,9 +68,9 @@ if (command === 'check-filenames') {
   res = checkCodes(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
-  let specsGlob = argv['specs']
-  let testsGlob = argv['tests']
-  const categories = argv['categories']
+  const specsGlob = argv.specs
+  const testsGlob = argv.tests
+  const categories = argv.categories
   const ignoreGlob = argv.ignore
   const showMystery = argv['show-mystery'] === true
   const showCategoryStats = argv['category-stats'] === true

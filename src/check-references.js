@@ -10,7 +10,7 @@ const glob = require('glob')
 const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
-const { getCategoriesForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, setCategories, specCategories } = require('./lib/category')
+const { getCategoriesForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, setCategories } = require('./lib/category')
 const { Table } = require('console-table-printer')
 const { specPriorities } = require('./lib/priority')
 const sortBy = require('lodash.sortby')
@@ -105,7 +105,7 @@ function processReferences (specs, tests) {
 
     const unreferencedCriteria = []
     // Used as a title later on
-    const category = value.categories && value.categories !== ['Unknown'] ? ' ' +value.categories.filter(c => c !== 'Total').map(c => { return pc.bgYellow(pc.black(`#${c}`))}).join(', ') : ''
+    const category = value.categories && value.categories !== ['Unknown'] ? ' ' + value.categories.filter(c => c !== 'Total').map(c => { return pc.bgYellow(pc.black(`#${c}`)) }).join(', ') : ''
     // Used as a shortcut for all the loops
     const categories = value.categories
     categories.forEach(c => increaseSpecCountForCategory(c))
@@ -125,7 +125,7 @@ function processReferences (specs, tests) {
         allAcCodes.push(c)
 
         fileForAc.set(c, value.file)
-        
+
         if (linksForAC) {
           refOutput += `${pc.green(c)}:  ${linksForAC.length} (${linksForAC.toString()})\r\n`
           criteriaWithRefs.push(c)
@@ -168,7 +168,7 @@ function processReferences (specs, tests) {
       }
 
       if (value.criteria.length > acceptableMinimum) {
-        categories.forEach(c=> increaseAcceptableSpecsForCategory(c))
+        categories.forEach(c => increaseAcceptableSpecsForCategory(c))
       }
     }
 
@@ -283,18 +283,10 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
     }
     if (showCategoryStats) {
       const shouldOutputImage = false
-      let specFilesTotal = 0
-      let labelledFeatureTotal = 0
-      let labelledSystestTotal = 0
-      let acceptableSpecsTotal = 0
 
       categories = Object.keys(specCategories).map(key => {
         const c = specCategories[key]
         const coverage = (c.covered / c.codes * 100).toFixed(1)
-        specFilesTotal += c.specCount | 0
-        labelledFeatureTotal += c.featureCovered | 0
-        labelledSystestTotal += c.systemTestCovered | 0
-        acceptableSpecsTotal += c.acceptableSpecCount | 0
 
         return {
           Category: key,

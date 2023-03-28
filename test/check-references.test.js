@@ -142,7 +142,7 @@ test('check-references: Specs can be in multiple categories at once', t => {
   t.equal(c[2].Category, 'CATEisAlsoInHere', 'Cate Is Also In Here category exists')
   t.equal(c[2].Specs, 1, 'CATE Is Also In Here category has one spec, which has been in a previous category')
   t.equal(c[2].Criteria, 3, 'The spec in this category has three criteria (same as the last one)')
-  
+
   t.equal(c[3].Category, 'AllSpecs', 'AllSpecs contains two specifications')
   t.equal(c[3].Specs, 2, 'AllSpecs contains both specifications')
   t.equal(c[3].Criteria, 4, 'The specs in this category have four criteria (total)')
