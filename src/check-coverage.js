@@ -100,10 +100,11 @@ function checkCoverage (paths, ignoreGlob, isVerbose = false) {
     if (fs.existsSync(`${appDir}/build/status`)) {
       rimrafSync(`${appDir}/build/status/*`)
     } else {
-      fs.mkdirSync(`${appDir}/build/status`)
+      fs.mkdirSync(`${appDir}/build/status/`)
     }
   } else {
     fs.mkdirSync(`${appDir}/build/`)
+    fs.mkdirSync(`${appDir}/build/status/`)
   }
 
   const exitCode = 0
