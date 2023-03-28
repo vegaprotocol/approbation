@@ -75,7 +75,6 @@ function gatherTests (fileList) {
 
     if (codesInFeature !== null) {
       codesInFeature.forEach(acCode => {
-        console.dir(acCode)
         if (linksInFeatures.has(acCode)) {
           const referrers = linksInFeatures.get(acCode)
           referrers.push(file)
