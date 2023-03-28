@@ -29,13 +29,16 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Pages
         uses: actions/configure-pages@v3
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+      - uses: actions/setup-node@v3
         with:
-          source: ./
-          destination: ./_site
+          node-version: 19
+      - run: npm ci
+      - run: npm node ./bin/approbation.js check-coverage --specs '*' --verbose
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload entire repository
+          path: 'build'
 
   # Deployment job
   deploy:
