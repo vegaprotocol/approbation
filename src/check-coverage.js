@@ -57,6 +57,8 @@ function gatherAllCodes() {
 }
 
 function generateImageFiles(allCodes, testResults) {
+  console.log(process.cwd);
+  
   allCodes.forEach(ac => {
     let source = 'untested'
     if (testResults.has(ac.Code)) {
