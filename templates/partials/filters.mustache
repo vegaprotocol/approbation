@@ -1,12 +1,26 @@
 <style type="text/css">
     #filters {
-        background: #fff;
         position: fixed;
         bottom: 0;
         right: 0;
         max-width: 300px;
         width: 30%;
         height: 300px;
+    }
+
+    #filters legend {
+        background: #fff;
+        display: block;
+        border: 1px solid #000;
+        margin-top: -0.5em;
+        padding: 8px;
+        font-size: 1.1em;
+        font-weight: bold;
+    }
+    
+    #filters fieldset {
+        border: 1px solid #000;
+        background: #fff;
     }
 </style>
 
@@ -28,6 +42,11 @@
         hideAll();
         document.querySelectorAll('.tested.fail').forEach(el => el.classList.remove('hide'));
     }
+
+    function showMixedResults() {
+        hideAll();
+        document.querySelectorAll('.tested.mix').forEach(el => el.classList.remove('hide'));
+    }
 </script>
 
 <div id="filters">
@@ -42,6 +61,9 @@
                 </p>
                 <p>
                     <label onClick={showCoveredAndFailing()}><input type="radio" name="filter" value="fai" /> Covered and failing</label
+                </p>
+                <p>
+                    <label onClick={showMixedResults()}><input type="radio" name="filter" value="fai" /> Mixed pass/fail</label
                 </p>
             </legend>
         </fieldset>

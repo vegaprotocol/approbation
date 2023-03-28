@@ -50,7 +50,7 @@ function gatherCoverage() {
 function gatherAllCodes() {
   const fileContents = fs.readFileSync('./test/test-data/approbation-codes.csv')
   return parse(fileContents, {
-    columns: ['Code', 'Source', 'Systests'],
+    columns: ['Code', 'Source', 'Systests', 'Definition'],
     skip_empty_lines: true
   })
 
@@ -63,10 +63,8 @@ function generateImageFiles(allCodes, testResults) {
       const resultForCode = testResults.get(ac.Code)
       if (resultForCode === 'pass') {
         source = 'pass'
-      } else if (resultForCode === 'fail') {
+      } else if (resultForCode === 'fail' || resultForCode === 'mix') {
         source = 'fail'
-      } else if (resultForCode === 'mix') {
-        source = 'mixed'
       }
     }
 
@@ -117,7 +115,9 @@ function checkCoverage(paths, ignoreGlob, isVerbose = false) {
   res.allCodes.forEach(e => {
     const r = res.testResults.resultsByAc.get(e.Code)
     e.Passing = r ? r : 'unknown',
+    e.PassingLabel = r && r === 'pass' ? 'Passing' : e.Passing === 'unknown' ? 'Unknown' : 'Failing or mixed'
     e.className = `${e.Passing} ${e && e.Systests === 'true' ? 'tested' : 'untested'}`
+    e.CoveredLabel = e.Systests === 'true' ? 'Is covered by one or more system tests' : 'No system tests cover this'
   })
 
   isVerbose && console.log(pc.yellow(`Generating status images...`))

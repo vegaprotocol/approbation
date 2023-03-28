@@ -96,6 +96,7 @@ function processReferences (specs, tests) {
   let criteriaUnreferencedTotal = 0
   const allAcCodes = []
   const criteriaWithSystests = []
+  const fileForAc = new Map()
 
   // Step 3: Output the data
   specs.forEach((value, key) => {
@@ -123,6 +124,8 @@ function processReferences (specs, tests) {
         const linksForAC = tests.get(c)
         allAcCodes.push(c)
 
+        fileForAc.set(c, value.file)
+        
         if (linksForAC) {
           refOutput += `${pc.green(c)}:  ${linksForAC.length} (${linksForAC.toString()})\r\n`
           criteriaWithRefs.push(c)
@@ -196,6 +199,7 @@ function processReferences (specs, tests) {
   })
 
   return {
+    fileForAc,
     allAcCodes,
     criteriaTotal,
     criteriaWithSystests,
@@ -234,7 +238,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       }
     }
 
-    const { allAcCodes, criteriaWithSystests, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
+    const { fileForAc, allAcCodes, criteriaWithSystests, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
     const criteriaReferencedPercent = (criteriaReferencedTotal / criteriaTotal * 100).toFixed(1)
     const criteriaUnreferencedPercent = (criteriaUnreferencedTotal / criteriaTotal * 100).toFixed(1)
 
@@ -350,19 +354,18 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
         fs.mkdirSync('./results')
       }
 
-      if (shouldOutputCSV) {
-        let specCsvOutput = ''
-        allAcCodes.forEach(c => {
-          const shouldHaveSystests = criteriaWithSystests.includes(c) ? 'true' : 'false'
-          specCsvOutput += `\r\n${c},specs,${shouldHaveSystests}`
-        })
-        if (unknownCriteriaInTests.size > 0) {
-          for (const [key, value] of unknownCriteriaInTests) {
-            specCsvOutput += `\r\n${key},test,false`
-          }
+      let specCsvOutput = ''
+      allAcCodes.forEach(c => {
+        const f = fileForAc.get(c)
+        const shouldHaveSystests = criteriaWithSystests.includes(c) ? 'true' : 'false'
+        specCsvOutput += `\r\n${c},specs,${shouldHaveSystests},${f}`
+      })
+      if (unknownCriteriaInTests.size > 0) {
+        for (const [key, value] of unknownCriteriaInTests) {
+          specCsvOutput += `\r\n${key},test,false,${value.length === 1 ? value : value[0] + ' & more'}`
         }
-        fs.writeFileSync('results/approbation-codes.csv', specCsvOutput)
       }
+      fs.writeFileSync('results/approbation-codes.csv', specCsvOutput)
     }
 
     return {
