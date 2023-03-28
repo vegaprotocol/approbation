@@ -120,13 +120,24 @@ function checkCoverage (paths, ignoreGlob, isVerbose = false) {
   isVerbose && console.log('Opening code list:')
   res.allCodes = gatherAllCodes()
   isVerbose && console.log(pc.green(`- Got ${res.allCodes.length} codes`))
+
   res.allCodes.forEach(e => {
-    const r = res.testResults.resultsByAc.get(e.Code)
-    e.Passing = r || 'unknown'
-    e.PassingLabel = r && r === 'pass' ? 'Passing' : e.Passing === 'unknown' ? 'Unknown' : 'Failing or mixed'
-    e.className = `${e.Passing} ${e && e.Systests === 'true' ? 'tested' : 'untested'}`
-    e.CoveredLabel = e.Systests === 'true' ? 'Is covered by one or more system tests' : 'No system tests cover this'
-  })
+    const source = e.Definition.match(/(protocol|non-protocol-specs)\/([\w\-.]*)/); 
+    let p
+    if (source) {
+      p = `<a target="_blank" href="https://github.com/vegaprotocol/specs/blob/master/${source[1]}/${source[2]}#${e.Code}">${source[2]}</a>`
+    } else {
+      p = e.Definition
+    }
+
+
+    const r = res.testResults.resultsByAc.get(e.Code);
+    e.Passing = r || 'unknown';
+    e.PassingLabel = r && r === 'pass' ? 'Passing' : e.Passing === 'unknown' ? 'Unknown' : 'Failing or mixed';
+    e.className = `${e.Passing} ${e && e.Systests === 'true' ? 'tested' : 'untested'}`;
+    e.CoveredLabel = e.Systests === 'true' ? 'Is covered by one or more system tests' : 'No system tests cover this';
+    e.Definition = p
+  });
 
   isVerbose && console.log(pc.yellow('Generating status images...'))
   generateImageFiles(res.allCodes, res.testResults.resultsByAc)
