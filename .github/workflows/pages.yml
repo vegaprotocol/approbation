@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: 19
       - run: npm ci
-      - run: npm node ./bin/approbation.js check-coverage --specs '*' --verbose
+      - run: npm run pages-coverage
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
