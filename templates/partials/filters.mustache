@@ -1,0 +1,49 @@
+<style type="text/css">
+    #filters {
+        background: #fff;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        max-width: 300px;
+        width: 30%;
+        height: 300px;
+    }
+</style>
+
+<script>
+    function showAll() {
+        document.querySelectorAll('.result').forEach(el => el.classList.remove('hide'));
+    }
+
+    function hideAll() {
+        document.querySelectorAll('.result').forEach(el => el.classList.add('hide'));
+    }
+
+    function showCoveredAndUnknown() {
+        hideAll();
+        document.querySelectorAll('.tested.unknown').forEach(el => el.classList.remove('hide'));
+    }
+
+    function showCoveredAndFailing() {
+        hideAll();
+        document.querySelectorAll('.tested.fail').forEach(el => el.classList.remove('hide'));
+    }
+</script>
+
+<div id="filters">
+    <form>
+        <fieldset>
+            <legend>Show only</legend>
+                <p>
+                    <label onClick={showAll()}><input type="radio" name="filter" value="unk"  selected /> Show all</label
+                </p>
+                <p>
+                    <label onClick={showCoveredAndUnknown()}><input type="radio" name="filter" value="unk" /> Covered and unknown</label
+                </p>
+                <p>
+                    <label onClick={showCoveredAndFailing()}><input type="radio" name="filter" value="fai" /> Covered and failing</label
+                </p>
+            </legend>
+        </fieldset>
+    </form>
+</div>

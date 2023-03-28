@@ -59,8 +59,8 @@ function gatherAllCodes() {
 function generateImageFiles(allCodes, testResults) {
   allCodes.forEach(ac => {
     let source = 'untested'
-    if (testResults.has(ac)) {
-      const resultForCode = testResults.get(ac)
+    if (testResults.has(ac.Code)) {
+      const resultForCode = testResults.get(ac.Code)
       if (resultForCode === 'pass') {
         source = 'pass'
       } else if (resultForCode === 'fail') {
@@ -69,9 +69,15 @@ function generateImageFiles(allCodes, testResults) {
         source = 'mixed'
       }
     }
-    fs.copyFileSync(`./assets/icons/${source}.svg`, `./build/status/${ac}.svg`)
-  })
 
+    fs.copyFileSync(`./assets/icons/${source}.svg`, `./build/status/${ac.Code}.svg`)
+
+    if (ac.Systests === 'true') {
+      fs.copyFileSync('./assets/icons/has-tests.svg', `./build/status/${ac.Code}-tested.svg`)
+    } else {
+      fs.copyFileSync('./assets/icons/no-tests.svg', `./build/status/${ac.Code}-tested.svg`)
+    }
+  })
 }
 
 function generateHTML(allCodes, testResults){
@@ -80,6 +86,7 @@ function generateHTML(allCodes, testResults){
     stylesheet: fs.readFileSync('./templates/partials/stylesheet.mustache', { encoding: 'utf-8' }).toString(),
     footer: fs.readFileSync('./templates/partials/footer.mustache', { encoding: 'utf-8' }).toString(),
     codes: fs.readFileSync('./templates/partials/codes.mustache', { encoding: 'utf-8' }).toString(),
+    filters: fs.readFileSync('./templates/partials/filters.mustache', { encoding: 'utf-8' }).toString(),
   }
 
   const html = Mustache.render(template, { allCodes, testResults }, partials)
@@ -109,7 +116,8 @@ function checkCoverage(paths, ignoreGlob, isVerbose = false) {
   isVerbose && console.log(pc.green(`- Got ${res.allCodes.length} codes`))
   res.allCodes.forEach(e => {
     const r = res.testResults.resultsByAc.get(e.Code)
-    e.Passing = r ? r.Passing : 'unknown'
+    e.Passing = r ? r : 'unknown',
+    e.className = `${e.Passing} ${e && e.Systests === 'true' ? 'tested' : 'untested'}`
   })
 
   isVerbose && console.log(pc.yellow(`Generating status images...`))

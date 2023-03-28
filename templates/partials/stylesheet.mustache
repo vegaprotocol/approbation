@@ -17,7 +17,8 @@
     padding: 0.5em 2em;
   }
 
-  table tbody td.status {
+  table tbody td.status,
+  table tbody td.tested {
     text-align: center;
     vertical-align: middle;
   }
@@ -26,12 +27,29 @@
     text-decoration: none;
   }
 
+  table tbody td.status img, 
   table tbody td.status img {
     vertical-align: middle;
   }
 
+  table tr.tested.pass {
+    background: #cdffec;
+  }
+
+  table tr.tested.fail {
+    background: #ffd0e7;
+  }
+
+  table tr.tested.unknown {
+    background: #fbc2c2;
+  }
+
   :target td {
-    background: #dfff0b;
+    border: #dfff0b;
+  }
+
+  tr.hide {
+    display: none;
   }
 
   footer {

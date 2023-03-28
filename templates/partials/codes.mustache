@@ -2,20 +2,21 @@
     <thead>
         <tr>
             <th>Acceptance Criteria</th>
+            <th>Covered</th>
             <th>Status</th>
         </tr>
     </thead>
     <tbody>
         {{#allCodes}}
-        <tr id="{{Code}}">
+        <tr id="{{Code}}" class="result {{className}}">
             <td class="code">
                 <a href="#{{Code}}">{{Code}}</a>
             </td>
-            <td class="status">
-                <img src="./status/{{status/}}{{Code}}.svg" width="25" height="25" />
+            <td class="tested">
+                <img src="./status/{{status/}}{{Code}}-tested.svg" width="25" height="25" loading="lazy" />
             </td>
-            <td class="should">
-                {{Systests}}
+            <td class="status">
+                <img src="./status/{{status/}}{{Code}}.svg" width="25" height="25" loading="lazy" />
             </td>
         </tr>
         {{/allCodes}}
