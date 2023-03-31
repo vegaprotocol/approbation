@@ -92,7 +92,7 @@
         document.body.removeChild(el);
     };
 
-    function copyIds() {
+    function copyIds(event) {
        const ids = Array.from(document.querySelectorAll('tr:not(.hide) td.code')).map(el => el.getAttribute('data-code')).join('\r\n- [ ] ') 
        copyToClipboard(ids)
 
@@ -104,6 +104,9 @@
         el.textContent = 'Copy visible IDs'
         el.disabled = false
        }, 1000)
+
+       event && event.preventDefault();
+       return false
     }
 
     function initialise() {
@@ -133,40 +136,54 @@
     }
 
     document.addEventListener("DOMContentLoaded", (event) => {
+        document.getElementById('filter-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            return false
+        })
+
+        document.getElementById('copy-button').addEventListener('click', copyIds)
+        const s = document.getElementById('showAll')
+        document.getElementById('unknown').addEventListener('click', showCoveredAndUnknown)
+        document.getElementById('failing').addEventListener('click', showCoveredAndFailing)
+        document.getElementById('mixed').addEventListener('click', showMixedResults)
+
         initialise()
+
+        // Hacky reselect radio on load
+        document.querySelector('#filters :checked').click()
     })
 </script>
 
 <div id="filters">
-    <form>
+    <form id="filter-form"> 
         <fieldset>
             <legend>Show only</legend>
                 <p>
-                    <label onClick={showAll()}><input type="radio" name="filter" value="unk"  selected /> 
+                    <label id="showAll"><input type="radio" name="filter" value="all" checked /> 
                     <span class="h" data-hover="Show all of the Acceptance Criteria regardless of test coverage or source">
                         Show all
                     </span> (<span id="allCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showCoveredAndUnknown()}><input type="radio" name="filter" value="unk" />
+                    <label id="unknown"><input type="radio" name="filter" value="unk" />
                     <span class="h" data-hover="Show only Acceptance Criteria which are 'covered' but have no passing or failing test results">
                         Covered and unknown
                     </span> (<span id="unknownCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showCoveredAndFailing()}><input type="radio" name="filter" value="fai" />
+                    <label id="failing"><input type="radio" name="filter" value="fai" />
                     <span class="h" data-hover="Show only Acceptance Criteria which are covered only by failing tests">
                         Covered and failing
                     </span> (<span id="failingCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showMixedResults()}><input type="radio" name="filter" value="fai" />
+                    <label id="mixed"><input type="radio" name="filter" value="fai" />
                     <span class="h" data-hover="Show only Acceptance Criteria with multiple tests, some failing some passing">
                         Mixed pass/fail
                     </span> (<span id="mixedCount">0</span>)</label>
                 </p>
                 <p>
-                    <button onClick={copyIds()} id="copy-button">Copy visible IDs</button>
+                    <button id="copy-button">Copy visible IDs</button>
                 </p>
             </legend>
         </fieldset>
