@@ -92,16 +92,16 @@
         <fieldset>
             <legend>Show only</legend>
                 <p>
-                    <label onClick={showAll()}><input type="radio" name="filter" value="unk"  selected /> Show all (<span id="allCount"></span>)</label
+                    <label onClick={showAll()}><input type="radio" name="filter" value="unk"  selected /> Show all (<span id="allCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showCoveredAndUnknown()}><input type="radio" name="filter" value="unk" /> Covered and unknown (<span id="unknownCount"></span>)</label
+                    <label onClick={showCoveredAndUnknown()}><input type="radio" name="filter" value="unk" /> Covered and unknown (<span id="unknownCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showCoveredAndFailing()}><input type="radio" name="filter" value="fai" /> Covered and failing (<span id="failingCount"></span>)</label
+                    <label onClick={showCoveredAndFailing()}><input type="radio" name="filter" value="fai" /> Covered and failing (<span id="failingCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showMixedResults()}><input type="radio" name="filter" value="fai" /> Mixed pass/fail (<span id="mixedCount"></span>)</label>
+                    <label onClick={showMixedResults()}><input type="radio" name="filter" value="fai" /> Mixed pass/fail (<span id="mixedCount">0</span>)</label>
                 </p>
                 <p>
                     <button onClick={copyIds()} id="copy-button">Copy visible IDs</button>
