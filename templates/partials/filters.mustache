@@ -1,9 +1,10 @@
 <style type="text/css">
     #filters {
+        font-size: 0.9em;
         position: fixed;
         bottom: 0;
         right: 0;
-        max-width: 300px;
+        max-width: 340px;
         width: 30%;
         height: 300px;
     }
@@ -22,6 +23,37 @@
         border: 1px solid #000;
         background: #fff;
     }
+
+    #filters .h {
+        display: inline-block;
+        border-bottom: 1px dotted #000;
+        position: relative;
+    }
+
+    #filters .h:before {
+        content: attr(data-hover);
+        visibility: hidden;
+        opacity: 0;
+        width: 200px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        padding: 5px 5px;
+        transition: opacity 0.2s ease-in-out;
+        font-size: 0.9em;
+
+        position: absolute;
+        z-index: 1;
+        left: -235px;
+        top: 0;
+    }
+
+    #filters .h:hover:before {
+        opacity: 1;
+        visibility: visible;
+    }
+
 </style>
 
 <script>
@@ -75,11 +107,29 @@
     }
 
     function initialise() {
-        document.getElementById('allCount').textContent = document.querySelectorAll('.result').length
-        document.getElementById('unknownCount').textContent = document.querySelectorAll('.result.tested.unknown').length
-        document.getElementById('failingCount').textContent = document.querySelectorAll('.result.tested.fail').length
-        document.getElementById('mixedCount').textContent = document.querySelectorAll('.result.tested.mix').length
+        const t = document.querySelectorAll('.result').length;
+        document.getElementById('allCount').textContent = `${t} - 100%`
 
+        const unknown = document.querySelectorAll('.result.tested.unknown').length 
+        document.getElementById('unknownCount').textContent = showCount(t, unknown)  
+
+        const fail = document.querySelectorAll('.result.tested.fail').length
+        document.getElementById('failingCount').textContent = showCount(t, fail)  
+
+        const mix = document.querySelectorAll('.result.tested.mix').length
+        document.getElementById('mixedCount').textContent = showCount(t, mix)  
+    }
+
+    function showCount(total, count) {
+        return `${count} - ${pct(total, count)}`
+    }
+
+    function pct(total, count) {
+        if (!total || !count) {
+            return '?%'
+        }
+
+        return `${Math.round(Number(count) / Number(total) * 100, 2)}%`
     }
 
     document.addEventListener("DOMContentLoaded", (event) => {
@@ -92,16 +142,28 @@
         <fieldset>
             <legend>Show only</legend>
                 <p>
-                    <label onClick={showAll()}><input type="radio" name="filter" value="unk"  selected /> Show all (<span id="allCount">0</span>)</label
+                    <label onClick={showAll()}><input type="radio" name="filter" value="unk"  selected /> 
+                    <span class="h" data-hover="Show all of the Acceptance Criteria regardless of test coverage or source">
+                        Show all
+                    </span> (<span id="allCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showCoveredAndUnknown()}><input type="radio" name="filter" value="unk" /> Covered and unknown (<span id="unknownCount">0</span>)</label
+                    <label onClick={showCoveredAndUnknown()}><input type="radio" name="filter" value="unk" />
+                    <span class="h" data-hover="Show only Acceptance Criteria which are 'covered' but have no passing or failing test results">
+                        Covered and unknown
+                    </span> (<span id="unknownCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showCoveredAndFailing()}><input type="radio" name="filter" value="fai" /> Covered and failing (<span id="failingCount">0</span>)</label
+                    <label onClick={showCoveredAndFailing()}><input type="radio" name="filter" value="fai" />
+                    <span class="h" data-hover="Show only Acceptance Criteria which are covered only by failing tests">
+                        Covered and failing
+                    </span> (<span id="failingCount">0</span>)</label
                 </p>
                 <p>
-                    <label onClick={showMixedResults()}><input type="radio" name="filter" value="fai" /> Mixed pass/fail (<span id="mixedCount">0</span>)</label>
+                    <label onClick={showMixedResults()}><input type="radio" name="filter" value="fai" />
+                    <span class="h" data-hover="Show only Acceptance Criteria with multiple tests, some failing some passing">
+                        Mixed pass/fail
+                    </span> (<span id="mixedCount">0</span>)</label>
                 </p>
                 <p>
                     <button onClick={copyIds()} id="copy-button">Copy visible IDs</button>
