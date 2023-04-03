@@ -54,16 +54,18 @@ function gatherAllCodes () {
 }
 
 function generateImageFiles (allCodes, testResults) {
-  console.log(process.cwd())
-
   allCodes.forEach(ac => {
-    let source = 'untested'
+    let source = 'untested-uncovered'
     if (testResults.has(ac.Code)) {
       const resultForCode = testResults.get(ac.Code)
       if (resultForCode === 'pass') {
         source = 'pass'
       } else if (resultForCode === 'fail' || resultForCode === 'mix') {
         source = 'fail'
+      }
+    } else {
+      if (ac.Systests === 'true') {
+        source = 'untested-covered'
       }
     }
 
@@ -89,6 +91,22 @@ function generateHTML (allCodes, testResults) {
   const html = Mustache.render(template, { allCodes, testResults }, partials)
   const res = fs.writeFileSync(`${appDir}/build/index.html`, html)
   return res
+}
+
+function getPassingLabel(status, hasSystests) {
+   if (status === 'pass') {
+    return 'Test(s) reference this AC and all are passsing'
+   } else if(status === 'fail') {
+    return 'Test(s) reference this AC and all are failing'
+   } else if(status === 'mix') {
+    return 'Test(s) reference this AC and some are failing'
+   } else {
+     if (hasSystests === 'true') {
+       return 'Tests reference this criteria but they are not running' 
+     } else {
+       return 'No tests reference this criteria'
+     }
+   }
 }
 
 function checkCoverage (paths, ignoreGlob, isVerbose = false) {
@@ -133,7 +151,7 @@ function checkCoverage (paths, ignoreGlob, isVerbose = false) {
 
     const r = res.testResults.resultsByAc.get(e.Code);
     e.Passing = r || 'unknown';
-    e.PassingLabel = r && r === 'pass' ? 'Passing' : e.Passing === 'unknown' ? 'Unknown' : 'Failing or mixed';
+    e.PassingLabel = getPassingLabel(r, e.Systests)
     e.className = `${e.Passing} ${e && e.Systests === 'true' ? 'tested' : 'untested'}`;
     e.CoveredLabel = e.Systests === 'true' ? 'Is covered by one or more system tests' : 'No system tests cover this';
     e.Definition = p
