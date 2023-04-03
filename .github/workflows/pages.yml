@@ -40,11 +40,6 @@ jobs:
         with:
           # Upload entire repository
           path: 'build'
-      - name: Cache Yarn and node-modules
-        uses: auguwu/node-pm-cache@master
-        with:
-          node-modules: ./node_modules
-          package-manager: npm
 
   # Deployment job
   deploy:
