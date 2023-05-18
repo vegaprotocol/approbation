@@ -34,6 +34,7 @@ const specPriorities = {
   '0011-NP-CLIE': 2,
   '0063-VALK': 2,
   '0012-NP-LIPE': 2,
+  '0080-SPOT': 2,
   // ==============
   '0017-PART': 3,
   '0025-OCRE': 3,
