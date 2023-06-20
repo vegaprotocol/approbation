@@ -1,6 +1,6 @@
 const pc = require('picocolors')
 
-function ignoreFiles(includeList, ignoreList, category = 'spec') {
+function ignoreFiles (includeList, ignoreList, category = 'spec') {
   if (ignoreList.length === 0 || !ignoreList) {
     return includeList
   }

@@ -36,7 +36,7 @@ const pc = require('picocolors')
  * @param {*} arr
  * @param {number} n
  */
-function* chunks (arr, n = 3) {
+function * chunks (arr, n = 3) {
   for (let i = 0; i < arr.length; i += n) {
     yield arr.slice(i, i + n)
   }
@@ -53,7 +53,7 @@ function findDuplicates (codes) {
   const uniq = codes.flat().map(code => {
     return {
       count: 1,
-      code: code
+      code
     }
   })
     .reduce((a, b) => {

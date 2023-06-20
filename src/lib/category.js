@@ -2,22 +2,22 @@
 const ErrorCategoriesEmpty = new Error('Categories have not been set')
 let specCategories
 
-function isCategoriesEmpty() {
+function isCategoriesEmpty () {
   if (specCategories === undefined) {
     throw ErrorCategoriesEmpty
   }
-  return Object.keys(specCategories).length === 0 
+  return Object.keys(specCategories).length === 0
 }
 
-function setCategories(categories) {
+function setCategories (categories) {
   specCategories = categories
-  if (!specCategories['Unknown']) {
-    specCategories['Unknown'] = { specs: [], specCount: 0 }
+  if (!specCategories.Unknown) {
+    specCategories.Unknown = { specs: [], specCount: 0 }
   }
-  specCategories['Total'] = { specs: [], specCount: 0 }
+  specCategories.Total = { specs: [], specCount: 0 }
 }
 
-function getCategoriesForSpec(code) {
+function getCategoriesForSpec (code) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
   }
@@ -27,14 +27,14 @@ function getCategoriesForSpec(code) {
   })
 
   // There shouldn't be more than one. But if there is, take the first one.
-  return (categories.length > 0) ? [...categories, 'Total'] : [ 'Unknown', 'Total' ]
+  return (categories.length > 0) ? [...categories, 'Total'] : ['Unknown', 'Total']
 }
 
-function setOrIncreaseProperty(category, property, value) {
+function setOrIncreaseProperty (category, property, value) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
   }
-  
+
   if (specCategories[category][property]) {
     specCategories[category][property] += value
   } else {
@@ -42,52 +42,52 @@ function setOrIncreaseProperty(category, property, value) {
   }
 }
 
-function increaseCodesForCategory(category, count) {
+function increaseCodesForCategory (category, count) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
   }
   setOrIncreaseProperty(category, 'codes', count)
 }
 
-function increaseCoveredForCategory(category, count) {
+function increaseCoveredForCategory (category, count) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
-  }  
+  }
   setOrIncreaseProperty(category, 'covered', count)
 }
 
-function increaseFeatureCoveredForCategory(category, count) {
+function increaseFeatureCoveredForCategory (category, count) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
-  } 
+  }
   setOrIncreaseProperty(category, 'featureCovered', count)
 }
 
-function increaseSystemTestCoveredForCategory(category, count) {
+function increaseSystemTestCoveredForCategory (category, count) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
-  } 
+  }
   setOrIncreaseProperty(category, 'systemTestCovered', count)
 }
 
-function increaseUncoveredForCategory(category, count) {
+function increaseUncoveredForCategory (category, count) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
-  } 
+  }
   setOrIncreaseProperty(category, 'uncovered', count)
 }
 
-function increaseSpecCountForCategory(category) {
+function increaseSpecCountForCategory (category) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
-  } 
+  }
   setOrIncreaseProperty(category, 'specCount', 1)
 }
 
-function increaseAcceptableSpecsForCategory(category) {
+function increaseAcceptableSpecsForCategory (category) {
   if (isCategoriesEmpty()) {
     throw ErrorCategoriesEmpty
-  } 
+  }
   setOrIncreaseProperty(category, 'acceptableSpecCount', 1)
 }
 
