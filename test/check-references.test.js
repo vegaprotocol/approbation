@@ -118,7 +118,7 @@ test('check-references: detect references in tests that are not in specs', t => 
   t.equal(mc.size, 1, 'There should be 1 mystery criteria')
 
   t.equal(mc.keys().next().value, '0007-MYST-001', 'It should list the unkown code')
-  t.equal(mc.values().next().value[0], './test/check-references/mystery-criteria/tests/test.feature', 'It should point to the file with the unknown code')
+  t.equal(mc.values().next().value[0], 'test/check-references/mystery-criteria/tests/test.feature', 'It should point to the file with the unknown code')
 })
 
 test('check-references: Specs can be in multiple categories at once', t => {
