@@ -60,9 +60,9 @@ if (command === 'check-filenames') {
   res = checkCodes(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
-  let specsGlob = argv['specs']
-  let testsGlob = argv['tests']
-  const categories = argv['categories']
+  const specsGlob = argv.specs
+  const testsGlob = argv.tests
+  const categories = argv.categories
   const ignoreGlob = argv.ignore
   const showMystery = argv['show-mystery'] === true
   const showCategoryStats = argv['category-stats'] === true
