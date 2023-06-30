@@ -3,7 +3,11 @@
 Scripts for producing a coverage matrix for Vega [specifications](https://github.com/vegaprotocol/specs)
 
 ```bash
+# Use node
 npx github:vegaprotocol/approbation
+
+# Or run the docker image
+docker run ghcr.io/vegaprotocol/approbation:latest
 ```
 
 # Available commands
@@ -22,8 +26,13 @@ All of the globs below are relatively simple - check out [globs primer](https://
 
 ### check-codes example
 ```bash
+# Use node
 npx github:vegaprotocol/approbation@latest check-filenames --specs="./specs-internal/protocol/**/*.{md,ipynb}" --show-branches 
+
+# Or run the docker image
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-codes --specs="/run/specs-internal/protocol/**/*.{md,ipynb}" --show-branches
 ```
+
 
 
 ## check-filenames
@@ -38,7 +47,11 @@ npx github:vegaprotocol/approbation@latest check-filenames --specs="./specs-inte
 
 ### check-filenames example
 ```bash
-npx github:vegaprotocol/approbation@latest check-codes --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*,0002-*,0004-*}" --show-branches 
+# Use node
+npx github:vegaprotocol/approbation@latest check-filenames codes --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*,0002-*,0004-*}" --show-branches
+
+# Or run the docker image
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-filenames codes --specs="/run/specs/protocol/**/*.{md,ipynb}" --tests="/run/MultisigControl/test/*.js" --ignore="/run/specs/protocol/{0001-*,0002-*,0004-
 ```
 
 
@@ -63,7 +76,11 @@ npx github:vegaprotocol/approbation@latest check-codes --specs="./specs/protocol
 
 ### check-references example
 ```bash
+# Use node
 npx github:vegaprotocol/approbation@latest check-references --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*}" --categories="specs/protocol/categories.json" --show-branches --show-mystery
+
+# Or run the docker image
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-references --specs="/run/specs/protocol/**/*.{md,ipynb}" --tests="/run/MultisigControl/test/*.js" --ignore="/run/specs/protocol/{0001-*}" --categories="/run/specs/protocol/categories.json" --show-branches --show-mystery
 ```
 
 
@@ -122,7 +139,11 @@ Run `npm run setup` to configure your environment:
 
 # Use in CI
 ```shell
+# Use node
 npx --silent --yes github:vegaprotocol/approbation
+
+# Or run the docker image
+docker run ghcr.io/vegaprotocol/approbation:latest
 ```
 
 # [License](./LICENSE)
