@@ -9,7 +9,8 @@
     "test:ci": "tape test/*.js",
     "test": "tape test/*.js | tap-arc",
     "lint": "standard **/*.js",
-    "setup": "husky install"
+    "setup": "husky install",
+    "build": "pkg ."
   },
   "repository": {
     "type": "git",

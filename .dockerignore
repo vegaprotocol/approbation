@@ -1,0 +1,13 @@
+dist
+build
+LICENSE
+*.md
+test
+.husky
+.github
+results
+assets
+.dockerignore
+.npmignore
+.gitignore
+
