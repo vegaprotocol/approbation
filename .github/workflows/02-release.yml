@@ -3,7 +3,7 @@ name: Package approbation image
 
 "on":
   push:
-    branches: [pkg]
+    branches: [main]
 
 jobs:
   build:
@@ -42,10 +42,3 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
-
-      - name: Clean up old images
-        uses: d22/cleanup-ghcr-containers-action@v0.3.3
-        with:
-          access-token: ${{ secrets.GH_CLEANUP_TOKEN }}
-          package-name: 'ghcr.io/vegaprotocol/approbation'
-          versions-to-keep: 3 
