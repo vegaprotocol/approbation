@@ -6,8 +6,7 @@
   "bin": "./bin/approbation.js",
   "scripts": {
     "test:ci": "tape test/*.js",
-    "test": "tape test/*.js | tap-arc",
-    "lint": "standard **/*.js"
+    "test": "tape test/*.js | tap-arc"
   },
   "repository": {
     "type": "git",
@@ -20,9 +19,8 @@
   },
   "homepage": "https://github.com/vegaprotocol/approbation#readme",
   "devDependencies": {
-    "standard": "^17.1.0",
     "tap-arc": "0.3.5",
-    "tape": "5.6.3"
+    "tape": "5.6.4"
   },
   "dependencies": {
     "fast-glob": "^3.3.0",
