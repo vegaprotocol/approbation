@@ -4,7 +4,7 @@ Scripts for producing a coverage matrix for Vega [specifications](https://github
 
 ```bash
 # Use node
-npx github:vegaprotocol/approbation
+npx @vegaprotocol/approbation
 
 # Or run the docker image
 docker run ghcr.io/vegaprotocol/approbation:latest
@@ -27,7 +27,7 @@ All of the globs below are relatively simple - check out [globs primer](https://
 ### check-codes example
 ```bash
 # Use node
-npx github:vegaprotocol/approbation@latest check-filenames --specs="./specs-internal/protocol/**/*.{md,ipynb}" --show-branches 
+npx @vegaprotocol/approbation check-filenames --specs="./specs-internal/protocol/**/*.{md,ipynb}" --show-branches 
 
 # Or run the docker image
 docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-codes --specs="/run/specs-internal/protocol/**/*.{md,ipynb}" --show-branches
@@ -48,7 +48,7 @@ docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-codes 
 ### check-filenames example
 ```bash
 # Use node
-npx github:vegaprotocol/approbation@latest check-filenames codes --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*,0002-*,0004-*}" --show-branches
+npx @vegaprotocol/approbation check-filenames codes --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*,0002-*,0004-*}" --show-branches
 
 # Or run the docker image
 docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-filenames codes --specs="/run/specs/protocol/**/*.{md,ipynb}" --tests="/run/MultisigControl/test/*.js" --ignore="/run/specs/protocol/{0001-*,0002-*,0004-
@@ -141,7 +141,7 @@ Run `npm run setup` to configure your environment:
 # Use in CI
 ```shell
 # Use node
-npx --silent --yes github:vegaprotocol/approbation
+npx --silent --yes @vegaprotocol/approbation
 
 # Or run the docker image
 docker run ghcr.io/vegaprotocol/approbation:latest
