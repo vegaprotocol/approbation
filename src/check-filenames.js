@@ -9,7 +9,7 @@
  * files that don't look right as per the above. It's not elegant, but it gets the job done.
  */
 const fs = require('fs')
-const glob = require('glob')
+const glob = require('fast-glob')
 const path = require('path')
 const { validSpecificationFilename, ignoreFiles } = require('./lib')
 const pc = require('picocolors')

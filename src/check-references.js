@@ -6,7 +6,7 @@
  * This script is pretty ugly. Sorry.
  */
 const fs = require('fs')
-const glob = require('glob')
+const glob = require('fast-glob')
 const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
