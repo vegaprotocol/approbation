@@ -1,9 +1,9 @@
 {
   "name": "@vegaprotocol/approbation",
-  "version": "4.2.4",
+  "version": "4.3.0",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "main": "./bin/approbation.js",
-  "engine": ">= 16",
+  "engine": ">= 18",
   "bin": "./bin/approbation.js",
   "scripts": {
     "test:ci": "tape test/*.js",

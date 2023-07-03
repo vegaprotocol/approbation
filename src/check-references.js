@@ -197,7 +197,7 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false) {
+function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, outputPath = './results') {
   verbose = isVerbose
   showFiles = shouldShowFiles
 
@@ -295,8 +295,8 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       console.log(tableOutput)
 
       if (shouldOutputJenkins || shouldOutputCSV || shouldOutputImage) {
-        if (!fs.existsSync('./results')) {
-          fs.mkdirSync('./results')
+        if (!fs.existsSync(outputPath)) {
+          fs.mkdirSync(outputPath, { recursive: true })
         }
 
         if (shouldOutputCSV) {
@@ -304,14 +304,14 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
           categories.forEach(c => {
             csvOutput += `\r\n${Object.values(c).join(',')}`
           })
-          fs.writeFileSync('results/approbation-categories.csv', csvOutput)
+          fs.writeFileSync(`${outputPath}/approbation-categories.csv`, csvOutput)
 
           if (shouldShowFileStats) {
             let csvOutputFiles = Object.keys(specsTableRows[0]).join(',')
             specsTableRows.forEach(c => {
               csvOutputFiles += `\r\n${Object.values(c).join(',')}`
             })
-            fs.writeFileSync('results/approbation-files.csv', csvOutputFiles)
+            fs.writeFileSync(`${outputPath}/approbation-files.csv`, csvOutputFiles)
           }
         }
 
@@ -322,7 +322,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
         if (shouldOutputJenkins) {
           const skipCategories = ['Category', 'Specs', 'Acceptable']
           const jenkinsLine = Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()
-          fs.writeFileSync('results/jenkins.txt', jenkinsLine)
+          fs.writeFileSync(`${outputPath}/jenkins.txt`, jenkinsLine)
         }
 
         console.groupEnd()

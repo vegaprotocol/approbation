@@ -72,6 +72,7 @@ docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-filena
 | `--show-file-stats`  | boolean  | display detailed stats per file         | -    |
 | `--output-csv`  | boolean  | Outputs a CSV file to summarise the console output          | -    |
 | `--output-jenkins`  | boolean  | Outputs a text file to summarise the console output, to sendover to jenkins          | -    |
+| `--output`  | string  | A path to write the CSV or Jenkins output to | `./results`    |
 | `--verbose`  | boolean  | MORE output        | -    |
 
 ### check-references example
@@ -80,7 +81,7 @@ docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-filena
 npx github:vegaprotocol/approbation@latest check-references --specs="./specs/protocol/**/*.{md,ipynb}" --tests="./MultisigControl/test/*.js" --ignore="./specs/protocol/{0001-*}" --categories="specs/protocol/categories.json" --show-branches --show-mystery
 
 # Or run the docker image
-docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-references --specs="/run/specs/protocol/**/*.{md,ipynb}" --tests="/run/MultisigControl/test/*.js" --ignore="/run/specs/protocol/{0001-*}" --categories="/run/specs/protocol/categories.json" --show-branches --show-mystery
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-references --specs="/run/specs/protocol/**/*.{md,ipynb}" --tests="/run/MultisigControl/test/*.js" --ignore="/run/specs/protocol/{0001-*}" --categories="/run/specs/protocol/categories.json" --show-branches --show-mystery --output-csv --output="/run/results/"
 ```
 
 

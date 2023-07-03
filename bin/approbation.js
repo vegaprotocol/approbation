@@ -8,6 +8,13 @@ const pc = require('picocolors')
 const { outputBranches } = require('../src/lib/get-project-branches')
 const argv = require('minimist')(process.argv.slice(2))
 const command = argv._[0]
+const IS_DEBUG = process.env.debug !== undefined
+
+function debugOutput (text) {
+  if (IS_DEBUG) {
+    console.log(pc.purple(text))
+  }
+}
 
 function warn (lines) {
   console.warn('')
@@ -60,6 +67,7 @@ if (command === 'check-filenames') {
   res = checkCodes(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
+  debugOutput('check-references')
   const specsGlob = argv.specs
   const testsGlob = argv.tests
   const categories = argv.categories
@@ -69,6 +77,7 @@ if (command === 'check-filenames') {
   const isVerbose = argv.verbose === true
   const showFiles = argv['show-files'] === true
   const shouldOutputCSV = argv['output-csv'] === true
+  let outputPath = argv.output
   const shouldOutputJenkins = argv['output-jenkins'] === true
   const shouldShowFileStats = argv['show-file-stats'] === true
 
@@ -87,8 +96,22 @@ if (command === 'check-filenames') {
     process.exit(1)
   }
 
+  if (shouldOutputCSV || shouldOutputJenkins) {
+    if (!outputPath || outputPath.length === 0) {
+      console.error(pc.yellow('Output path should be provided with --output if CSV or Jenkins output are enabled. Defaulting to ./results'))
+      outputPath = './results'
+    } else {
+      // Ensure we don't have a trailing slash for consistency with the default
+      if (outputPath && outputPath.endsWith('/')) {
+        debugOutput(`Removing trailing slash from output path: ${outputPath}`)
+        outputPath = outputPath.slice(0, -1)
+      }
+      console.info(pc.yellow(`Output folder: ${outputPath}`))
+    }
+  }
+
   // TODO: Turn in to an object
-  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats)
+  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats, outputPath)
 
   process.exit(res.exitCode)
 } else {
