@@ -1,13 +1,12 @@
 {
   "name": "@vegaprotocol/approbation",
-  "version": "4.3.2",
+  "version": "4.4.0",
   "description": "Match Acceptance Criteria Codes with the tests that test them",
   "engine": ">= 18",
   "bin": "./bin/approbation.js",
   "scripts": {
     "test:ci": "tape test/*.js",
-    "test": "tape test/*.js | tap-arc",
-    "lint": "standard **/*.js"
+    "test": "tape test/*.js | tap-arc"
   },
   "repository": {
     "type": "git",
@@ -20,14 +19,13 @@
   },
   "homepage": "https://github.com/vegaprotocol/approbation#readme",
   "devDependencies": {
-    "standard": "^17.1.0",
     "tap-arc": "0.3.5",
-    "tape": "5.6.3"
+    "tape": "5.6.4"
   },
   "dependencies": {
+    "fast-glob": "^3.3.0",
     "console-table-printer": "^2.10.0",
     "git-rev-sync": "3.0.2",
-    "glob": "^10.2.7",
     "lodash.sortby": "^4.7.0",
     "minimist": "^1.2.5",
     "picocolors": "^1.0.0"
