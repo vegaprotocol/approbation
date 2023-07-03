@@ -6,7 +6,7 @@ test
 results
 assets
 .husky
-
+.DS_Store
 
 Dockerfile
 .dockerignore
@@ -19,6 +19,7 @@ Dockerfile
 # Node
 .npmignore
 .nvmrc
+
 ## Logs
 logs
 *.log
