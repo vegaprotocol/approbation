@@ -99,7 +99,7 @@ function checkPath (files) {
     if (matchedContent === null) {
       // There were no matches for the AC prefix, so this file probably needs attention
       countEmptyFiles++
-      console.group(file)
+      console.group(pc.bold(pc.red(file)))
       console.error('no acceptance criteria')
       console.groupEnd(file)
     } else {
@@ -115,40 +115,46 @@ function checkPath (files) {
       if (dupes.length > 0) {
         // There are multiple uses of the same code, warn
         countErrorFiles++
-        console.group(file)
+        console.group(pc.red(file))
         console.error('Found multiple uses of the same code:')
         console.dir(dupes)
-        console.groupEnd(file)
+        console.groupEnd()
       }
 
       // If all of the arrays aren't 1, there's probably a mistake. Output all chunks to
       // point to where the error is
       const unbalancedChunks = totalAcceptanceCriteria.filter(i => i.length !== 1)
-
       countAcceptanceCriteria += totalAcceptanceCriteria.length
 
       if (unbalancedChunks.length > 0) {
         // Something is wrong, dump out the array as a starting point for working out what
         countErrorFiles++
-        console.group(file)
-        console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
+        console.group(pc.red(file))
+          console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
         console.error('Found something odd:')
         console.dir(chunkedMatches)
+        console.groupEnd();
       }
+
+      if (verbose) {
+        const uniqueAcceptanceCriteria = [...new Set(totalAcceptanceCriteria.flat())].map(i => `${i}`.trim()).sort()
+        console.log(`  ACs: ${Array.from(uniqueAcceptanceCriteria.map(i => pc.yellow(`${i}`))).join(pc.white(', '))}`)
+      }
+
 
       // The files are *valid*, at least. But do they have enough ACs?
       if (totalAcceptanceCriteria.length >= minimumAcceptableACsPerSpec) {
         countAcceptableFiles++
         if (verbose) {
-          console.group(file)
+          console.group(pc.bold(file))
           console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
-          console.groupEnd(file)
+          console.groupEnd()
         }
       } else {
         countErrorFiles++
-        console.group(file)
+        console.group(pc.red(file))
         console.error(`${totalAcceptanceCriteria.length} acceptance criteria`)
-        console.groupEnd(file)
+        console.groupEnd()
       }
     }
   })
