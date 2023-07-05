@@ -13,7 +13,7 @@ docker run ghcr.io/vegaprotocol/approbation:latest
 # Available commands
 
 All of the globs below are relatively simple - check out [globs primer](https://github.com/isaacs/node-glob#glob-primer) for how to get *more* specific (i.e. look for tests that reference only one specification) or less specific (all subfolders).
- 
+
 ## check-codes
 > Looks for possible errors in the coding of acceptance criteria
 
@@ -27,13 +27,11 @@ All of the globs below are relatively simple - check out [globs primer](https://
 ### check-codes example
 ```bash
 # Use node
-npx @vegaprotocol/approbation check-filenames --specs="./specs-internal/protocol/**/*.{md,ipynb}" --show-branches 
+npx @vegaprotocol/approbation check-filenames --specs="./specs/protocol/**/*.{md,ipynb}" --show-branches 
 
 # Or run the docker image
-docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-codes --specs="/run/specs-internal/protocol/**/*.{md,ipynb}" --show-branches
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-codes --specs="/run/specs/protocol/**/*.{md,ipynb}" --show-branches
 ```
-
-
 
 ## check-filenames
 > Check that spec filenames are valid
@@ -59,7 +57,6 @@ docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-filena
 > Coverage statistics for acceptance criteria
     
 **Arguments**
-**Arguments**
 | **Parameter**   | **Type** | **Description**                      | **Example**          |
 |-----------------|----------|--------------------------------------|----------------------|
 | `--tests`         | glob     | tests to check for AC codes          | `tests/**/*.{py,feature}`    |
@@ -82,6 +79,47 @@ npx github:vegaprotocol/approbation@latest check-references --specs="./specs/pro
 
 # Or run the docker image
 docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-references --specs="/run/specs/protocol/**/*.{md,ipynb}" --tests="/run/MultisigControl/test/*.js" --ignore="/run/specs/protocol/{0001-*}" --categories="/run/specs/protocol/categories.json" --show-branches --show-mystery --output-csv --output="/run/results/"
+```
+ 
+## next-filename
+> Suggests what file sequence number to use next, given a list of spec files
+
+**Arguments**
+| **Parameter**   | **Type** | **Description**                      | **Example**          |
+|-----------------|----------|--------------------------------------|----------------------|
+| `--specs`         | glob     | specs to pull AC codes from          | `{specs/**/*.md}`    |
+| `--ignore`        | glob     | glob of files not to include | `specs/0001-spec.md` |
+| `--verbose` | boolean  | Display extra output | -  | 
+
+In the case of three specs, ['001...', '002...', '003...'] this would suggest '004'. However if '002' didn't exist, it would indicate that '002' is available, as well as '004'.
+### next-filename example
+```bash
+# Use node
+npx @vegaprotocol/approbation next-filename --specs="./specs/protocol/**/*.{md,ipynb}" 
+
+# Or run the docker image
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest next-filename --specs="/run/specs/protocol/**/*.{md,ipynb}" 
+```
+
+## next-code
+> Suggests what AC code to use next given a spec file
+
+**Arguments**
+| **Parameter**   | **Type** | **Description**                      | **Example**          |
+|-----------------|----------|--------------------------------------|----------------------|
+| `--specs`         | glob     | spec to pull AC codes from. Should only match one file.          | `{specs/**/0001-SPEC-spec.md}`    |
+| `--ignore`        | glob     | glob of files not to include | `specs/0001-spec.md` |
+| `--verbose` | boolean  | Display extra output | -  | 
+
+Like `next-filename`, `next-code` will suggest the lowest available code in the sequence (e.g. if there is `0001-SPEC-001` and `0001-SPEC-003`), it will suggest both `0001-SPEC-002` and `000-SPEC-004`. If using the lowest available code, ensure it isn't already referenced by any tests (i.e. isn't listed as a 'Mystery Criteria' by `check-references`).
+
+### next-code example
+```bash
+# Use node
+npx @vegaprotocol/approbation next-filename --specs="./specs/protocol/**/*.{md,ipynb}" 
+
+# Or run the docker image
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest next-filename --specs="/run/specs/protocol/**/*.{md,ipynb}" 
 ```
 
 
@@ -134,16 +172,12 @@ you can signal this with `0008-SYSA-additional-tests`
 # Development
 Run `npm run setup` to configure your environment:
 
-- Linting uses [standard](https://www.npmjs.com/package/standard)
-- Tests are run pre-push by [Husky](https://www.npmjs.com/package/husky)
+- Tests should be run pre-push
 - Package is published to `npm` on tag
 
 # Use in CI
 ```shell
-# Use node
-npx --silent --yes @vegaprotocol/approbation
-
-# Or run the docker image
+# Use the pre-packaged docker version
 docker run ghcr.io/vegaprotocol/approbation:latest
 ```
 

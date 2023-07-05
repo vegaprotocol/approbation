@@ -70,7 +70,9 @@ test('check-codes: ignore glob ignores ignored files', t => {
 test('check-codes: Do not crash when a filename included in the glob is not in the right format', t => {
   t.plan(5)
 
+  quiet();
   const { exitCode, res } = checkCodes('./test/check-codes/invalid-filename-matches-glob/**/*.md')
+  loud();
 
   t.equal(exitCode, 0, 'Expected success')
   t.equal(res.countAcceptableFiles, 1, 'There is 1 acceptable files')

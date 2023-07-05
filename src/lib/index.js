@@ -22,5 +22,6 @@ module.exports = {
   featurePath: './qa-scenarios/',
   validSpecificationFilename: /^([0-9]{4}(-NP)?)-([A-Z]{4})-([a-z_]+)/,
   validSpecificationPrefix: /^([0-9]{4}(-NP)?-[A-Z]{4})/,
-  validAcceptanceCriteriaCode: /([0-9]{4}(-NP)?-[A-Z]{4})-([0-9]{3})/g
+  validAcceptanceCriteriaCode: /([0-9]{4}(-NP)?-[A-Z]{4})-([0-9]{3})/g,
+  acceptanceCodeElements: /([0-9]{4}(-NP)?-[A-Z]{4})-([0-9]{3})/
 }

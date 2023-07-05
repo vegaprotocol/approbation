@@ -2,6 +2,8 @@
 
 const packageJson = require('../package.json')
 const { checkFilenames } = require('../src/check-filenames')
+const { nextFilename } = require('../src/next-filename')
+const { nextCode } = require('../src/next-code')
 const { checkCodes } = require('../src/check-codes')
 const { checkReferences } = require('../src/check-references')
 const pc = require('picocolors')
@@ -52,6 +54,32 @@ if (command === 'check-filenames') {
   }
 
   res = checkFilenames(paths, ignoreGlob)
+  process.exit(res.exitCode)
+} else if (command === 'next-filename') {
+  let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  const ignoreGlob = argv.ignore
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
+  } else {
+    paths = argv.specs
+  }
+  const isVerbose = argv.verbose === true
+
+  res = nextFilename(paths, ignoreGlob, isVerbose)
+  process.exit(res.exitCode)
+} else if (command === 'next-code') {
+  let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  const ignoreGlob = argv.ignore
+  const isVerbose = argv.verbose === true
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
+  } else {
+    paths = argv.specs
+  }
+
+  res = nextCode(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-codes') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
