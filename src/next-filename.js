@@ -1,12 +1,7 @@
 /**
- * Check all markdown files in the protocol folder are name appropriately
- *
- * An filename is based off:
- * 1. The sequence number of the specification file
- * 2. The 4 character string ID of the specification file
- *
- * This script can be replaced by a script in any language, as long as it helps point to
- * files that don't look right as per the above. It's not elegant, but it gets the job done.
+ * Returns the next filename in a sequence, giving the next number,
+ * or if there is one missing giving the lowest number possible as 
+ * well as the highest.
  */
 const glob = require('fast-glob')
 const path = require('path')
@@ -17,12 +12,12 @@ function getRandomCode() {
   return Array.from({length: 4}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)]).join('');
 }
 
-function padNumber(number) {
+function padNumber(number, length = 4) {
   // Convert the number to a string
   let str = number.toString();
   
   // Pad the string with zeros if necessary
-  while (str.length < 4) {
+  while (str.length < length) {
     str = "0" + str;
   }
   
@@ -76,6 +71,7 @@ function nextFilename(paths, ignoreGlob, verbose) {
         }
       }
     })
+
     fileList.sort()
 
     nextHighest = seenSequenceNumbers.length > 0 ? parseInt(seenSequenceNumbers[seenSequenceNumbers.length - 1]) + 1 : 1
@@ -85,7 +81,7 @@ function nextFilename(paths, ignoreGlob, verbose) {
     }
 
     if (nextHighest) {
-      let moreSpecific = ' ';
+      let moreSpecific = '';
       if (nextHighest !== nextLowest) {
         moreSpecific = 'highest '
       }
