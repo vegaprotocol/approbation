@@ -205,7 +205,6 @@ function processReferences (specs, tests) {
 function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, featuresPath, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, outputPath = './results') {
   verbose = isVerbose
   showFiles = shouldShowFiles
-
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
   const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
   const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
@@ -281,6 +280,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
     }
     
     if (true) {
+      const totals = []
       const milestoneNames = new Set()
       const milestones = new Map()
       Object.keys(specFeatures).forEach(key => milestoneNames.add(specFeatures[key].milestone))
@@ -303,11 +303,14 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       })
 
       milestones.forEach((featuresByMilestone, milestoneKey) => {
+        if (milestoneKey === 'unknown') {
+          return
+        }
         const Covered = featuresByMilestone.reduce((acc, cur) => acc + cur.Covered, 0);
         const acs = featuresByMilestone.reduce((acc, cur) => acc + cur.acs, 0);
         const Coverage = `${(Covered / acs * 100).toFixed(1)}%`
-        featuresByMilestone.push({
-          Feature: `** Total`,
+        totals.push({
+          Feature: `Total`,
           Milestone: milestoneKey || '-',
           acs,
           Covered,
@@ -321,6 +324,8 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       const t = new Table()
       t.addRows(milestones.get('deployment-1'));
       t.addRows(milestones.get('deployment-2'));
+      t.addRows([{ Feature: '---', Milestone: '---', acs: '---', Covered: '---', 'by/FeatTest': '---', 'by/SysTest': '---', Uncovered: '---', Coverage: '---' }]);
+      t.addRows(totals);
       const tableOutput = t.render()
       console.log(tableOutput)
     }
@@ -356,11 +361,11 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
         }
 
         if (shouldOutputCSV) {
-          let csvOutput = Object.keys(categories[0]).join(',')
+          let categoriesCsvOutput = Object.keys(categories[0]).join(',')
           categories.forEach(c => {
-            csvOutput += `\r\n${Object.values(c).join(',')}`
+            categoriesCsvOutput += `\r\n${Object.values(c).join(',')}`
           })
-          fs.writeFileSync(`${outputPath}/approbation-categories.csv`, csvOutput)
+          fs.writeFileSync(`${outputPath}/approbation-categories.csv`, categoriesCsvOutput)
 
           if (shouldShowFileStats) {
             let csvOutputFiles = Object.keys(specsTableRows[0]).join(',')
@@ -369,10 +374,6 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
             })
             fs.writeFileSync(`${outputPath}/approbation-files.csv`, csvOutputFiles)
           }
-        }
-
-        if (shouldOutputImage) {
-          console.log(pc.red('Generating image not yet supported'))
         }
 
         if (shouldOutputJenkins) {
