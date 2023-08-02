@@ -80,6 +80,20 @@ function setOrIncreaseProperty(feature, property, value) {
   }
 }
 
+function logUncoveredForFeature(feature) {
+  let f = (feature.match(validAcceptanceCriteriaCode) ? getFeatureForAc(feature) : feature);
+
+  if (isFeatureEmpty() || !specFeatures[f]) {
+    f = 'Unknown';
+  }
+
+  if (specFeatures[f]['uncoveredAcs']) {
+    specFeatures[f]['uncoveredAcs'].add(feature);
+  } else {
+    specFeatures[f]['uncoveredAcs'] = new Set([feature]);
+  } 
+}
+
 function increaseCodesForFeature(feature, count) {
   if (isFeatureEmpty()) {
     throw ErrorFeatureEmpty;
@@ -113,6 +127,7 @@ function increaseUncoveredForFeature(feature, count) {
     throw ErrorFeatureEmpty;
   }
   setOrIncreaseProperty(feature, "uncovered", count);
+  logUncoveredForFeature(feature);
 }
 
 function increaseSpecCountForFeature(feature) {

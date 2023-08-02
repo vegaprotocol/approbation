@@ -11,7 +11,7 @@ const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
 const { getCategoriesForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, setCategories } = require('./lib/category')
-const { setFeatures, increaseAcceptableSpecsForFeature, increaseCodesForFeature, increaseCoveredForFeature, increaseFeatureCoveredForFeature, increaseSpecCountForFeature, increaseSystemTestCoveredForFeature, increaseUncoveredForFeature } = require('./lib/feature')
+const { setFeatures, increaseAcceptableSpecsForFeature, increaseCodesForFeature, increaseCoveredForFeature, increaseFeatureCoveredForFeature, increaseSpecCountForFeature, increaseSystemTestCoveredForFeature, increaseUncoveredForFeature, specFeatures } = require('./lib/feature')
 const { Table } = require('console-table-printer')
 const { specPriorities } = require('./lib/priority')
 const sortBy = require('lodash.sortby')
@@ -289,6 +289,12 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       Object.keys(specFeatures).filter(k => k !== 'Unknown').forEach(key => {
         const c = specFeatures[key]
         const coverage = (c.covered / (c.acs.length | 0) * 100).toFixed(1)
+        
+        if (c.uncovered !== 0 && c.uncoveredAcs) {
+          console.group(pc.red(`Uncovered ACs for ${key}`))
+          console.dir(Array.from(c.uncoveredAcs).join(', '))
+          console.groupEnd()
+        }
 
         milestones.get(c.milestone).push({
           Feature: key,
@@ -300,6 +306,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
           Uncovered: c.uncovered || 0,
           Coverage: isNaN(coverage) ? '0%' : `${coverage}%`
         })
+
       })
 
       milestones.forEach((featuresByMilestone, milestoneKey) => {
