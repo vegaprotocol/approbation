@@ -99,6 +99,7 @@ if (command === 'check-filenames') {
   const specsGlob = argv.specs
   const testsGlob = argv.tests
   const categories = argv.categories
+  const features = argv.features
   const ignoreGlob = argv.ignore
   const showMystery = argv['show-mystery'] === true
   const showCategoryStats = argv['category-stats'] === true
@@ -139,7 +140,7 @@ if (command === 'check-filenames') {
   }
 
   // TODO: Turn in to an object
-  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats, outputPath)
+  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, features, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats, outputPath)
 
   process.exit(res.exitCode)
 } else {
@@ -177,6 +178,7 @@ if (command === 'check-filenames') {
   showArg(`--specs="${pc.yellow('{specs/**/*.md}')}"`, 'glob of specs to pull AC codes from ')
   showArg(`--tests="${pc.yellow('tests/**/*.{py,feature}')}"`, 'glob of tests to match to the spec AC codes')
   showArg(`--categories="${pc.yellow('./specs/protocol/categories.json')}"`, 'Single JSON file that contains the categories for this test run')
+  showArg(`--features="${pc.yellow('./specs/protocol/features.json')}"`, 'Single JSON file that contains the features for this test run')
   showArg(`--ignore="${pc.yellow('{tests/**/*.{py,feature}')}"`, 'glob of files to ignore for both tests and specs')
   showArg('--show-mystery', 'If set, display criteria in tests that are not in any specs matched by --specs')
   showArg('--category-stats', 'Show more detail for referenced/unreferenced codes')

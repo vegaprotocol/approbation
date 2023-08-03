@@ -47,7 +47,9 @@ test("next-code: extractPrefixFromCodes: returns all unique prefixes found", (t)
 
 test("next-code: nextCode: returns the next code in the sequence", (t) => {
   t.plan(3);
+  quiet();
   const { exitCode, nextLowest, nextHighest } = nextCode('./test/next-code/big-skip/*.md','', false)
+  loud();
 
   t.equal(exitCode, 0, "Exit code is 0");
   t.equal(nextLowest, "002", "Next lowest is 003");
