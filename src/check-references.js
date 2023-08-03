@@ -291,10 +291,12 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
         const coverage = (c.covered / (c.acs.length | 0) * 100).toFixed(1)
         
         if (c.uncovered !== 0 && c.uncoveredAcs) {
-          console.group(pc.red(`Uncovered ACs for ${key}`))
-          console.dir(Array.from(c.uncoveredAcs).join(', '))
-          console.groupEnd()
+          console.log(
+            pc.red(`Uncovered ACs for ${key} (${c.milestone}): `) + 
+            Array.from(c.uncoveredAcs).join(', ')
+          )
         }
+          
 
         milestones.get(c.milestone).push({
           Feature: key,
