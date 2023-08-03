@@ -221,7 +221,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       setCategories(specCategories)
       // Features gather Acceptance Criteria across spec files or categories, and tally the numbers
       
-      if (featuresPath !== undefined) {
+      if (featuresPath !== undefined && featuresPath.length > 0) {
         specFeatures = setFeatures(JSON.parse(fs.readFileSync(featuresPath)))
       }
 
