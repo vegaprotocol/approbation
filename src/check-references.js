@@ -220,7 +220,10 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       specCategories = JSON.parse(fs.readFileSync(categoriesPath))
       setCategories(specCategories)
       // Features gather Acceptance Criteria across spec files or categories, and tally the numbers
-      specFeatures = setFeatures(JSON.parse(fs.readFileSync(featuresPath)))
+      
+      if (featuresPath !== undefined) {
+        specFeatures = setFeatures(JSON.parse(fs.readFileSync(featuresPath)))
+      }
 
       specs = gatherSpecs(specList)
       tests = gatherTests(testList)
@@ -279,7 +282,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       console.log(st.render())
     }
     
-    if (true) {
+    if (featuresPath) {
       const totals = []
       const milestoneNames = new Set()
       const milestones = new Map()
@@ -296,7 +299,6 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
             Array.from(c.uncoveredAcs).join(', ')
           )
         }
-          
 
         milestones.get(c.milestone).push({
           Feature: key,

@@ -7,13 +7,12 @@
 
 const { validAcceptanceCriteriaCode } = require(".");
 
-const ErrorFeaturesEmpty = new Error("Features have not been set");
 let specFeatures;
 let acToFeatureLookup = new Map()
 
 function isFeatureEmpty() {
   if (specFeatures === undefined) {
-    throw ErrorFeaturesEmpty;
+    return true
   }
   return Object.keys(specFeatures).length === 0;
 }
@@ -30,7 +29,7 @@ function isFeatureEmpty() {
 function isValidFeature(featureName, feature) {
   // Has a name set
   if (!featureName || !featureName.length) {
-    return false;
+    return false
   }
 
   // Feature must have acceptance criteria and more than 0
@@ -96,35 +95,35 @@ function logUncoveredForFeature(feature) {
 
 function increaseCodesForFeature(feature, count) {
   if (isFeatureEmpty()) {
-    throw ErrorFeatureEmpty;
+    return false
   }
   setOrIncreaseProperty(feature, "codes", count);
 }
 
 function increaseCoveredForFeature(feature, count) {
   if (isFeatureEmpty()) {
-    throw ErrorFeatureEmpty;
+    return false
   }
   setOrIncreaseProperty(feature, "covered", count);
 }
 
 function increaseFeatureCoveredForFeature(feature, count) {
   if (isFeatureEmpty()) {
-    throw ErrorFeatureEmpty;
+    return false
   }
   setOrIncreaseProperty(feature, "featureCovered", count);
 }
 
 function increaseSystemTestCoveredForFeature(feature, count) {
   if (isFeatureEmpty()) {
-    throw ErrorFeatureEmpty;
+    return false
   }
   setOrIncreaseProperty(feature, "systemTestCovered", count);
 }
 
 function increaseUncoveredForFeature(feature, count) {
   if (isFeatureEmpty()) {
-    throw ErrorFeatureEmpty;
+    return false
   }
   setOrIncreaseProperty(feature, "uncovered", count);
   logUncoveredForFeature(feature);
@@ -132,14 +131,14 @@ function increaseUncoveredForFeature(feature, count) {
 
 function increaseSpecCountForFeature(feature) {
   if (isFeatureEmpty()) {
-    throw ErrorFeatureEmpty;
+    return false
   }
   setOrIncreaseProperty(feature, "specCount", 1);
 }
 
 function increaseAcceptableSpecsForFeature(feature) {
   if (isFeatureEmpty()) {
-    throw ErrorFeatureEmpty;
+    return false
   }
   setOrIncreaseProperty(feature, "acceptableSpecCount", 1);
 }
