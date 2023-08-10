@@ -6,6 +6,7 @@
  */
 
 const { validAcceptanceCriteriaCode } = require(".");
+const pc = require('picocolors')
 
 let specFeatures;
 let acToFeatureLookup = new Map()
@@ -45,13 +46,19 @@ function isValidFeature(featureName, feature) {
   return true;
 }
 
+function findDuplicateAcs(arr) {
+  return [...new Set(arr.filter((item, index) => arr.indexOf(item) !== index))];
+};
+
 function setFeatures(fileFeatures) {
   specFeatures = fileFeatures;
   if (!specFeatures.Unknown) {
     specFeatures.Unknown = { acs: [], milestone: "-", acCount: 0 };
   }
-  
+
   Object.entries(specFeatures).forEach(([featureName, feature]) => {
+    const isValid = isValidFeature(featureName, feature)
+
     feature.acs.forEach((ac) => {
       acToFeatureLookup.set(ac, featureName);
     })
@@ -90,7 +97,7 @@ function logUncoveredForFeature(feature) {
     specFeatures[f]['uncoveredAcs'].add(feature);
   } else {
     specFeatures[f]['uncoveredAcs'] = new Set([feature]);
-  } 
+  }
 }
 
 function increaseCodesForFeature(feature, count) {
@@ -154,4 +161,5 @@ module.exports = {
   increaseSpecCountForFeature,
   increaseSystemTestCoveredForFeature,
   increaseUncoveredForFeature,
+  findDuplicateAcs
 };
