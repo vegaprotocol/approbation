@@ -11,7 +11,7 @@ const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
 const { getCategoriesForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, setCategories } = require('./lib/category')
-const { setFeatures, increaseAcceptableSpecsForFeature, increaseCodesForFeature, increaseCoveredForFeature, increaseFeatureCoveredForFeature, increaseSpecCountForFeature, increaseSystemTestCoveredForFeature, increaseUncoveredForFeature, specFeatures } = require('./lib/feature')
+const { setFeatures, increaseAcceptableSpecsForFeature, increaseCodesForFeature, increaseCoveredForFeature, increaseFeatureCoveredForFeature, increaseSpecCountForFeature, increaseSystemTestCoveredForFeature, increaseUncoveredForFeature, specFeatures, findDuplicateAcs } = require('./lib/feature')
 const { Table } = require('console-table-printer')
 const { specPriorities } = require('./lib/priority')
 const sortBy = require('lodash.sortby')
@@ -20,7 +20,7 @@ const sortBy = require('lodash.sortby')
 let verbose = false
 let showFiles = false
 
-function gatherSpecs (fileList) {
+function gatherSpecs(fileList) {
   // Step 1: Gather all the initial details
   const specFiles = new Map()
 
@@ -44,7 +44,12 @@ function gatherSpecs (fileList) {
       criteria = [...new Set(labelledAcceptanceCriteria)]
     }
 
-    const categories = getCategoriesForSpec(codeStart[0])
+    let categories
+    try {
+      categories = getCategoriesForSpec(codeStart[0])
+    } catch (e) {
+      categories = [];
+    }
 
     specFiles.set(fileName, {
       name: `${path}${file}`,
@@ -60,7 +65,7 @@ function gatherSpecs (fileList) {
 }
 
 // Step 2: Gather all the features
-function gatherTests (fileList) {
+function gatherTests(fileList) {
   const linksInFeatures = new Map()
 
   fileList.forEach(file => {
@@ -91,10 +96,12 @@ function gatherTests (fileList) {
   return linksInFeatures
 }
 
-function processReferences (specs, tests) {
+function processReferences(specs, tests) {
   let criteriaTotal = 0
   let criteriaReferencedTotal = 0
   let criteriaUnreferencedTotal = 0
+  const allCriteriaInSpecs = []
+
   // Step 3: Output the data
   specs.forEach((value, key) => {
     value.referencedByFeature = 0
@@ -118,6 +125,7 @@ function processReferences (specs, tests) {
     // Tally Criteria
     if (value.criteria && value.criteria.length > 0) {
       value.criteria.forEach(c => {
+        allCriteriaInSpecs.push(c)
         const linksForAC = tests.get(c)
 
         if (linksForAC) {
@@ -195,6 +203,7 @@ function processReferences (specs, tests) {
   })
 
   return {
+    allCriteriaInSpecs,
     criteriaTotal,
     criteriaReferencedTotal,
     criteriaUnreferencedTotal,
@@ -202,7 +211,7 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, featuresPath, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, outputPath = './results') {
+function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featuresPath, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, outputPath = './results') {
   verbose = isVerbose
   showFiles = shouldShowFiles
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
@@ -220,7 +229,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       specCategories = JSON.parse(fs.readFileSync(categoriesPath))
       setCategories(specCategories)
       // Features gather Acceptance Criteria across spec files or categories, and tally the numbers
-      
+
       if (featuresPath !== undefined && featuresPath.length > 0) {
         specFeatures = setFeatures(JSON.parse(fs.readFileSync(featuresPath)))
       }
@@ -238,7 +247,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       }
     }
 
-    const { criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
+    const { criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests, allCriteriaInSpecs } = processReferences(specs, tests)
     const criteriaReferencedPercent = (criteriaReferencedTotal / criteriaTotal * 100).toFixed(1)
     const criteriaUnreferencedPercent = (criteriaUnreferencedTotal / criteriaTotal * 100).toFixed(1)
 
@@ -281,24 +290,50 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       st.addRows(sortBy(specsTableRows, ['Priority', 'Coverage']))
       console.log(st.render())
     }
-    
+
     if (featuresPath) {
       const totals = []
       const milestoneNames = new Set()
       const milestones = new Map()
+
       Object.keys(specFeatures).forEach(key => milestoneNames.add(specFeatures[key].milestone))
       milestoneNames.forEach(m => milestones.set(m, []))
-      
+
       Object.keys(specFeatures).filter(k => k !== 'Unknown').forEach(key => {
         const c = specFeatures[key]
         const coverage = (c.covered / (c.acs.length | 0) * 100).toFixed(1)
-        
-        if (c.uncovered !== 0 && c.uncoveredAcs) {
-          console.log(
-            pc.red(`Uncovered ACs for ${key} (${c.milestone}): `) + 
-            Array.from(c.uncoveredAcs).join(', ')
-          )
+
+        const mysteryFeatureAcs = []
+        c.acs.forEach(ac => {
+          if (allCriteriaInSpecs.indexOf(ac) === -1) {
+            mysteryFeatureAcs.push(ac)
+          }
+        })
+
+        const duplicateAcs = findDuplicateAcs(c.acs);
+        if (duplicateAcs.length > 0 || mysteryFeatureAcs.length > 0 || c.uncovered !== 0) {
+          console.group(pc.bold(`Feature errors: ${key}`))
+
+          console.group();
+          if (duplicateAcs.length > 0) {
+            console.log(pc.red(pc.bold(`Duplicate ACs for ${key}(${c.milestone})`)) + ` ${duplicateAcs.join(', ')}`)
+          }
+
+          if (mysteryFeatureAcs.length > 0) {
+            console.log(pc.red(pc.bold(`Mystery ACs for ${key}(${c.milestone})`)) + ` ${JSON.stringify(mysteryFeatureAcs)} `)
+          }
+
+          if (c.uncovered !== 0 && c.uncoveredAcs) {
+            console.log(
+              pc.red(`Uncovered ACs for ${key}(${c.milestone}): `) +
+              Array.from(c.uncoveredAcs).join(', ')
+            )
+          }
+          console.groupEnd()
+          console.groupEnd()
+          console.log();
         }
+
 
         milestones.get(c.milestone).push({
           Feature: key,
@@ -308,7 +343,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
           'by/FeatTest': c.featureCovered || 0,
           'by/SysTest': c.systemTestCovered || 0,
           Uncovered: c.uncovered || 0,
-          Coverage: isNaN(coverage) ? '0%' : `${coverage}%`
+          Coverage: isNaN(coverage) ? '0%' : `${coverage}% `
         })
 
       })
@@ -319,7 +354,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
         }
         const Covered = featuresByMilestone.reduce((acc, cur) => acc + cur.Covered, 0);
         const acs = featuresByMilestone.reduce((acc, cur) => acc + cur.acs, 0);
-        const Coverage = `${(Covered / acs * 100).toFixed(1)}%`
+        const Coverage = `${(Covered / acs * 100).toFixed(1)}% `
         totals.push({
           Feature: `Total`,
           Milestone: milestoneKey || '-',
@@ -335,6 +370,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
       const t = new Table()
       t.addRows(milestones.get('deployment-1'));
       t.addRows(milestones.get('deployment-2'));
+      t.addRows(milestones.get('deployment-3'));
       t.addRows([{ Feature: '---', Milestone: '---', acs: '---', Covered: '---', 'by/FeatTest': '---', 'by/SysTest': '---', Uncovered: '---', Coverage: '---' }]);
       t.addRows(totals);
       const tableOutput = t.render()
@@ -357,7 +393,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
           'by/FeatTest': c.featureCovered || '-',
           'by/SysTest': c.systemTestCovered || '-',
           Uncovered: c.uncovered || '-',
-          Coverage: isNaN(coverage) ? '-' : `${coverage}%`
+          Coverage: isNaN(coverage) ? '-' : `${coverage}% `
         }
       })
 
@@ -374,9 +410,9 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
         if (shouldOutputCSV) {
           let categoriesCsvOutput = Object.keys(categories[0]).join(',')
           categories.forEach(c => {
-            categoriesCsvOutput += `\r\n${Object.values(c).join(',')}`
+            categoriesCsvOutput += `\r\n${Object.values(c).join(',')} `
           })
-          fs.writeFileSync(`${outputPath}/approbation-categories.csv`, categoriesCsvOutput)
+          fs.writeFileSync(`${outputPath} /approbation-categories.csv`, categoriesCsvOutput)
 
           if (shouldShowFileStats) {
             let csvOutputFiles = Object.keys(specsTableRows[0]).join(',')
@@ -432,5 +468,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, feat
 }
 
 module.exports = {
+  gatherSpecs,
+  findDuplicateAcs,
   checkReferences
 }
