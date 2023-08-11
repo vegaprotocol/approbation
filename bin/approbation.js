@@ -2,21 +2,31 @@
 
 const packageJson = require('../package.json')
 const { checkFilenames } = require('../src/check-filenames')
+const { nextFilename } = require('../src/next-filename')
+const { nextCode } = require('../src/next-code')
 const { checkCodes } = require('../src/check-codes')
+const { checkFeatures } = require('../src/check-features')
 const { checkReferences } = require('../src/check-references')
 const { checkCoverage } = require('../src/check-coverage')
 const pc = require('picocolors')
 const { outputBranches } = require('../src/lib/get-project-branches')
 const argv = require('minimist')(process.argv.slice(2))
 const command = argv._[0]
+const IS_DEBUG = process.env.debug !== undefined
 
-function warn (lines) {
+function debugOutput(text) {
+  if (IS_DEBUG) {
+    console.log(pc.purple(text))
+  }
+}
+
+function warn(lines) {
   console.warn('')
   lines.map(l => console.warn(pc.yellow(`! ${l}`)))
   console.warn('')
 }
 
-function showArg (arg, description) {
+function showArg(arg, description) {
   if (description) {
     console.log(`${pc.bold(arg)}: ${description}`)
   } else {
@@ -53,6 +63,31 @@ if (command === 'check-filenames') {
   const paths = argv.specs
 
   res = checkCoverage(paths, ignoreGlob, isVerbose)
+} else if (command === 'next-filename') {
+  let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  const ignoreGlob = argv.ignore
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
+  } else {
+    paths = argv.specs
+  }
+  const isVerbose = argv.verbose === true
+
+  res = nextFilename(paths, ignoreGlob, isVerbose)
+  process.exit(res.exitCode)
+} else if (command === 'next-code') {
+  let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
+  const ignoreGlob = argv.ignore
+  const isVerbose = argv.verbose === true
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided, defaulting to:', `--specs="${paths}"`, '(This behaviour will be deprecated in 3.0.0)'])
+  } else {
+    paths = argv.specs
+  }
+
+  res = nextCode(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-codes') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
@@ -67,16 +102,40 @@ if (command === 'check-filenames') {
 
   res = checkCodes(paths, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
+} else if (command === 'check-features') {
+  let specs, features
+  const isVerbose = argv.verbose === true
+  const ignoreGlob = argv.ignore
+
+  if (!argv.features) {
+    warn(['No --features argument provided)'])
+    process.exit(1);
+  } else {
+    features = argv.features
+  }
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided'])
+    process.exit(1);
+  } else {
+    specs = argv.specs
+  }
+
+  res = checkFeatures(specs, features, ignoreGlob, isVerbose)
+  process.exit(res.exitCode)
 } else if (command === 'check-references') {
+  debugOutput('check-references')
   const specsGlob = argv.specs
   const testsGlob = argv.tests
   const categories = argv.categories
+  const features = argv.features
   const ignoreGlob = argv.ignore
   const showMystery = argv['show-mystery'] === true
   const showCategoryStats = argv['category-stats'] === true
   const isVerbose = argv.verbose === true
   const showFiles = argv['show-files'] === true
   const shouldOutputCSV = argv['output-csv'] === true
+  let outputPath = argv.output
   const shouldOutputJenkins = argv['output-jenkins'] === true
   const shouldShowFileStats = argv['show-file-stats'] === true
 
@@ -95,8 +154,22 @@ if (command === 'check-filenames') {
     process.exit(1)
   }
 
+  if (shouldOutputCSV || shouldOutputJenkins) {
+    if (!outputPath || outputPath.length === 0) {
+      console.error(pc.yellow('Output path should be provided with --output if CSV or Jenkins output are enabled. Defaulting to ./results'))
+      outputPath = './results'
+    } else {
+      // Ensure we don't have a trailing slash for consistency with the default
+      if (outputPath && outputPath.endsWith('/')) {
+        debugOutput(`Removing trailing slash from output path: ${outputPath}`)
+        outputPath = outputPath.slice(0, -1)
+      }
+      console.info(pc.yellow(`Output folder: ${outputPath}`))
+    }
+  }
+
   // TODO: Turn in to an object
-  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats)
+  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, features, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats, outputPath)
 
   process.exit(res.exitCode)
 } else {
@@ -134,6 +207,7 @@ if (command === 'check-filenames') {
   showArg(`--specs="${pc.yellow('{specs/**/*.md}')}"`, 'glob of specs to pull AC codes from ')
   showArg(`--tests="${pc.yellow('tests/**/*.{py,feature}')}"`, 'glob of tests to match to the spec AC codes')
   showArg(`--categories="${pc.yellow('./specs/protocol/categories.json')}"`, 'Single JSON file that contains the categories for this test run')
+  showArg(`--features="${pc.yellow('./specs/protocol/features.json')}"`, 'Single JSON file that contains the features for this test run')
   showArg(`--ignore="${pc.yellow('{tests/**/*.{py,feature}')}"`, 'glob of files to ignore for both tests and specs')
   showArg('--show-mystery', 'If set, display criteria in tests that are not in any specs matched by --specs')
   showArg('--category-stats', 'Show more detail for referenced/unreferenced codes')

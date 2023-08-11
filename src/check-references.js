@@ -6,11 +6,12 @@
  * This script is pretty ugly. Sorry.
  */
 const fs = require('fs')
-const glob = require('glob')
+const glob = require('fast-glob')
 const path = require('path')
 const pc = require('picocolors')
 const { validSpecificationPrefix, validAcceptanceCriteriaCode, ignoreFiles } = require('./lib')
 const { getCategoriesForSpec, increaseCodesForCategory, increaseCoveredForCategory, increaseAcceptableSpecsForCategory, increaseUncoveredForCategory, increaseFeatureCoveredForCategory, increaseSystemTestCoveredForCategory, increaseSpecCountForCategory, setCategories } = require('./lib/category')
+const { setFeatures, increaseAcceptableSpecsForFeature, increaseCodesForFeature, increaseCoveredForFeature, increaseFeatureCoveredForFeature, increaseSpecCountForFeature, increaseSystemTestCoveredForFeature, increaseUncoveredForFeature, specFeatures, findDuplicateAcs } = require('./lib/feature')
 const { Table } = require('console-table-printer')
 const { specPriorities } = require('./lib/priority')
 const sortBy = require('lodash.sortby')
@@ -19,7 +20,7 @@ const sortBy = require('lodash.sortby')
 let verbose = false
 let showFiles = false
 
-function gatherSpecs (fileList) {
+function gatherSpecs(fileList) {
   // Step 1: Gather all the initial details
   const specFiles = new Map()
 
@@ -43,7 +44,12 @@ function gatherSpecs (fileList) {
       criteria = [...new Set(labelledAcceptanceCriteria)]
     }
 
-    const categories = getCategoriesForSpec(codeStart[0])
+    let categories
+    try {
+      categories = getCategoriesForSpec(codeStart[0])
+    } catch (e) {
+      categories = [];
+    }
 
     specFiles.set(fileName, {
       name: `${path}${file}`,
@@ -59,7 +65,7 @@ function gatherSpecs (fileList) {
 }
 
 // Step 2: Gather all the features
-function gatherTests (fileList) {
+function gatherTests(fileList) {
   const linksInFeatures = new Map()
 
   fileList.forEach(file => {
@@ -90,12 +96,13 @@ function gatherTests (fileList) {
   return linksInFeatures
 }
 
-function processReferences (specs, tests) {
+function processReferences(specs, tests) {
   let criteriaTotal = 0
   let criteriaReferencedTotal = 0
   let criteriaUnreferencedTotal = 0
   const criteriaWithSystests = []
   const fileForAc = new Map()
+  const allCriteriaInSpecs = []
 
   // Step 3: Output the data
   specs.forEach((value, key) => {
@@ -120,6 +127,7 @@ function processReferences (specs, tests) {
     // Tally Criteria
     if (value.criteria && value.criteria.length > 0) {
       value.criteria.forEach(c => {
+        allCriteriaInSpecs.push(c)
         const linksForAC = tests.get(c)
 
         fileForAc.set(c, value.file)
@@ -129,6 +137,7 @@ function processReferences (specs, tests) {
           criteriaWithRefs.push(c)
           criteriaReferencedTotal++
           categories.forEach(c => increaseCoveredForCategory(c, 1))
+          increaseCoveredForFeature(c, 1)
 
           // Hacky hack: Limit these to 1 or 0 rather than a true tally.
           let criteriaAlreadyLoggedSystest = false
@@ -137,10 +146,12 @@ function processReferences (specs, tests) {
             if (!criteriaAlreadyLoggedSystest && l.match('system-tests')) {
               // Used for check-coverage
               criteriaWithSystests.push(c)
+              increaseSystemTestCoveredForFeature(c, 1)
               categories.forEach(c => increaseSystemTestCoveredForCategory(c, 1))
               value.referencedBySystemTest++
               criteriaAlreadyLoggedSystest = true
             } else if (!criteriaAlreadyLoggedFeature && l.match('.feature')) {
+              increaseFeatureCoveredForFeature(c, 1)
               categories.forEach(c => increaseFeatureCoveredForCategory(c, 1))
               value.referencedByFeature++
               criteriaAlreadyLoggedFeature = true
@@ -157,6 +168,7 @@ function processReferences (specs, tests) {
       if (criteriaWithRefs.length !== value.criteria.length) {
         value.criteria.forEach(v => {
           if (!criteriaWithRefs.includes(v)) {
+            increaseUncoveredForFeature(v, 1)
             unreferencedCriteria.push(v)
             criteriaUnreferencedTotal++
           }
@@ -198,6 +210,7 @@ function processReferences (specs, tests) {
 
   return {
     fileForAc,
+    allCriteriaInSpecs,
     criteriaTotal,
     criteriaWithSystests,
     criteriaReferencedTotal,
@@ -206,22 +219,29 @@ function processReferences (specs, tests) {
   }
 }
 
-function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false) {
+function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featuresPath, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, outputPath = './results') {
   verbose = isVerbose
   showFiles = shouldShowFiles
-
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
   const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
   const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
   let categories
 
-  let specs, tests, specCategories
+  let specs, tests, features, specFeatures
   const exitCode = 0
+
 
   if (specList.length > 0 && testList.length > 0) {
     try {
+      // Categories gather spec files in to categories, and tally the number of codes in each category
       specCategories = JSON.parse(fs.readFileSync(categoriesPath))
       setCategories(specCategories)
+      // Features gather Acceptance Criteria across spec files or categories, and tally the numbers
+
+      if (featuresPath !== undefined && featuresPath.length > 0) {
+        specFeatures = setFeatures(JSON.parse(fs.readFileSync(featuresPath)))
+      }
+
       specs = gatherSpecs(specList)
       tests = gatherTests(testList)
     } catch (e) {
@@ -278,6 +298,93 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       st.addRows(sortBy(specsTableRows, ['Priority', 'Coverage']))
       console.log(st.render())
     }
+
+    if (featuresPath) {
+      const totals = []
+      const milestoneNames = new Set()
+      const milestones = new Map()
+
+      Object.keys(specFeatures).forEach(key => milestoneNames.add(specFeatures[key].milestone))
+      milestoneNames.forEach(m => milestones.set(m, []))
+
+      Object.keys(specFeatures).filter(k => k !== 'Unknown').forEach(key => {
+        const c = specFeatures[key]
+        const coverage = (c.covered / (c.acs.length | 0) * 100).toFixed(1)
+
+        const mysteryFeatureAcs = []
+        c.acs.forEach(ac => {
+          if (allCriteriaInSpecs.indexOf(ac) === -1) {
+            mysteryFeatureAcs.push(ac)
+          }
+        })
+
+        const duplicateAcs = findDuplicateAcs(c.acs);
+        if (duplicateAcs.length > 0 || mysteryFeatureAcs.length > 0 || c.uncovered !== 0) {
+          console.group(pc.bold(`Feature errors: ${key}`))
+
+          console.group();
+          if (duplicateAcs.length > 0) {
+            console.log(pc.red(pc.bold(`Duplicate ACs for ${key}(${c.milestone})`)) + ` ${duplicateAcs.join(', ')}`)
+          }
+
+          if (mysteryFeatureAcs.length > 0) {
+            console.log(pc.red(pc.bold(`Mystery ACs for ${key}(${c.milestone})`)) + ` ${JSON.stringify(mysteryFeatureAcs)} `)
+          }
+
+          if (c.uncovered !== 0 && c.uncoveredAcs) {
+            console.log(
+              pc.red(`Uncovered ACs for ${key}(${c.milestone}): `) +
+              Array.from(c.uncoveredAcs).join(', ')
+            )
+          }
+          console.groupEnd()
+          console.groupEnd()
+          console.log();
+        }
+
+
+        milestones.get(c.milestone).push({
+          Feature: key,
+          Milestone: c.milestone || 0,
+          acs: c.acs.length || 0,
+          Covered: c.covered || 0,
+          'by/FeatTest': c.featureCovered || 0,
+          'by/SysTest': c.systemTestCovered || 0,
+          Uncovered: c.uncovered || 0,
+          Coverage: isNaN(coverage) ? '0%' : `${coverage}% `
+        })
+
+      })
+
+      milestones.forEach((featuresByMilestone, milestoneKey) => {
+        if (milestoneKey === 'unknown') {
+          return
+        }
+        const Covered = featuresByMilestone.reduce((acc, cur) => acc + cur.Covered, 0);
+        const acs = featuresByMilestone.reduce((acc, cur) => acc + cur.acs, 0);
+        const Coverage = `${(Covered / acs * 100).toFixed(1)}% `
+        totals.push({
+          Feature: `Total`,
+          Milestone: milestoneKey || '-',
+          acs,
+          Covered,
+          'by/FeatTest': featuresByMilestone.reduce((acc, cur) => acc + cur['by/FeatTest'], 0) || '-',
+          'by/SysTest': featuresByMilestone.reduce((acc, cur) => acc + cur['by/SysTest'], 0) || '-',
+          Uncovered: featuresByMilestone.reduce((acc, cur) => acc + cur.Uncovered, 0) || '-',
+          Coverage
+        })
+      })
+
+      const t = new Table()
+      t.addRows(milestones.get('deployment-1'));
+      t.addRows(milestones.get('deployment-2'));
+      t.addRows(milestones.get('deployment-3'));
+      t.addRows([{ Feature: '---', Milestone: '---', acs: '---', Covered: '---', 'by/FeatTest': '---', 'by/SysTest': '---', Uncovered: '---', Coverage: '---' }]);
+      t.addRows(totals);
+      const tableOutput = t.render()
+      console.log(tableOutput)
+    }
+
     if (showCategoryStats) {
       const shouldOutputImage = false
 
@@ -294,7 +401,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
           'by/FeatTest': c.featureCovered || '-',
           'by/SysTest': c.systemTestCovered || '-',
           Uncovered: c.uncovered || '-',
-          Coverage: isNaN(coverage) ? '-' : `${coverage}%`
+          Coverage: isNaN(coverage) ? '-' : `${coverage}% `
         }
       })
 
@@ -304,34 +411,30 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       console.log(tableOutput)
 
       if (shouldOutputJenkins || shouldOutputCSV || shouldOutputImage) {
-        if (!fs.existsSync('./results')) {
-          fs.mkdirSync('./results')
+        if (!fs.existsSync(outputPath)) {
+          fs.mkdirSync(outputPath, { recursive: true })
         }
 
         if (shouldOutputCSV) {
-          let csvOutput = Object.keys(categories[0]).join(',')
+          let categoriesCsvOutput = Object.keys(categories[0]).join(',')
           categories.forEach(c => {
-            csvOutput += `\r\n${Object.values(c).join(',')}`
+            categoriesCsvOutput += `\r\n${Object.values(c).join(',')} `
           })
-          fs.writeFileSync('results/approbation-categories.csv', csvOutput)
+          fs.writeFileSync(`${outputPath} /approbation-categories.csv`, categoriesCsvOutput)
 
           if (shouldShowFileStats) {
             let csvOutputFiles = Object.keys(specsTableRows[0]).join(',')
             specsTableRows.forEach(c => {
               csvOutputFiles += `\r\n${Object.values(c).join(',')}`
             })
-            fs.writeFileSync('results/approbation-files.csv', csvOutputFiles)
+            fs.writeFileSync(`${outputPath}/approbation-files.csv`, csvOutputFiles)
           }
-        }
-
-        if (shouldOutputImage) {
-          console.log(pc.red('Generating image not yet supported'))
         }
 
         if (shouldOutputJenkins) {
           const skipCategories = ['Category', 'Specs', 'Acceptable']
           const jenkinsLine = Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()
-          fs.writeFileSync('results/jenkins.txt', jenkinsLine)
+          fs.writeFileSync(`${outputPath}/jenkins.txt`, jenkinsLine)
         }
 
         console.groupEnd()
@@ -344,7 +447,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
       }
 
       let specCsvOutput = ''
-      
+
       let allAcCodes = []
       specs.forEach(s => allAcCodes.push(s.criteria))
       allAcCodes.flat().forEach(c => {
@@ -352,7 +455,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
         const shouldHaveSystests = criteriaWithSystests.includes(c) ? 'true' : 'false'
         specCsvOutput += `\r\n${c},specs,${shouldHaveSystests},${f}`
       })
-      
+
       if (unknownCriteriaInTests.size > 0) {
         for (const [key, value] of unknownCriteriaInTests) {
           specCsvOutput += `\r\n${key},test,false,${value.length === 1 ? value : value[0] + ' & more'}`
@@ -396,5 +499,7 @@ function checkReferences (specsGlob, testsGlob, categoriesPath, ignoreGlob, show
 }
 
 module.exports = {
+  gatherSpecs,
+  findDuplicateAcs,
   checkReferences
 }

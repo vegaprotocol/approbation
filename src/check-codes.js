@@ -24,7 +24,7 @@
  * files that don't look right as per the above. It's not elegant, but it gets the job done.
  */
 const fs = require('fs')
-const glob = require('glob')
+const glob = require('fast-glob')
 const path = require('path')
 const { validSpecificationPrefix, ignoreFiles } = require('./lib')
 const { minimumAcceptableACsPerSpec } = require('./config')
@@ -53,7 +53,7 @@ function findDuplicates (codes) {
   const uniq = codes.flat().map(code => {
     return {
       count: 1,
-      code: code
+      code
     }
   })
     .reduce((a, b) => {
@@ -67,7 +67,7 @@ function findDuplicates (codes) {
 // Outputs acceptance criteria count if it's acceptable
 let verbose = false
 
-function checkPath (files) {
+function checkPath (files, output = true) {
   // The number of files that appear to have 0 acceptance criteria
   let countEmptyFiles = 0
   // The number of files that appear to have errors
@@ -76,6 +76,8 @@ function checkPath (files) {
   let countAcceptableFiles = 0
   // Total acceptance criteria across all files
   let countAcceptanceCriteria = 0
+  // All unique codes
+  let uniqueCodes = []
 
   files.forEach(file => {
     const fileName = path.basename(file)
@@ -87,9 +89,9 @@ function checkPath (files) {
     const content = fs.readFileSync(`${file}`, 'ascii')
     const codeStart = fileName.match(validSpecificationPrefix)
 
-    // Wkip files that do not match the expected file name pattern
+    // Skip files that do not match the expected file name pattern
     if (!codeStart || !codeStart[0] || codeStart[0].length <= 4) {
-      console.error(`Skipping: ${fileName} (does not match '${validSpecificationPrefix}')`)
+      output && console.error(`Skipping: ${fileName} (does not match '${validSpecificationPrefix}')`)
       return
     }
 
@@ -99,9 +101,9 @@ function checkPath (files) {
     if (matchedContent === null) {
       // There were no matches for the AC prefix, so this file probably needs attention
       countEmptyFiles++
-      console.group(file)
-      console.error('no acceptance criteria')
-      console.groupEnd(file)
+      output && console.group(pc.bold(pc.red(file)))
+      output && console.error('no acceptance criteria')
+      output && console.groupEnd(file)
     } else {
       // Acceptance code links are self referential, and have a name property, which makes
       // 3 instances of each code. So a basic check for this is to split the matches in to
@@ -115,45 +117,53 @@ function checkPath (files) {
       if (dupes.length > 0) {
         // There are multiple uses of the same code, warn
         countErrorFiles++
-        console.group(file)
-        console.error('Found multiple uses of the same code:')
-        console.dir(dupes)
-        console.groupEnd(file)
+        output && console.group(pc.red(file))
+        output && console.error('Found multiple uses of the same code:')
+        output && console.dir(dupes)
+        output && console.groupEnd()
       }
 
       // If all of the arrays aren't 1, there's probably a mistake. Output all chunks to
       // point to where the error is
       const unbalancedChunks = totalAcceptanceCriteria.filter(i => i.length !== 1)
-
       countAcceptanceCriteria += totalAcceptanceCriteria.length
 
       if (unbalancedChunks.length > 0) {
         // Something is wrong, dump out the array as a starting point for working out what
         countErrorFiles++
-        console.group(file)
-        console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
-        console.error('Found something odd:')
-        console.dir(chunkedMatches)
+        output && console.group(pc.red(file))
+        output && console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
+        output && console.error('Found something odd:')
+        output && console.dir(chunkedMatches)
+        output && console.groupEnd();
       }
+
+      uniqueCodes = [...new Set(totalAcceptanceCriteria.flat())].map(i => `${i}`.trim()).sort()
+      if (output && verbose) {
+        console.log(`  ACs: ${Array.from(uniqueCodes.map(i => pc.yellow(`${i}`))).join(pc.white(', '))}`)
+      }
+
 
       // The files are *valid*, at least. But do they have enough ACs?
       if (totalAcceptanceCriteria.length >= minimumAcceptableACsPerSpec) {
         countAcceptableFiles++
-        if (verbose) {
-          console.group(file)
+        if (output && verbose) {
+          console.group(pc.bold(file))
           console.log(`${totalAcceptanceCriteria.length} acceptance criteria`)
-          console.groupEnd(file)
+          console.groupEnd()
         }
       } else {
         countErrorFiles++
-        console.group(file)
-        console.error(`${totalAcceptanceCriteria.length} acceptance criteria`)
-        console.groupEnd(file)
+        output && console.group(pc.red(file))
+        output && console.error(`${totalAcceptanceCriteria.length} acceptance criteria`)
+        output && console.groupEnd()
       }
     }
   })
 
   return {
+    uniqueCodes,
+    countFiles: files.length,
     countEmptyFiles,
     countErrorFiles,
     countAcceptableFiles,
