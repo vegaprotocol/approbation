@@ -370,6 +370,7 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
       const t = new Table()
       t.addRows(milestones.get('deployment-1'));
       t.addRows(milestones.get('deployment-2'));
+      t.addRows(milestones.get('deployment-3'));
       t.addRows([{ Feature: '---', Milestone: '---', acs: '---', Covered: '---', 'by/FeatTest': '---', 'by/SysTest': '---', Uncovered: '---', Coverage: '---' }]);
       t.addRows(totals);
       const tableOutput = t.render()
