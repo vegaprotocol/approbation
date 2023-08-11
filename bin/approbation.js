@@ -5,6 +5,7 @@ const { checkFilenames } = require('../src/check-filenames')
 const { nextFilename } = require('../src/next-filename')
 const { nextCode } = require('../src/next-code')
 const { checkCodes } = require('../src/check-codes')
+const { checkFeatures } = require('../src/check-features')
 const { checkReferences } = require('../src/check-references')
 const pc = require('picocolors')
 const { outputBranches } = require('../src/lib/get-project-branches')
@@ -12,19 +13,19 @@ const argv = require('minimist')(process.argv.slice(2))
 const command = argv._[0]
 const IS_DEBUG = process.env.debug !== undefined
 
-function debugOutput (text) {
+function debugOutput(text) {
   if (IS_DEBUG) {
     console.log(pc.purple(text))
   }
 }
 
-function warn (lines) {
+function warn(lines) {
   console.warn('')
   lines.map(l => console.warn(pc.yellow(`! ${l}`)))
   console.warn('')
 }
 
-function showArg (arg, description) {
+function showArg(arg, description) {
   if (description) {
     console.log(`${pc.bold(arg)}: ${description}`)
   } else {
@@ -93,6 +94,27 @@ if (command === 'check-filenames') {
   }
 
   res = checkCodes(paths, ignoreGlob, isVerbose)
+  process.exit(res.exitCode)
+} else if (command === 'check-features') {
+  let specs, features
+  const isVerbose = argv.verbose === true
+  const ignoreGlob = argv.ignore
+
+  if (!argv.features) {
+    warn(['No --features argument provided)'])
+    process.exit(1);
+  } else {
+    features = argv.features
+  }
+
+  if (!argv.specs) {
+    warn(['No --specs argument provided'])
+    process.exit(1);
+  } else {
+    specs = argv.specs
+  }
+
+  res = checkFeatures(specs, features, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
   debugOutput('check-references')

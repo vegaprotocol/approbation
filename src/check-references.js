@@ -44,7 +44,12 @@ function gatherSpecs(fileList) {
       criteria = [...new Set(labelledAcceptanceCriteria)]
     }
 
-    const categories = getCategoriesForSpec(codeStart[0])
+    let categories
+    try {
+      categories = getCategoriesForSpec(codeStart[0])
+    } catch (e) {
+      categories = [];
+    }
 
     specFiles.set(fileName, {
       name: `${path}${file}`,
@@ -462,5 +467,7 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
 }
 
 module.exports = {
+  gatherSpecs,
+  findDuplicateAcs,
   checkReferences
 }
