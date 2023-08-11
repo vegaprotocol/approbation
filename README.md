@@ -22,12 +22,12 @@ All of the globs below are relatively simple - check out [globs primer](https://
 |-----------------|----------|--------------------------------------|----------------------|
 | `--specs`         | glob     | specs to pull AC codes from          | `{specs/**/*.md}`    |
 | `--ignore`        | glob     | glob of files not to check for codes | `specs/0001-spec.md` |
-| `--show-branches` | boolean  | Show git branches for subfolders of the current folder | -  | 
+| `--show-branches` | boolean  | Show git branches for subfolders of the current folder | -  |
 
 ### check-codes example
 ```bash
 # Use node
-npx @vegaprotocol/approbation check-filenames --specs="./specs/protocol/**/*.{md,ipynb}" --show-branches 
+npx @vegaprotocol/approbation check-filenames --specs="./specs/protocol/**/*.{md,ipynb}" --show-branches
 
 # Or run the docker image
 docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-codes --specs="/run/specs/protocol/**/*.{md,ipynb}" --show-branches
@@ -41,7 +41,7 @@ docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-codes 
 |-----------------|----------|--------------------------------------|----------------------|
 | `--specs`         | glob     | specs to pull AC codes from          | `{specs/**/*.md}`    |
 | `--ignore`        | glob     | glob of files not to check for codes | `specs/0001-spec.md` |
-| `--show-branches` | boolean  | Show git branches for subfolders of the current folder | -  | 
+| `--show-branches` | boolean  | Show git branches for subfolders of the current folder | -  |
 
 ### check-filenames example
 ```bash
@@ -51,11 +51,34 @@ npx @vegaprotocol/approbation check-filenames codes --specs="./specs/protocol/**
 # Or run the docker image
 docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-filenames codes --specs="/run/specs/protocol/**/*.{md,ipynb}" --tests="/run/MultisigControl/test/*.js" --ignore="/run/specs/protocol/{0001-*,0002-*,0004-
 ```
+## check-features
+> Validates a feature file
 
+**Arguments**
+| **Parameter**   | **Type** | **Description**                      | **Example**          |
+|-----------------|----------|--------------------------------------|----------------------|
+| `--specs`         | glob     | specs to pull AC codes from          | `{specs/**/*.md}`    |
+| `--ignore`        | glob     | glob of files not to check for codes | `specs/0001-spec.md` |
+| `--features`        | string   | JSON file that contains features mappings for specs                         | `specs/features.json`     |
+| `--verbose`         | boolean  | Also list all acs not in a feature                                                                  | -                         |
+
+### check-features example
+```bash
+# Use node
+npx @vegaprotocol/approbation check-features
+--specs="{./specs/protocol/**/*.{md,ipynb},./specs/non-protocol-specs/**/*.{md,ipynb}}"
+--ignore="{./spec-internal/protocol/0060*,./specs/non-protocol-specs/{0001-NP*,0002-NP*,0004-NP*,0006-NP*,0007-NP*,0008-NP*,0010-NP*}}"
+--features="specs/protocol/features.json"
+
+# Or run the docker image
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-features --specs="/run/specs/protocol/**/*.{md,ipynb}"
+--ignore="{./spec-internal/protocol/0060*,./specs/non-protocol-specs/{0001-NP*,0002-NP*,0004-NP*,0006-NP*,0007-NP*,0008-NP*,0010-NP*}}"
+--features="specs/protocol/features.json"
+```
 
 ## check-references
 > Coverage statistics for acceptance criteria
-    
+
 **Arguments**
 | **Parameter**       | **Type** | **Description**                                                             | **Example**               |
 | ------------------- | -------- | --------------------------------------------------------------------------- | ------------------------- |
@@ -82,7 +105,7 @@ npx github:vegaprotocol/approbation@latest check-references --specs="./specs/pro
 # Or run the docker image
 docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-references --specs="/run/specs/protocol/**/*.{md,ipynb}" --tests="/run/MultisigControl/test/*.js" --ignore="/run/specs/protocol/{0001-*}" --categories="/run/specs/protocol/categories.json" --show-branches --show-mystery --output-csv --output="/run/results/"
 ```
- 
+
 ## next-filename
 > Suggests what file sequence number to use next, given a list of spec files
 
@@ -91,16 +114,16 @@ docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest check-refere
 |-----------------|----------|--------------------------------------|----------------------|
 | `--specs`         | glob     | specs to pull AC codes from          | `{specs/**/*.md}`    |
 | `--ignore`        | glob     | glob of files not to include | `specs/0001-spec.md` |
-| `--verbose` | boolean  | Display extra output | -  | 
+| `--verbose` | boolean  | Display extra output | -  |
 
 In the case of three specs, ['001...', '002...', '003...'] this would suggest '004'. However if '002' didn't exist, it would indicate that '002' is available, as well as '004'.
 ### next-filename example
 ```bash
 # Use node
-npx @vegaprotocol/approbation next-filename --specs="./specs/protocol/**/*.{md,ipynb}" 
+npx @vegaprotocol/approbation next-filename --specs="./specs/protocol/**/*.{md,ipynb}"
 
 # Or run the docker image
-docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest next-filename --specs="/run/specs/protocol/**/*.{md,ipynb}" 
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest next-filename --specs="/run/specs/protocol/**/*.{md,ipynb}"
 ```
 
 ## next-code
@@ -111,23 +134,23 @@ docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest next-filenam
 |-----------------|----------|--------------------------------------|----------------------|
 | `--specs`         | glob     | spec to pull AC codes from. Should only match one file.          | `{specs/**/0001-SPEC-spec.md}`    |
 | `--ignore`        | glob     | glob of files not to include | `specs/0001-spec.md` |
-| `--verbose` | boolean  | Display extra output | -  | 
+| `--verbose` | boolean  | Display extra output | -  |
 
 Like `next-filename`, `next-code` will suggest the lowest available code in the sequence (e.g. if there is `0001-SPEC-001` and `0001-SPEC-003`), it will suggest both `0001-SPEC-002` and `000-SPEC-004`. If using the lowest available code, ensure it isn't already referenced by any tests (i.e. isn't listed as a 'Mystery Criteria' by `check-references`).
 
 ### next-code example
 ```bash
 # Use node
-npx @vegaprotocol/approbation next-filename --specs="./specs/protocol/**/*.{md,ipynb}" 
+npx @vegaprotocol/approbation next-filename --specs="./specs/protocol/**/*.{md,ipynb}"
 
 # Or run the docker image
-docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest next-filename --specs="/run/specs/protocol/**/*.{md,ipynb}" 
+docker run -v "$(pwd):/run" ghcr.io/vegaprotocol/approbation:latest next-filename --specs="/run/specs/protocol/**/*.{md,ipynb}"
 ```
 
 
 # Background
-Each [protocol specification](https://github.com/vegaprotocol/specs) receives a sequence number when it is merged in to master. 
-This sequence number is a 0-padded integer, strictly 1 greater than the last merged 
+Each [protocol specification](https://github.com/vegaprotocol/specs) receives a sequence number when it is merged in to master.
+This sequence number is a 0-padded integer, strictly 1 greater than the last merged
 specification. The sequence number is the start of the filename, with the end result
 that the `./protocol/` folder lists files in the order they were created.
 
@@ -161,11 +184,11 @@ reasonable.
 5. Merge!
 
 ## How to reference acceptance criteria in a spec.
-These are more *convention* than a rule, but following these steps will ensure that the scripts in 
+These are more *convention* than a rule, but following these steps will ensure that the scripts in
 this folder pick up your references.
 
 1. When you are writing your feature, take a look at the acceptance criteria.
-2. If you're addressing one, reference it at the end of the Feature name, for example if you are 
+2. If you're addressing one, reference it at the end of the Feature name, for example if you are
 writing a test that covers `0008-SYSA-001`, call the feature `Verify blah (0008-SYSA-001)`
 3. If it covers more than one feature, add it inside the same brackets: `Verify blah (0008-SYSA-001, 0008-SYSA-002)`
 4. If a feature test intentionally covers something that isn't explicitly an acceptance criteria
