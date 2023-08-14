@@ -4,6 +4,7 @@
             <th>AC</th>
             <th>Covered</th>
             <th>Status</th>
+            <th>Category</th>
             <th>Criteria</th>
         </tr>
     </thead>
@@ -11,8 +12,8 @@
         {{#allCodes}}
         <tr id="{{Code}}" class="result {{className}}">
             <td class="code" data-code="{{Code}}">
-                <sup><a href="#{{Code}}">#</a></sup> 
-                <sup><a target="_blank" href="https://github.com/search?q=org%3Avegaprotocol%20{{Code}}&type=code">🕵️</a></sup> 
+                <sup><a href="#{{Code}}">#</a></sup>
+                <sup><a target="_blank" href="https://github.com/search?q=org%3Avegaprotocol%20{{Code}}&type=code">🕵️</a></sup>
                 <span>{{Code}}</span>
             </td>
             <td class="tested">
@@ -20,6 +21,8 @@
             </td>
             <td class="status">
                 <img src="./status/{{status/}}{{Code}}.svg" title="{{PassingLabel}}" width="25" height="25" loading="lazy" />
+            </td>
+            <td>
             </td>
             <td class="source">
                 {{{Definition}}}

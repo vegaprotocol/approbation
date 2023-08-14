@@ -255,7 +255,7 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
       }
     }
 
-    const { fileForAc, criteriaWithSystests, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests } = processReferences(specs, tests)
+    const { fileForAc, criteriaWithSystests, criteriaTotal, criteriaReferencedTotal, criteriaUnreferencedTotal, unknownCriteriaInTests, allCriteriaInSpecs } = processReferences(specs, tests)
     const criteriaReferencedPercent = (criteriaReferencedTotal / criteriaTotal * 100).toFixed(1)
     const criteriaUnreferencedPercent = (criteriaUnreferencedTotal / criteriaTotal * 100).toFixed(1)
 
