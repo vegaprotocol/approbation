@@ -72,6 +72,14 @@ function getFeatureForAc(ac) {
   return f
 }
 
+function getMilestoneForAc(ac) {
+  const f = acToFeatureLookup.get(ac);
+  if (!f) {
+    return 'Unknown'
+  }
+  return specFeatures[f]['milestone'] || 'Unknown'
+}
+
 function setOrIncreaseProperty(feature, property, value) {
   let f = (feature.match(validAcceptanceCriteriaCode) ? getFeatureForAc(feature) : feature);
 
@@ -151,6 +159,8 @@ function increaseAcceptableSpecsForFeature(feature) {
 }
 
 module.exports = {
+  getFeatureForAc,
+  getMilestoneForAc,
   isValidFeature,
   setFeatures,
   specFeatures,

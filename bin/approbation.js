@@ -61,8 +61,14 @@ if (command === 'check-filenames') {
   const ignoreGlob = argv.ignore
   const isVerbose = argv.verbose === true
   const paths = argv.specs
+  const features = argv.features
 
-  res = checkCoverage(paths, ignoreGlob, isVerbose)
+  if (!features) {
+    warn(['No --features argument provided, exiting'])
+    process.exit(1)
+  }
+
+  res = checkCoverage(paths, ignoreGlob, features, isVerbose)
 } else if (command === 'next-filename') {
   let paths = '{./non-protocol-specs/**/*.md,./protocol/**/*.md}'
   const ignoreGlob = argv.ignore

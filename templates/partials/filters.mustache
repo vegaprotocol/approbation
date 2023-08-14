@@ -6,7 +6,7 @@
         right: 0;
         max-width: 340px;
         width: 30%;
-        height: 300px;
+        height: 320px;
     }
 
     #filters legend {
@@ -18,7 +18,7 @@
         font-size: 1.1em;
         font-weight: bold;
     }
-    
+
     #filters fieldset {
         border: 1px solid #000;
         background: #fff;
@@ -80,6 +80,32 @@
         document.querySelectorAll('.tested.mix').forEach(el => el.classList.remove('hide'));
     }
 
+    function showFeature() {
+      const feat = document.getElementById('fea').value
+      if (feat !== '-') {
+        hideAll();
+        document.querySelector('#filters :checked').checked = false
+        document.querySelector('#mil').selectedIndex = 0;
+
+        document.querySelectorAll(`[data-feature='${feat}']`).forEach(el => el.classList.remove('hide'));
+      } else {
+        showAll();
+      }
+    }
+
+    function showMilestone() {
+      const mile = document.getElementById('mil').value
+      if (mile !== '-') {
+        hideAll();
+        document.querySelector('#filters :checked').checked = false
+        document.querySelector('#fea').selectedIndex = 0;
+
+        document.querySelectorAll(`[data-milestone='${mile}']`).forEach(el => el.classList.remove('hide'));
+      } else {
+        showAll();
+      }
+    }
+
     function copyToClipboard(str) {
         const el = document.createElement('textarea');
         el.value = str;
@@ -93,7 +119,7 @@
     };
 
     function copyIds(event) {
-       const ids = Array.from(document.querySelectorAll('tr:not(.hide) td.code')).map(el => el.getAttribute('data-code')).join('\r\n- [ ] ') 
+       const ids = Array.from(document.querySelectorAll('tr:not(.hide) td.code')).map(el => el.getAttribute('data-code')).join('\r\n- [ ] ')
        copyToClipboard(ids)
 
        const el = document.getElementById('copy-button')
@@ -113,14 +139,14 @@
         const t = document.querySelectorAll('.result').length;
         document.getElementById('allCount').textContent = `${t} - 100%`
 
-        const unknown = document.querySelectorAll('.result.tested.unknown').length 
-        document.getElementById('unknownCount').textContent = showCount(t, unknown)  
+        const unknown = document.querySelectorAll('.result.tested.unknown').length
+        document.getElementById('unknownCount').textContent = showCount(t, unknown)
 
         const fail = document.querySelectorAll('.result.tested.fail').length
-        document.getElementById('failingCount').textContent = showCount(t, fail)  
+        document.getElementById('failingCount').textContent = showCount(t, fail)
 
         const mix = document.querySelectorAll('.result.tested.mix').length
-        document.getElementById('mixedCount').textContent = showCount(t, mix)  
+        document.getElementById('mixedCount').textContent = showCount(t, mix)
     }
 
     function showCount(total, count) {
@@ -147,19 +173,22 @@
         document.getElementById('failing').addEventListener('click', showCoveredAndFailing)
         document.getElementById('mixed').addEventListener('click', showMixedResults)
 
+        document.getElementById('fea').addEventListener('change', showFeature)
+        document.getElementById('mil').addEventListener('change', showMilestone)
         initialise()
 
         // Hacky reselect radio on load
         document.querySelector('#filters :checked').click()
+        document.querySelectorAll('select').selectedIndex = 0
     })
 </script>
 
 <div id="filters">
-    <form id="filter-form"> 
+    <form id="filter-form">
         <fieldset>
             <legend>Show only</legend>
                 <p>
-                    <label id="showAll"><input type="radio" name="filter" value="all" checked /> 
+                    <label id="showAll"><input type="radio" name="filter" value="all" checked />
                     <span class="h" data-hover="Show all of the Acceptance Criteria regardless of test coverage or source">
                         Show all
                     </span> (<span id="allCount">0</span>)</label
@@ -181,6 +210,25 @@
                     <span class="h" data-hover="Show only Acceptance Criteria with multiple tests, some failing some passing">
                         Mixed pass/fail
                     </span> (<span id="mixedCount">0</span>)</label>
+                </p>
+                <hr />
+                <p>
+                    <label id="milestone">Milestone
+                    <select id="mil">
+                        <option value="-">Show all</option>
+                        {{#Milestones}}
+                        <option value="{{.}}">{{.}}</option>
+                        {{/Milestones}}
+                    </select></label>
+                </p>
+                <p>
+                    <label id="feature">Feature
+                    <select id="fea">
+                        <option value="-">Show all</option>
+                        {{#Features}}
+                        <option value="{{.}}">{{.}}</option>
+                        {{/Features}}
+                    </select></label>
                 </p>
                 <p>
                     <button id="copy-button">Copy visible IDs</button>

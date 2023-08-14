@@ -5,9 +5,10 @@ const { parse } = require('csv-parse/sync')
 const { rimrafSync } = require('rimraf')
 const findRoot = require('find-root')
 const appDir = findRoot()
+const { setFeatures, getFeatureForAc, getMilestoneForAc } = require('./lib/feature')
 
 // Outputs acceptance criteria count if it's acceptable
-function gatherCoverage () {
+function gatherCoverage() {
   const res = new Map()
   const fileContents = fs.readFileSync('./test/test-data/coverage-report.csv')
   const rows = parse(fileContents, {
@@ -45,7 +46,7 @@ function gatherCoverage () {
   }
 }
 
-function gatherAllCodes () {
+function gatherAllCodes() {
   const fileContents = fs.readFileSync('./test/test-data/approbation-codes.csv')
   return parse(fileContents, {
     columns: ['Code', 'Source', 'Systests', 'Definition'],
@@ -53,7 +54,7 @@ function gatherAllCodes () {
   })
 }
 
-function generateImageFiles (allCodes, testResults) {
+function generateImageFiles(allCodes, testResults) {
   allCodes.forEach(ac => {
     let source = 'untested-uncovered'
     if (testResults.has(ac.Code)) {
@@ -79,7 +80,7 @@ function generateImageFiles (allCodes, testResults) {
   })
 }
 
-function generateHTML (allCodes, testResults) {
+function generateHTML(allCodes, testResults, Features, Milestones) {
   const template = fs.readFileSync(`${appDir}/templates/template.mustache`, { encoding: 'utf-8' }).toString()
   const partials = {
     stylesheet: fs.readFileSync(`${appDir}/templates/partials/stylesheet.mustache`, { encoding: 'utf-8' }).toString(),
@@ -88,28 +89,39 @@ function generateHTML (allCodes, testResults) {
     filters: fs.readFileSync(`${appDir}/templates/partials/filters.mustache`, { encoding: 'utf-8' }).toString()
   }
 
-  const html = Mustache.render(template, { allCodes, testResults }, partials)
+  Features.delete(undefined)
+  Milestones.delete(undefined)
+
+  const html = Mustache.render(template, {
+    allCodes,
+    testResults,
+    Features: [...Features],
+    Milestones: [...Milestones]
+  }, partials)
   const res = fs.writeFileSync(`${appDir}/build/index.html`, html)
   return res
 }
 
 function getPassingLabel(status, hasSystests) {
-   if (status === 'pass') {
+  if (status === 'pass') {
     return 'Test(s) reference this AC and all are passsing'
-   } else if(status === 'fail') {
+  } else if (status === 'fail') {
     return 'Test(s) reference this AC and all are failing'
-   } else if(status === 'mix') {
+  } else if (status === 'mix') {
     return 'Test(s) reference this AC and some are failing'
-   } else {
-     if (hasSystests === 'true') {
-       return 'Tests reference this criteria but they are not running' 
-     } else {
-       return 'No tests reference this criteria'
-     }
-   }
+  } else {
+    if (hasSystests === 'true') {
+      return 'Tests reference this criteria but they are not running'
+    } else {
+      return 'No tests reference this criteria'
+    }
+  }
 }
 
-function checkCoverage (paths, ignoreGlob, isVerbose = false) {
+function checkCoverage(paths, ignoreGlob, featuresPath, isVerbose = false) {
+  const Features = new Set()
+  const Milestones = new Set()
+  let specFeatures
   isVerbose && console.log('Cleaning previous build')
 
   if (fs.existsSync(`${appDir}/build`)) {
@@ -131,6 +143,10 @@ function checkCoverage (paths, ignoreGlob, isVerbose = false) {
     allCodes: undefined
   }
 
+  if (featuresPath !== undefined && featuresPath.length > 0) {
+    specFeatures = setFeatures(JSON.parse(fs.readFileSync(featuresPath)))
+  }
+
   isVerbose && console.log('Opening coverage log:')
   res.testResults = gatherCoverage()
   isVerbose && console.log(pc.green(`- Got ${res.testResults.resultsByAc.size} results`))
@@ -140,7 +156,7 @@ function checkCoverage (paths, ignoreGlob, isVerbose = false) {
   isVerbose && console.log(pc.green(`- Got ${res.allCodes.length} codes`))
 
   res.allCodes.forEach(e => {
-    const source = e.Definition.match(/(protocol|non-protocol-specs)\/([\w\-.]*)/); 
+    const source = e.Definition.match(/(protocol|non-protocol-specs)\/([\w\-.]*)/);
     let p
     if (source) {
       p = `<a target="_blank" href="https://github.com/vegaprotocol/specs/blob/master/${source[1]}/${source[2]}#${e.Code}">${source[2]}</a>`
@@ -148,6 +164,10 @@ function checkCoverage (paths, ignoreGlob, isVerbose = false) {
       p = e.Definition
     }
 
+    e.Feature = getFeatureForAc(e.Code)
+    Features.add(e.Feature)
+    e.Milestone = getMilestoneForAc(e.Code)
+    Milestones.add(e.Milestone)
 
     const r = res.testResults.resultsByAc.get(e.Code);
     e.Passing = r || 'unknown';
@@ -161,7 +181,7 @@ function checkCoverage (paths, ignoreGlob, isVerbose = false) {
   generateImageFiles(res.allCodes, res.testResults.resultsByAc)
 
   isVerbose && console.log(pc.yellow('Generating HTML...'))
-  generateHTML(res.allCodes, res.testResults.resultsByAc)
+  generateHTML(res.allCodes, res.testResults.resultsByAc, Features, Milestones)
 
   console.log(pc.green(pc.bold('\r\nDone')))
 

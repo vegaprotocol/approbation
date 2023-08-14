@@ -5,12 +5,13 @@
             <th>Covered</th>
             <th>Status</th>
             <th>Category</th>
+            <th>Milestone</th>
             <th>Criteria</th>
         </tr>
     </thead>
     <tbody>
         {{#allCodes}}
-        <tr id="{{Code}}" class="result {{className}}">
+        <tr id="{{Code}}" class="result {{className}}" data-milestone="{{Milestone}}" data-feature="{{Feature}}">
             <td class="code" data-code="{{Code}}">
                 <sup><a href="#{{Code}}">#</a></sup>
                 <sup><a target="_blank" href="https://github.com/search?q=org%3Avegaprotocol%20{{Code}}&type=code">🕵️</a></sup>
@@ -23,6 +24,10 @@
                 <img src="./status/{{status/}}{{Code}}.svg" title="{{PassingLabel}}" width="25" height="25" loading="lazy" />
             </td>
             <td>
+            {{Feature}}
+            </td>
+            <td>
+            {{Milestone}}
             </td>
             <td class="source">
                 {{{Definition}}}
