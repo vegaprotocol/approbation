@@ -5,7 +5,7 @@
   "engine": ">= 18",
   "bin": "./bin/approbation.js",
   "scripts": {
-    "pages-coverage": "node ./bin/approbation.js check-coverage --specs * --verbose",
+    "pages-coverage": "node ./bin/approbation.js check-coverage --specs * --verbose --features=./test/test-data/features.json",
     "test:ci": "tape 'test/**/*.test.js'",
     "test": "tape 'test/**/*.test.js' | tap-arc"
   },
