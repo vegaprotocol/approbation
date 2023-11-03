@@ -412,7 +412,7 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
           categories.forEach(c => {
             categoriesCsvOutput += `\r\n${Object.values(c).join(',')} `
           })
-          fs.writeFileSync(`${outputPath} /approbation-categories.csv`, categoriesCsvOutput)
+          fs.writeFileSync(`${outputPath}/approbation-categories.csv`, categoriesCsvOutput)
 
           if (shouldShowFileStats) {
             let csvOutputFiles = Object.keys(specsTableRows[0]).join(',')
