@@ -348,6 +348,8 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
 
       })
 
+      const t = new Table()
+
       milestones.forEach((featuresByMilestone, milestoneKey) => {
         if (milestoneKey === 'unknown') {
           return
@@ -365,12 +367,11 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
           Uncovered: featuresByMilestone.reduce((acc, cur) => acc + cur.Uncovered, 0) || '-',
           Coverage
         })
+
+        t.addRows(featuresByMilestone);
       })
 
-      const t = new Table()
-      t.addRows(milestones.get('deployment-1'));
-      t.addRows(milestones.get('deployment-2'));
-      t.addRows(milestones.get('deployment-3'));
+
       t.addRows([{ Feature: '---', Milestone: '---', acs: '---', Covered: '---', 'by/FeatTest': '---', 'by/SysTest': '---', Uncovered: '---', Coverage: '---' }]);
       t.addRows(totals);
       const tableOutput = t.render()
