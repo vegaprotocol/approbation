@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/vegaprotocol/approbation#readme",
   "devDependencies": {
-    "tap-arc": "1.0.1",
+    "tap-arc": "1.2.2",
     "tape": "5.6.6"
   },
   "dependencies": {
