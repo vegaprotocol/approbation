@@ -425,10 +425,15 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
         }
 
         if (shouldOutputJenkins) {
-          const currentMilestone = totals.pop()
+          const currentMilestone = totals && totals.length > 0 ? totals.pop() : false
+          
           const skipCategories = ['Category', 'Specs', 'Acceptable']
           let jenkinsLine = `All ACs: ${Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()}`
-          jenkinsLine += `\r\nCurrent milestone ACs: *${currentMilestone.Milestone}*: ${currentMilestone.Coverage}`
+
+          if (currentMilestone) {
+            jenkinsLine += `\r\nCurrent milestone ACs: *${currentMilestone.Milestone}*: ${currentMilestone.Coverage}`
+          }
+          
           fs.writeFileSync(`${outputPath}/jenkins.txt`, jenkinsLine)
         }
 
