@@ -218,6 +218,8 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
   const specList = ignoreFiles(glob.sync(specsGlob, {}), ignoreList)
   const testList = ignoreFiles(glob.sync(testsGlob, {}), ignoreList, 'test')
   let categories
+  const milestones = new Map()
+  const totals = []
 
   let specs, tests, features, specFeatures
   const exitCode = 0
@@ -292,9 +294,7 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
     }
 
     if (featuresPath) {
-      const totals = []
       const milestoneNames = new Set()
-      const milestones = new Map()
 
       Object.keys(specFeatures).forEach(key => milestoneNames.add(specFeatures[key].milestone))
       milestoneNames.forEach(m => milestones.set(m, []))
@@ -425,9 +425,10 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
         }
 
         if (shouldOutputJenkins) {
+          const currentMilestone = totals.pop()
           const skipCategories = ['Category', 'Specs', 'Acceptable']
-          let jenkinsLine = `All ACs: \r\n ${Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()} \r\n`
-          jenkinsLine += `Current milestone ACs: \r\n ${Object.entries(milestones.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()}`
+          let jenkinsLine = `All ACs: ${Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()}`
+          jenkinsLine += `\r\nCurrent milestone ACs: *${currentMilestone.Milestone}*: ${currentMilestone.Coverage}`
           fs.writeFileSync(`${outputPath}/jenkins.txt`, jenkinsLine)
         }
 
