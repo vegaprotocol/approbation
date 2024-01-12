@@ -426,7 +426,8 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
 
         if (shouldOutputJenkins) {
           const skipCategories = ['Category', 'Specs', 'Acceptable']
-          const jenkinsLine = Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()
+          let jenkinsLine = `All ACs: \r\n ${Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()} \r\n`
+          jenkinsLine += `Current milestone ACs: \r\n ${Object.entries(milestones.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()}`
           fs.writeFileSync(`${outputPath}/jenkins.txt`, jenkinsLine)
         }
 
