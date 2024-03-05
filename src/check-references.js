@@ -430,7 +430,7 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
           const skipCategories = ['Category', 'Specs', 'Acceptable']
           let jenkinsLine = `All ACs: ${Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()}`
 
-          if (currentMilestone) {
+          if (currentMilestone && currentMilestone.Milestone && currentMilestone.Coverage) {
             jenkinsLine += `\r\nCurrent milestone ACs: *${currentMilestone.Milestone}*: ${currentMilestone.Coverage}`
           }
           
