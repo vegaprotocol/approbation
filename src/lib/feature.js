@@ -60,7 +60,12 @@ function setFeatures(fileFeatures) {
     const isValid = isValidFeature(featureName, feature)
 
     feature.acs.forEach((ac) => {
-      acToFeatureLookup.set(ac, featureName);
+      const existingMap = acToFeatureLookup.get(ac);
+      if (!existingMap) {
+        acToFeatureLookup.set(ac, [featureName]);
+      } else {
+        acToFeatureLookup.set(ac, [...existingMap, featureName]);
+      }
     })
   })
 
@@ -69,35 +74,40 @@ function setFeatures(fileFeatures) {
 
 function getFeatureForAc(ac) {
   const f = acToFeatureLookup.get(ac);
+
   return f
 }
 
 function setOrIncreaseProperty(feature, property, value) {
   let f = (feature.match(validAcceptanceCriteriaCode) ? getFeatureForAc(feature) : feature);
 
-  if (isFeatureEmpty() || !specFeatures[f]) {
-    f = 'Unknown';
+  if (isFeatureEmpty() || !f) {
+    f = ['Unknown'];
   }
 
-  if (specFeatures[f][property]) {
-    specFeatures[f][property] += value;
-  } else {
-    specFeatures[f][property] = value;
-  }
+  f.forEach((feature) => {
+    if (specFeatures[feature][property]) {
+      specFeatures[feature][property] += value;
+    } else {
+      specFeatures[feature][property] = value;
+    }
+  })
 }
 
 function logUncoveredForFeature(feature) {
   let f = (feature.match(validAcceptanceCriteriaCode) ? getFeatureForAc(feature) : feature);
 
-  if (isFeatureEmpty() || !specFeatures[f]) {
-    f = 'Unknown';
+  if (isFeatureEmpty() || !f) {
+  f = ['Unknown'];
   }
 
-  if (specFeatures[f]['uncoveredAcs']) {
-    specFeatures[f]['uncoveredAcs'].add(feature);
-  } else {
-    specFeatures[f]['uncoveredAcs'] = new Set([feature]);
-  }
+  f.forEach((feat) => {
+    if (specFeatures[feat]['uncoveredAcs']) {
+        specFeatures[feat]['uncoveredAcs'].add(feature);
+      } else {
+        specFeatures[feat]['uncoveredAcs'] = new Set([feature]);
+      }
+    });
 }
 
 function increaseCodesForFeature(feature, count) {
