@@ -211,7 +211,26 @@ function processReferences(specs, tests) {
   }
 }
 
-function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featuresPath, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, outputPath = './results') {
+/**
+ * This function signature is madness, but refactoring it has yet to be worth the time
+ * 
+ * @param {*} specsGlob 
+ * @param {*} testsGlob 
+ * @param {*} categoriesPath 
+ * @param {*} ignoreGlob 
+ * @param {*} featuresPath 
+ * @param {*} showMystery 
+ * @param {*} isVerbose 
+ * @param {*} showCategoryStats 
+ * @param {*} shouldShowFiles 
+ * @param {*} shouldOutputCSV 
+ * @param {*} shouldOutputJenkins 
+ * @param {*} shouldShowFileStats 
+ * @param {*} currentMilestone
+ * @param {*} outputPath 
+ * @returns 
+ */
+function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featuresPath, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, currentMilestone = 'colosseo_II', outputPath = './results') {
   verbose = isVerbose
   showFiles = shouldShowFiles
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
@@ -425,13 +444,21 @@ function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featu
         }
 
         if (shouldOutputJenkins) {
-          const currentMilestone = totals && totals.length > 0 ? totals.pop() : false
+          let cm
+          // If current milestone is set by parameter, use it
+          if (currentMilestone) {
+             cm = totals.find(t => t.Milestone === currentMilestone)
+          }
+          // If not, use the most recent
+          if (!cm) {
+            cm = totals && totals.length > 0 ? totals.pop() : false
+          }
           
           const skipCategories = ['Category', 'Specs', 'Acceptable']
           let jenkinsLine = `All ACs: ${Object.entries(categories.pop()).map(([key, value]) => skipCategories.indexOf(key) === -1 ? `*${key}*: ${value}` : '').join('  ').trim()}`
 
-          if (currentMilestone && currentMilestone.Milestone && currentMilestone.Coverage) {
-            jenkinsLine += `\r\nCurrent milestone ACs: *${currentMilestone.Milestone}*: ${currentMilestone.Coverage}`
+          if (cm && cm.Milestone && cm.Coverage) {
+            jenkinsLine += `\r\nCurrent milestone ACs: *${cm.Milestone}*: ${cm.Coverage}`
           }
           
           fs.writeFileSync(`${outputPath}/jenkins.txt`, jenkinsLine)

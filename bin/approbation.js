@@ -123,6 +123,7 @@ if (command === 'check-filenames') {
   const categories = argv.categories
   const features = argv.features
   const ignoreGlob = argv.ignore
+  const currentMilestone = argv['current-milestone']
   const showMystery = argv['show-mystery'] === true
   const showCategoryStats = argv['category-stats'] === true
   const isVerbose = argv.verbose === true
@@ -162,7 +163,7 @@ if (command === 'check-filenames') {
   }
 
   // TODO: Turn in to an object
-  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, features, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats, outputPath)
+  res = checkReferences(specsGlob, testsGlob, categories, ignoreGlob, features, showMystery, isVerbose, showCategoryStats, showFiles, shouldOutputCSV, shouldOutputJenkins, shouldShowFileStats, currentMilestone, outputPath)
 
   process.exit(res.exitCode)
 } else {
