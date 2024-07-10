@@ -16,6 +16,10 @@ const { Table } = require('console-table-printer')
 const { specPriorities } = require('./lib/priority')
 const sortBy = require('lodash.sortby')
 
+// can be overriden by passing in --current-milestone, this is set for an easy transition while Jenkins doesn't
+// have that param - see vegaprotocol/jenkins-shared-library/issues/751 
+const DEFAULT_CURRENT_MILESTONE = 'colosseo_II'
+
 // Ugly globals
 let verbose = false
 let showFiles = false
@@ -230,7 +234,7 @@ function processReferences(specs, tests) {
  * @param {*} outputPath 
  * @returns 
  */
-function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featuresPath, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, currentMilestone = 'colosseo_II', outputPath = './results') {
+function checkReferences(specsGlob, testsGlob, categoriesPath, ignoreGlob, featuresPath, showMystery = false, isVerbose = false, showCategoryStats = false, shouldShowFiles = false, shouldOutputCSV = false, shouldOutputJenkins = false, shouldShowFileStats = false, currentMilestone = DEFAULT_CURRENT_MILESTONE, outputPath = './results') {
   verbose = isVerbose
   showFiles = shouldShowFiles
   const ignoreList = ignoreGlob ? glob.sync(ignoreGlob, {}) : []
