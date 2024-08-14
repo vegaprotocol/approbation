@@ -2,7 +2,6 @@
 
 const packageJson = require('../package.json')
 const { checkFilenames } = require('../src/check-filenames')
-const { nextFilename } = require('../src/next-filename')
 const { nextCode } = require('../src/next-code')
 const { checkCodes } = require('../src/check-codes')
 const { checkFeatures } = require('../src/check-features')
