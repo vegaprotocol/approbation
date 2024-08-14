@@ -298,7 +298,8 @@ function checkReferences(specsGlob, testsGlob, ignoreGlob, featuresPath, current
         }
         const Covered = featuresByMilestone.reduce((acc, cur) => acc + cur.Covered, 0);
         const acs = featuresByMilestone.reduce((acc, cur) => acc + cur.acs, 0);
-        const Coverage = `${(Covered / acs * 100).toFixed(1)}% `
+        const coverageCalculated = (Covered / acs * 100).toFixed(1) 
+        const Coverage = `${isNaN(coverageCalculated) ? '0' : coverageCalculated}% `
         totals.push({
           Feature: `Total`,
           Milestone: milestoneKey || '-',
