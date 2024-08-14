@@ -5,9 +5,7 @@
  */
 const fs = require('fs')
 const glob = require('fast-glob')
-const path = require('path')
-const { validSpecificationPrefix, ignoreFiles } = require('./lib')
-const { minimumAcceptableACsPerSpec } = require('./config')
+const { ignoreFiles } = require('./lib')
 const pc = require('picocolors')
 const { gatherSpecs, findDuplicateAcs } = require('./check-references')
 const { setFeatures } = require('./lib/feature')

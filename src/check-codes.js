@@ -27,7 +27,6 @@ const fs = require('fs')
 const glob = require('fast-glob')
 const path = require('path')
 const { validSpecificationPrefix, ignoreFiles } = require('./lib')
-const { minimumAcceptableACsPerSpec } = require('./config')
 const pc = require('picocolors')
 
 /**
@@ -145,7 +144,7 @@ function checkPath (files, output = true) {
 
 
       // The files are *valid*, at least. But do they have enough ACs?
-      if (totalAcceptanceCriteria.length >= minimumAcceptableACsPerSpec) {
+      if (totalAcceptanceCriteria.length >= 1) {
         countAcceptableFiles++
         if (output && verbose) {
           console.group(pc.bold(file))
@@ -181,7 +180,7 @@ function checkCodes (paths, ignoreGlob, isVerbose = false) {
   if (fileList.length > 0) {
     res = checkPath(fileList)
     console.log('\r\n--------------------------------------------------')
-    console.log(`Acceptable         ${res.countAcceptableFiles} (files with more than ${minimumAcceptableACsPerSpec} ACs)`)
+    console.log(`Acceptable         ${res.countAcceptableFiles} (files with more than 1 ACs)`)
     console.log(`Need work          ${res.countEmptyFiles}`)
     console.log(`Files with errors  ${res.countErrorFiles}`)
     console.log(`Total ACs          ${res.countAcceptanceCriteria}`)
