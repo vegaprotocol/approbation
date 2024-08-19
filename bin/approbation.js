@@ -60,7 +60,7 @@ if (command === 'check-filenames') {
     process.exit(1);
   }
 
-  res = checkFeatures(specs, argv.features, ignoreGlob, isVerbose)
+  res = checkFeatures(paths, argv.features, ignoreGlob, isVerbose)
   process.exit(res.exitCode)
 } else if (command === 'check-references') {
   const testsGlob = argv.tests

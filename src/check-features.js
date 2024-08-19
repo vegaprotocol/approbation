@@ -73,6 +73,10 @@ function checkFeatures(paths, featuresPath, ignoreGlob, isVerbose = false) {
     exitCode = 1
   }
 
+  if (exitCode === 0) {
+    console.log(pc.green(pc.bold('All features are good')))
+  }
+
   return {
     exitCode,
     res
