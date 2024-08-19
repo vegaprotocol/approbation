@@ -6,7 +6,6 @@
  */
 
 const { validAcceptanceCriteriaCode } = require(".");
-const pc = require('picocolors')
 
 let specFeatures;
 let acToFeatureLookup = new Map()

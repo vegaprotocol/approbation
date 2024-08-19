@@ -3,9 +3,37 @@
 const pc = require('picocolors')
 const { ignoreFiles, acceptanceCodeElements, validSpecificationPrefix } = require('./lib')
 const { checkPath } = require('./check-codes')
-const { findLowestNumber, padNumber, getRandomCode } = require('./next-filename')
 const path = require('path')
 const glob = require('fast-glob')
+
+function padNumber(number, length = 4) {
+  // Convert the number to a string
+  let str = number.toString();
+  
+  // Pad the string with zeros if necessary
+  while (str.length < length) {
+    str = "0" + str;
+  }
+  
+  return str;
+}
+
+function findLowestNumber(numbers) {
+  // Convert the numbers to integers and sort them in ascending order
+  numbers = numbers.map(Number).sort((a, b) => a - b);
+  
+  // Find the lowest number that is not present in the array
+  let lowestNumber = 1;
+  for (let i = 0; i < numbers.length; i++) {
+    if (numbers[i] === lowestNumber) {
+      lowestNumber++;
+    } else if (numbers[i] > lowestNumber) {
+      break;
+    }
+  }
+  
+  return lowestNumber;
+}
 
 /**
  * Given a list of all of the codes in a file, it gives you the file's sequence (e.g. 001) 
