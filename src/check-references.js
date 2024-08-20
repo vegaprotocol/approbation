@@ -321,28 +321,38 @@ function checkReferences(specsGlob, testsGlob, ignoreGlob, featuresPath, current
       console.log(tableOutput)
     }
 
-        if (!fs.existsSync(outputPath)) {
-          fs.mkdirSync(outputPath, { recursive: true })
-        }
+    if (!fs.existsSync(outputPath)) {
+      fs.mkdirSync(outputPath, { recursive: true })
+    }
 
-          let cm
-          // If current milestone is set by parameter, use it
-          if (currentMilestone) {
-             cm = totals.find(t => t.Milestone === currentMilestone)
-          }
-          // If not, use the most recent
-          if (!cm) {
-            cm = totals && totals.length > 0 ? totals.pop() : false
-          }
-          
-          let jenkinsLine = `Total ACs: ${criteriaTotal}, Referenced ACs: ${criteriaReferencedTotal}, Unreferenced ACs: ${criteriaUnreferencedTotal}, Coverage: ${criteriaReferencedPercent}%`
-          if (cm && cm.Milestone && cm.Coverage) {
-            jenkinsLine += `\r\nCurrent milestone ACs: *${cm.Milestone}*: ${cm.Coverage}`
-          }
-          
-          fs.writeFileSync(`${outputPath}/jenkins.txt`, jenkinsLine)
+    /*
+     * Output files
+     */
+    let cm
+    // If current milestone is set by parameter, use it
+    if (currentMilestone) {
+       cm = totals.find(t => t.Milestone === currentMilestone)
+    }
+    // If not, use the most recent
+    if (!cm) {
+      cm = totals && totals.length > 0 ? totals.pop() : false
+    }
+    
+    let jenkinsLine = `Total ACs: ${criteriaTotal}, Referenced ACs: ${criteriaReferencedTotal}, Unreferenced ACs: ${criteriaUnreferencedTotal}, Coverage: ${criteriaReferencedPercent}%`
+    if (cm && cm.Milestone && cm.Coverage) {
+      jenkinsLine += `\r\nCurrent milestone ACs: *${cm.Milestone}*: ${cm.Coverage}`
+    }
+    
+    fs.writeFileSync(`${outputPath}/jenkins.txt`, jenkinsLine)
 
-        console.groupEnd()
+
+    let csvOutputFiles = Object.keys(specsTableRows[0]).join(',')
+    specsTableRows.forEach(c => {
+      csvOutputFiles += `\r\n${Object.values(c).join(',')}`
+    })
+    fs.writeFileSync(`${outputPath}/approbation-files.csv`, csvOutputFiles)
+
+    console.groupEnd()
 
     return {
       exitCode,
